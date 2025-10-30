@@ -1,26 +1,253 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #5FB75D;
+  --color-primary-50: #E8F5E7;
+  --color-primary-100: #D0EBCE;
+  --color-primary-500: #4A9244;
+  /* Breakpoints (ajústalos a los de Figma si difieren) */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+
+  /* Tipografía base (handoff: Quicksand) */
+  --font-sans: "Quicksand", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Escala desde tokens (typography.json) */
+  --text-body: 1rem;        /* 16px */
+  --leading-body: 1.5;      /* 24px */
+  --text-h2: 1.5rem;        /* 24px */
+  --leading-h2: 2rem;       /* 32px */
+  --text-h1: 2rem;          /* 32px */
+  --leading-h1: 2.5rem;     /* 40px */
+  /* Escala utilitaria adicional */
+  --text-xs: 0.75rem;       /* 12px */
+  --text-sm: 0.875rem;      /* 14px */
+  --text-base: 1rem;        /* 16px */
+  --text-lg: 1.125rem;      /* 18px */
+  --text-xl: 1.25rem;       /* 20px */
+  --text-2xl: 1.5rem;       /* 24px */
+  --text-3xl: 1.875rem;     /* 30px */
+  --text-4xl: 2rem;         /* 32px */
+  --leading-tight: 1.2;
+  --leading-relaxed: 1.6;
+
+  /* Espaciado (escala base 4px - spacing.json) */
+  --spacing-0: 0.125rem;  /* 2px */
+  --spacing-1: 0.25rem;   /* 4px */
+  --spacing-2: 0.5rem;    /* 8px */
+  --spacing-3: 0.75rem;   /* 12px */
+  --spacing-4: 1rem;      /* 16px */
+  --spacing-5: 1.25rem;   /* 20px */
+  --spacing-6: 1.5rem;    /* 24px */
+  --spacing-7: 2rem;      /* 32px */
+  --spacing-8: 2.5rem;    /* 40px */
+  --spacing-9: 3rem;      /* 48px */
+  --spacing-10: 3.5rem;   /* 56px */
+
+  /* Radio (radius.json) */
+  --radius-sm: 10px;      /* XS */
+  --radius-md: 15px;      /* M */
+  --radius-lg: 23px;      /* XL */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+/* Reset base no destructivo: solo box-sizing global y margen del body */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; }
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Light theme - según diseño Figma */
+  --background: #D9D9D9;
+  --foreground: #1a1a1a;
+  --primary: #5FB75D;
+  --card-bg: #ffffff;
+  --border-color: #E0E0E0;
+  --text-secondary: #757575;
+  --text-muted: #9E9E9E;
+  /* Safe area fallbacks */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  /* Paleta adicional desde colors.json (alias, sin romper lo existente) */
+  --color-zinc-gainsboro-100: #d9d9d9;
+  --color-zinc-gainsboro-200: #5a5b5a;
+  --color-alpine-salamander-100: #131917;
+  --color-white-100: #ffffff;
+  --color-white-200: #fffefe;
+  --color-thai-temple-100: #e5c438;
+  --color-soft-blue-100: #6484e2;
+  --color-dynamite-red-100: #dc3714;
+  --color-eerie-bauhaus-100: #404040;
+  --color-eerie-bauhaus-200: #1e1e1e;
+  --color-yellow-green-100: #cefb48;
+  
+  /* Accent colors from Figma design */
+  --accent-yellow: #FFC107;
+  --accent-green: #4CAF50;
+  --accent-blue: #2196F3;
+  --accent-red: #F44336;
+  --accent-orange: #FF9800;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography improvements */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: var(--leading-tight);
+}
+
+p {
+  line-height: var(--leading-relaxed);
+}
+
+/* Better spacing */
+section, article {
+  margin-bottom: 1.5rem;
+}
+
+/* Enhanced focus states */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Better hover states */
+button, a, [role="button"] {
+  cursor: pointer;
+  user-select: none;
+}
+
+html[data-scroll-behavior="smooth"] {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a9244;
+}
+
+/* Dark mode support */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+input, textarea, select {
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* Container y secciones para maquetación Figma */
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container { max-width: 640px; }
+}
+@media (min-width: 768px) {
+  .container { max-width: 768px; }
+}
+@media (min-width: 1024px) {
+  .container { max-width: 1024px; }
+}
+@media (min-width: 1280px) {
+  .container { max-width: 1184px; } /* típico layout con 48px de padding total */
+}
+@media (min-width: 1440px) {
+  .container { max-width: 1328px; } /* ajusta a ancho de lienzo Figma si es 1440 */
+}
+
+.section {
+  padding-top: var(--spacing-12);
+  padding-bottom: var(--spacing-12);
+}
+
+/* Helpers comunes de “pixel-perfect” */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.elevated { box-shadow: var(--shadow-md); }
+.elevated-lg { box-shadow: var(--shadow-lg); }
+
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+
+/* Escalas de títulos (ajusta tamaños a los de Figma si difieren) */
+.h1 { font-size: var(--text-h1); line-height: var(--leading-h1); font-weight: 700; }
+.h2 { font-size: var(--text-h2); line-height: var(--leading-h2); font-weight: 600; }
+.h3 { font-size: var(--text-3xl); line-height: var(--leading-tight); font-weight: 700; }
+.h4 { font-size: var(--text-2xl); line-height: var(--leading-tight); font-weight: 700; }
+.h5 { font-size: var(--text-xl); line-height: var(--leading-tight); font-weight: 600; }
+.h6 { font-size: var(--text-lg); line-height: var(--leading-tight); font-weight: 600; }
+
+/* Body text util */
+.body { font-size: var(--text-body); line-height: var(--leading-body); }
+
+/* Utilidades Tailwind personalizadas para espaciados exactos usados en el diseño */
+@layer utilities {
+  .px-25 { padding-left: 25px; padding-right: 25px; }
+  .py-40 { padding-top: 40px; padding-bottom: 40px; }
+  .space-y-30 > :not([hidden]) ~ :not([hidden]) { margin-top: 30px; }
+  .px-20 { padding-left: 20px; padding-right: 20px; }
+  .py-15 { padding-top: 15px; padding-bottom: 15px; }
+  .mb-15 { margin-bottom: 15px; }
 }

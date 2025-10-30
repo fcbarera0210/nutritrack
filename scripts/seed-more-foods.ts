@@ -1,0 +1,80 @@
+import { db } from '../lib/db';
+import { foods } from '../lib/db/schema';
+
+const additionalFoods = [
+  { name: 'Aceite de oliva', brand: null, calories: 884, protein: 0, carbs: 0, fat: 100, fiber: 0 },
+  { name: 'Palta', brand: null, calories: 160, protein: 2, carbs: 8, fat: 15, fiber: 6 },
+  { name: 'Mani', brand: null, calories: 567, protein: 25.8, carbs: 16.1, fat: 49.2, fiber: 8.5 },
+  { name: 'Salmon', brand: null, calories: 208, protein: 20.4, carbs: 0, fat: 13.4, fiber: 0 },
+  { name: 'Atun en lata', brand: null, calories: 184, protein: 30, carbs: 0, fat: 8, fiber: 0 },
+  { name: 'Huevo', brand: null, calories: 155, protein: 13, carbs: 1.1, fat: 11, fiber: 0 },
+  { name: 'Pollo a la plancha', brand: null, calories: 239, protein: 27, carbs: 0, fat: 14, fiber: 0 },
+  { name: 'Carne molida', brand: null, calories: 259, protein: 17.2, carbs: 0, fat: 20, fiber: 0 },
+  { name: 'Tofu', brand: null, calories: 76, protein: 8, carbs: 1.9, fat: 4.8, fiber: 0.3 },
+  { name: 'Garbanzos cocidos', brand: null, calories: 164, protein: 8.9, carbs: 27.4, fat: 2.6, fiber: 7.6 },
+  { name: 'Lentejas cocidas', brand: null, calories: 116, protein: 9, carbs: 20, fat: 0.4, fiber: 7.9 },
+  { name: 'Frijoles negros', brand: null, calories: 132, protein: 8.9, carbs: 23.7, fat: 0.5, fiber: 8.7 },
+  { name: 'Pechuga de pollo', brand: null, calories: 165, protein: 31, carbs: 0, fat: 3.6, fiber: 0 },
+  { name: 'Merluza', brand: null, calories: 77, protein: 17.8, carbs: 0, fat: 0.7, fiber: 0 },
+  { name: 'Queso crema', brand: null, calories: 340, protein: 6.2, carbs: 3.9, fat: 34.4, fiber: 0 },
+  { name: 'Queso cheddar', brand: null, calories: 402, protein: 25, carbs: 1.3, fat: 33, fiber: 0 },
+  { name: 'Yogurt natural', brand: null, calories: 59, protein: 10, carbs: 3.6, fat: 0.4, fiber: 0 },
+  { name: 'Leche entera', brand: null, calories: 61, protein: 3.2, carbs: 4.8, fat: 3.2, fiber: 0 },
+  { name: 'Leche descremada', brand: null, calories: 34, protein: 3.4, carbs: 5, fat: 0.1, fiber: 0 },
+  { name: 'Miel', brand: null, calories: 304, protein: 0.3, carbs: 82.4, fat: 0, fiber: 0.2 },
+  { name: 'Azucar blanca', brand: null, calories: 387, protein: 0, carbs: 100, fat: 0, fiber: 0 },
+  { name: 'Mantequilla', brand: null, calories: 717, protein: 0.9, carbs: 0.1, fat: 81, fiber: 0 },
+  { name: 'Mermelada de fresa', brand: null, calories: 265, protein: 0.3, carbs: 68.5, fat: 0.1, fiber: 0.6 },
+  { name: 'Chocolate negro 70%', brand: null, calories: 598, protein: 7.8, carbs: 45.9, fat: 42.6, fiber: 11 },
+  { name: 'Avena', brand: null, calories: 389, protein: 17, carbs: 66, fat: 7, fiber: 11 },
+  { name: 'Quinoa cocida', brand: null, calories: 120, protein: 4.4, carbs: 21.3, fat: 1.9, fiber: 2.8 },
+  { name: 'Arroz integral cocido', brand: null, calories: 111, protein: 2.6, carbs: 23, fat: 0.9, fiber: 1.8 },
+  { name: 'Pasta integral cocida', brand: null, calories: 124, protein: 5, carbs: 25, fat: 1.1, fiber: 3.2 },
+  { name: 'Pan integral', brand: null, calories: 247, protein: 13, carbs: 41, fat: 4.2, fiber: 7 },
+  { name: 'Pan blanco', brand: null, calories: 265, protein: 9, carbs: 49, fat: 3.2, fiber: 2.7 },
+  { name: 'Zapallo italiano', brand: null, calories: 16, protein: 1.2, carbs: 3, fat: 0.2, fiber: 1.1 },
+  { name: 'Tomate', brand: null, calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2, fiber: 1.2 },
+  { name: 'Lechuga', brand: null, calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2, fiber: 1.3 },
+  { name: 'Brócoli', brand: null, calories: 34, protein: 2.8, carbs: 7, fat: 0.4, fiber: 2.6 },
+  { name: 'Espinacas', brand: null, calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4, fiber: 2.2 },
+  { name: 'Zanahoria', brand: null, calories: 41, protein: 0.9, carbs: 10, fat: 0.2, fiber: 2.8 },
+  { name: 'Cebolla', brand: null, calories: 40, protein: 1.1, carbs: 9.3, fat: 0.1, fiber: 1.7 },
+  { name: 'Pimiento rojo', brand: null, calories: 31, protein: 1, carbs: 7, fat: 0.3, fiber: 2.1 },
+  { name: 'Aji rojo', brand: null, calories: 40, protein: 1.9, carbs: 9, fat: 0.4, fiber: 1.5 },
+  { name: 'Champiñones', brand: null, calories: 22, protein: 3.1, carbs: 3.3, fat: 0.3, fiber: 1 },
+  { name: 'Papas', brand: null, calories: 77, protein: 2, carbs: 17, fat: 0.1, fiber: 2.2 },
+  { name: 'Camote', brand: null, calories: 86, protein: 1.6, carbs: 20, fat: 0.1, fiber: 3 },
+  { name: 'Manzana', brand: null, calories: 52, protein: 0.3, carbs: 14, fat: 0.2, fiber: 2.4 },
+  { name: 'Plátano', brand: null, calories: 89, protein: 1.1, carbs: 23, fat: 0.3, fiber: 2.6 },
+  { name: 'Naranja', brand: null, calories: 47, protein: 0.9, carbs: 12, fat: 0.1, fiber: 2.4 },
+  { name: 'Uvas rojas', brand: null, calories: 69, protein: 0.7, carbs: 18, fat: 0.2, fiber: 0.9 },
+  { name: 'Fresas', brand: null, calories: 32, protein: 0.7, carbs: 7.7, fat: 0.3, fiber: 2 },
+  { name: 'Kiwi', brand: null, calories: 61, protein: 1.1, carbs: 15, fat: 0.5, fiber: 3 },
+  { name: 'Pera', brand: null, calories: 57, protein: 0.4, carbs: 15, fat: 0.1, fiber: 3.1 },
+  { name: 'Piña', brand: null, calories: 50, protein: 0.5, carbs: 13, fat: 0.1, fiber: 1.4 },
+  { name: 'Mango', brand: null, calories: 60, protein: 0.8, carbs: 15, fat: 0.4, fiber: 1.6 },
+  { name: 'Sandia', brand: null, calories: 30, protein: 0.6, carbs: 8, fat: 0.2, fiber: 0.4 },
+];
+
+async function main() {
+  try {
+    console.log('Inserting additional foods...');
+    
+    for (const food of additionalFoods) {
+      await db.insert(foods).values({
+        ...food,
+        servingSize: 100,
+        servingUnit: 'g',
+      } as any);
+    }
+    
+    console.log(`Successfully inserted ${additionalFoods.length} foods`);
+    process.exit(0);
+  } catch (error) {
+    console.error('Error seeding foods:', error);
+    process.exit(1);
+  }
+}
+
+main();
+
