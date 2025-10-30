@@ -2,25 +2,27 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  const session = request.cookies.get('session');
-  const pathname = request.nextUrl.pathname;
+  try {
+    const session = request.cookies.get('session');
+    const pathname = request.nextUrl.pathname;
 
-  // Public paths that don't require authentication
-  const isPublicPath = pathname === '/login' || pathname === '/register';
-  const isApiPath = pathname.startsWith('/api');
-  
-  // Allow API routes and public paths
-  if (isPublicPath || isApiPath) {
+    const isPublicPath = pathname === '/login' || pathname === '/register';
+    const isApiPath = pathname.startsWith('/api');
+
+    if (isPublicPath || isApiPath) {
+      return NextResponse.next();
+    }
+
+    if (!session) {
+      const url = new URL('/login', request.url);
+      return NextResponse.redirect(url);
+    }
+
+    return NextResponse.next();
+  } catch {
+    // En caso de cualquier error en Edge, no bloquear la navegación
     return NextResponse.next();
   }
-
-  // Redirect to login if no session
-  if (!session) {
-    const url = new URL('/login', request.url);
-    return NextResponse.redirect(url);
-  }
-
-  return NextResponse.next();
 }
 
 export const config = {
