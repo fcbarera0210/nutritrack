@@ -101,6 +101,19 @@ npm run build
 npm start
 ```
 
+### 🚀 Deploy en Vercel
+1. Crea un proyecto en Vercel y conecta el repo `fcbarera0210/nutritrack`.
+2. Variables de entorno (Production/Preview/Development):
+   - `DATABASE_URL` (Neon/Postgres)
+   - `JWT_SECRET`
+   - Otros envs que uses localmente.
+3. Config por defecto de Next.js (ya incluida):
+   - Build Command: `npm run build`
+   - Install Command: `npm install`
+   - Node: `>=18` (definido en `package.json` → `engines`)
+4. Imágenes remotas permitidas (`next.config.ts`): Unsplash/picsum/loremflickr ya configurados.
+5. (Opcional) `vercel.json` incluido para dejar explícitos comandos de build.
+
 Base de datos y seeds (si aplica)
 ```bash
 npm run db:generate
