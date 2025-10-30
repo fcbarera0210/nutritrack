@@ -3,6 +3,11 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   try {
+    // En producción (Vercel) no ejecutamos lógica de autenticación
+    // para evitar errores en Edge hasta migrar a `proxy`.
+    if (process.env.VERCEL === '1') {
+      return NextResponse.next();
+    }
     const session = request.cookies.get('session');
     const pathname = request.nextUrl.pathname;
 
