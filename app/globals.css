@@ -188,7 +188,8 @@ input:focus, textarea:focus, select:focus {
 
 /* Excluir inputs en páginas de auth del box-shadow global */
 [class*="auth"] input:focus,
-input[class*="border-transparent"]:focus {
+input[class*="border-transparent"]:focus,
+select[class*="border-transparent"]:focus {
   box-shadow: none;
 }
 
@@ -256,4 +257,11 @@ input[class*="border-transparent"]:focus {
   .px-20 { padding-left: 20px; padding-right: 20px; }
   .py-15 { padding-top: 15px; padding-bottom: 15px; }
   .mb-15 { margin-bottom: 15px; }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

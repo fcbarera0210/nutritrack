@@ -13,14 +13,14 @@ NutriTrack es una aplicación web (Next.js) para registrar comidas y ejercicios,
 ### ✅ Funcionalidades implementadas (MVP completo)
 - **Autenticación**: registro, login, logout, sesiones JWT, guards server-side en layouts. Login y Register rediseñados con nuevo header oscuro, logo y formularios estilo moderno.
 - **Dashboard diario** (rediseñado 2025-10): header en caja oscura con calendario semanal, racha y gráficos circulares; sección kcal; cards de ejercicio/agua; cards de comidas con imágenes y botón rápido; navbar inferior actualizado.
-- **Gestión de alimentos**: búsqueda inteligente (sin tildes/mayúsculas), 50+ alimentos chilenos, filtros por categorías, formulario con cantidad y cálculo automático de macros.
+- **Gestión de alimentos**: búsqueda inteligente (sin tildes/mayúsculas), 50+ alimentos chilenos, filtros por categorías con íconos de Phosphor, formulario rediseñado con nuevo layout, carga incremental (15 por página), cards de alimentos con diseño oscuro y soporte visual para favoritos.
 - **Gestión de ejercicios**: 12+ ejercicios, cálculo de calorías por fórmula MET, visualización y eliminación.
 - **Perfil de usuario**: datos personales, TDEE (Mifflin‑St Jeor), objetivos y nivel de actividad, ajuste de macros objetivo, exportación CSV, dark mode toggle.
 - **Estadísticas**: gráfico de calorías últimos 7 días con datos reales, logros (gamificación) y animaciones.
 - **CRUD completo**: crear/editar/eliminar logs de alimentos y ejercicios con confirmaciones.
 - **Recordatorios y notificaciones**: API CRUD de recordatorios, permisos de notificaciones, notificaciones visuales.
 
-Notas de diseño: migración a `@phosphor-icons/react` v2, tokens de color y utilidades Tailwind personalizadas (espaciados exactos), navbar con fondo #131917 y botón central #CEFB48. Login/Register con header oscuro, logo de 3 puntos verticales, inputs con Phosphor Icons y borde focus #CEFB48.
+Notas de diseño: migración a `@phosphor-icons/react` v2, tokens de color y utilidades Tailwind personalizadas (espaciados exactos), navbar con fondo #131917 y botón central #CEFB48. Login/Register con header oscuro, logo de 3 puntos verticales, inputs con Phosphor Icons y borde focus #CEFB48. Página "Agregar Alimento" rediseñada con filtros por íconos, cards oscuras, scroll horizontal y formulario moderno.
 
 ---
 

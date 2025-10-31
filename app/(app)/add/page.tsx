@@ -1,11 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Search, PlusCircle, ArrowLeft } from 'lucide-react';
-import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { FloatingFood } from '@/components/ui/FloatingFood';
+import { useState, useEffect, useRef } from 'react';
+import { MagnifyingGlass, Plus, ArrowLeft, Info, Fish, Bread, Avocado, Star } from '@phosphor-icons/react';
 import { FoodLogForm } from '@/components/forms/FoodLogForm';
 import { ExerciseForm } from '@/components/forms/ExerciseForm';
 import { BottomNav } from '@/components/dashboard/BottomNav';
@@ -31,13 +27,57 @@ export default function AddPage() {
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
   const [showExerciseForm, setShowExerciseForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
+  const [showCategoryTooltip, setShowCategoryTooltip] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(15);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     // Cargar todos los alimentos al inicio
     handleSearch('');
   }, []);
 
-  const handleSearch = async (query: string) => {
+  useEffect(() => {
+    // Cerrar tooltip al hacer click fuera
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('[data-category-info]')) {
+        setShowCategoryTooltip(false);
+      }
+    };
+
+    if (showCategoryTooltip) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showCategoryTooltip]);
+
+  // IntersectionObserver para carga incremental
+  useEffect(() => {
+    const sentinel = loadMoreRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting) {
+          setVisibleCount((prev) => {
+            if (prev >= searchResults.length) return prev;
+            return Math.min(prev + 15, searchResults.length);
+          });
+        }
+      },
+      { root: null, rootMargin: '0px', threshold: 1.0 }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [searchResults]);
+
+  const handleSearch = async (query: string, categoryId?: string) => {
+    const category = categoryId !== undefined ? categoryId : selectedCategory;
     setSearchQuery(query);
     setIsSearching(true);
     
@@ -45,15 +85,21 @@ export default function AddPage() {
       const response = await fetch(`/api/foods/search?q=${encodeURIComponent(query)}`);
       const data = await response.json();
       
-      // Filtrar por categoría si no es "todos"
-      if (selectedCategory === 'todos') {
+      // Filtrar por categoría si no es "todos" o "favoritos"
+      if (category === 'todos') {
         setSearchResults(data);
+        setVisibleCount(15);
+      } else if (category === 'favoritos') {
+        // TODO: Implementar lógica de favoritos
+        setSearchResults([]);
+        setVisibleCount(15);
       } else {
         const filtered = data.filter((food: FoodItem) => {
-          const categoryId = categorizeFood(food.name);
-          return categoryId === selectedCategory;
+          const foodCategoryId = categorizeFood(food.name);
+          return foodCategoryId === category;
         });
         setSearchResults(filtered);
+        setVisibleCount(15);
       }
     } catch (error) {
       console.error('Error buscando alimentos:', error);
@@ -65,98 +111,140 @@ export default function AddPage() {
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    handleSearch(searchQuery);
+    handleSearch(searchQuery, categoryId);
   };
 
-  useEffect(() => {
-    if (selectedCategory !== 'todos') {
-      handleSearch(searchQuery);
-    }
-  }, [selectedCategory]);
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Floating decorations */}
-      <FloatingFood emoji="🍎" className="absolute top-20 left-8" delay={0} />
-      <FloatingFood emoji="🍌" className="absolute top-40 right-8" delay={500} />
-      <FloatingFood emoji="🥗" className="absolute top-60 left-12" delay={1000} />
-
-      <div className="container mx-auto px-4 py-6 max-w-md">
-        <div className="mb-6 flex items-center gap-3">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Agregar Alimento</h1>
-            <p className="text-gray-600 text-sm">
-              Busca o crea un alimento para registrar tu consumo
-            </p>
+    <div className="min-h-screen bg-[#D9D9D9] pb-24">
+      {/* Header oscuro con botón volver, título y descripción */}
+      <div className="bg-[#131917] rounded-b-[60px]">
+        <div className="px-25 pt-[40px] pb-6">
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard">
+              <button className="w-12 h-12 rounded-full bg-[#404040] flex items-center justify-center text-white hover:opacity-90 transition-colors flex-shrink-0">
+                <ArrowLeft size={25} weight="bold" />
+              </button>
+            </Link>
+            <div className="flex-1">
+              <h2 className="text-white font-semibold text-[20px]">Agregar Alimento</h2>
+              <p className="text-white/80 text-[14px]">
+                Busca o crea un alimento para registrar tu consumo
+              </p>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Contenido principal */}
+      <div className="px-[25px] pt-[25px] pb-[20px]">
 
         {/* Search Bar */}
-        <div className="mb-4">
-          <Input
-            type="text"
-            placeholder="Buscar alimentos..."
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-            icon={<Search className="w-5 h-5" />}
-          />
-        </div>
-
-        {/* Category Filters */}
         {!selectedFood && !showExerciseForm && (
           <div className="mb-4">
-            <p className="text-sm font-medium text-gray-700 mb-2">Filtrar por categoría:</p>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => handleCategoryChange(category.id)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                    selectedCategory === category.id
-                      ? 'bg-[#5FB75D] text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <span className="mr-1">{category.emoji}</span>
-                  {category.name}
-                </button>
-              ))}
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#5A5B5A]">
+                <MagnifyingGlass size={20} weight="regular" />
+              </div>
+              <input
+                type="text"
+                placeholder="Buscar alimentos..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+              />
             </div>
           </div>
         )}
 
-        {/* Quick Actions */}
+        {/* Category Filters */}
         {!selectedFood && !showExerciseForm && (
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <Card padding="md" className="text-center cursor-pointer hover:shadow-xl transition-all" onClick={() => {/* TODO: Modal para crear personalizado */}}>
-              <PlusCircle className="w-8 h-8 text-[#5FB75D] mx-auto mb-2" />
-              <p className="font-semibold text-gray-900">Crear Personalizado</p>
-              <p className="text-xs text-gray-500">Agregar manualmente</p>
-            </Card>
-            <Card padding="md" className="text-center cursor-pointer hover:shadow-xl transition-all" onClick={() => setShowExerciseForm(true)}>
-              <span className="text-4xl">🏃</span>
-              <p className="font-semibold text-gray-900 mt-2">Agregar Ejercicio</p>
-              <p className="text-xs text-gray-500">Registrar actividad</p>
-            </Card>
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[#131917] text-[14px] font-bold">Filtrar por categoría:</p>
+              <button
+                onClick={() => setShowCategoryTooltip(!showCategoryTooltip)}
+                className="relative"
+                data-category-info
+              >
+                <Info size={20} weight="bold" color="#6484e2" />
+                {showCategoryTooltip && (
+                  <div className="absolute right-0 top-6 bg-white rounded-[10px] shadow-[0_2px_10px_rgba(0,0,0,0.10)] p-3 z-10 min-w-[200px]" data-category-info>
+                    <div className="space-y-2">
+                      {categories.map((category) => {
+                        const IconComponent = category.icon;
+                        return (
+                          <div
+                            key={category.id}
+                            className="flex items-center gap-2 text-[12px] text-[#131917]"
+                          >
+                            {IconComponent ? (
+                              <IconComponent size={16} weight="bold" />
+                            ) : (
+                              <span>{category.emoji}</span>
+                            )}
+                            <span>{category.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </button>
+            </div>
+            <div className="overflow-x-auto scrollbar-hide -mx-[25px] pl-[25px]">
+              <div className="flex gap-2">
+                {categories.map((category) => {
+                  const IconComponent = category.icon;
+                  return (
+                    <button
+                      key={category.id}
+                      onClick={() => handleCategoryChange(category.id)}
+                      className={`flex-shrink-0 w-9 h-9 rounded-[10px] transition-all flex items-center justify-center ${
+                        selectedCategory === category.id
+                          ? 'bg-[#CEFB48] text-[#131917]'
+                          : 'bg-white text-[#131917] hover:opacity-90'
+                      }`}
+                      title={category.name}
+                    >
+                      {IconComponent ? (
+                        <IconComponent size={18} weight="bold" />
+                      ) : (
+                        <span>{category.emoji}</span>
+                      )}
+                    </button>
+                  );
+                })}
+                <div className="flex-shrink-0 w-[25px]"></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+        {/* Botón Alimento Personalizado */}
+        {!selectedFood && !showExerciseForm && (
+          <div className="mb-4">
+            <button
+              onClick={() => {/* TODO: Modal para crear personalizado */}}
+              className="w-full bg-[#CEFB48] text-[#131917] rounded-[10px] px-4 py-[10px] flex items-center justify-center gap-2 font-semibold text-[14px] hover:opacity-90 transition-opacity"
+            >
+              <span>Alimento personalizado</span>
+              <Plus size={18} weight="bold" />
+            </button>
           </div>
         )}
 
         {/* Search Results */}
         {isSearching && (
           <div className="text-center py-12">
-            <p className="text-gray-500">Buscando...</p>
+            <p className="text-[#5A5B5A]">Buscando...</p>
           </div>
         )}
 
         {!isSearching && searchQuery.length > 2 && searchResults.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No se encontraron alimentos</p>
-            <p className="text-sm text-gray-400 mt-2">Intenta con otro término de búsqueda</p>
+            <p className="text-[#5A5B5A]">No se encontraron alimentos</p>
+            <p className="text-[12px] text-[#5A5B5A] mt-2">Intenta con otro término de búsqueda</p>
           </div>
         )}
 
@@ -164,10 +252,13 @@ export default function AddPage() {
         {showExerciseForm ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Registrar Ejercicio</h3>
-              <Button variant="ghost" size="sm" onClick={() => setShowExerciseForm(false)}>
+              <h3 className="text-[#131917] text-[20px] font-semibold">Registrar Ejercicio</h3>
+              <button
+                onClick={() => setShowExerciseForm(false)}
+                className="text-[#5A5B5A] hover:text-[#131917] font-medium text-[14px]"
+              >
                 Volver
-              </Button>
+              </button>
             </div>
             <ExerciseForm
               onSuccess={() => {
@@ -180,10 +271,21 @@ export default function AddPage() {
         ) : selectedFood ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Registrar Alimento</h3>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedFood(null)}>
-                Ver más alimentos
-              </Button>
+              <h3 className="text-[#131917] text-[24px] font-bold">{selectedFood.name}</h3>
+              <button
+                onClick={() => {
+                  setIsFavorite(!isFavorite);
+                  // TODO: Implementar funcionalidad de favoritos
+                }}
+                className={`rounded-[15px] px-4 py-[5px] font-semibold text-[16px] hover:opacity-90 transition-opacity flex items-center gap-2 border-[3px] ${
+                  isFavorite
+                    ? 'bg-[#E5C438] border-[#E5C438] text-[#131917]'
+                    : 'bg-transparent border-[#E5C438] text-[#131917]'
+                }`}
+              >
+                <Star size={18} weight="bold" />
+                <span>Favorito</span>
+              </button>
             </div>
             <FoodLogForm
               food={selectedFood}
@@ -197,34 +299,56 @@ export default function AddPage() {
         ) : (
           // Mostrar lista de resultados
           searchResults.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">
+            <div className="space-y-3">
+              <h3 className="text-[#131917] text-[14px] font-medium mb-2">
                 {searchQuery ? 'Resultados de búsqueda:' : 'Todos los alimentos:'}
               </h3>
-              {searchResults.map((food) => (
-                <Card 
-                  key={food.id} 
-                  padding="md" 
-                  className="hover:shadow-xl transition-all cursor-pointer border hover:border-[#5FB75D]"
+              {searchResults.slice(0, visibleCount).map((food, index) => {
+                const isFavorite = index === 0 || (food as any)?.favorite === true || selectedCategory === 'favoritos';
+                return (
+                <button
+                  key={food.id}
                   onClick={() => setSelectedFood(food)}
+                  className={`relative w-full bg-[#131917] rounded-[30px] px-[20px] py-[18px] shadow-[0_2px_10px_rgba(0,0,0,0.10)] hover:opacity-90 transition-all text-left ${isFavorite ? 'border-[5px] border-[#E5C438]' : ''}`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{food.name}</p>
-                      <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
-                        {food.brand && <span>{food.brand}</span>}
-                        <span>100g</span>
-                      </div>
-                      <div className="flex items-center gap-3 mt-2 text-xs">
-                        <span className="text-red-600">P: {food.protein}g</span>
-                        <span className="text-yellow-600">C: {food.carbs}g</span>
-                        <span className="text-blue-600">G: {food.fat}g</span>
+                  <div className="flex flex-col gap-3">
+                    {/* Fila 1: Nombre izquierda / Kcal derecha */}
+                    <div className="flex items-end justify-between">
+                      <p className="font-semibold text-white text-[20px] leading-none">{food.name}</p>
+                      <div className="flex items-baseline gap-2 ml-4">
+                        <span className="text-white font-semibold text-[32px] leading-none">{food.calories}</span>
+                        <span className="text-white/70 text-[16px] leading-none">kcal</span>
                       </div>
                     </div>
-                    <span className="text-[#5FB75D] font-bold text-lg ml-4">{food.calories} kcal</span>
+
+                    {/* Fila 2: Macros izquierda / 100g derecha */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-[14px]">
+                        <div className="flex items-center gap-1 text-[#CEF154]">
+                          <Fish size={18} weight="bold" />
+                          <span>{food.protein}g</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-[#E5C438]">
+                          <Bread size={18} weight="bold" />
+                          <span>{food.carbs}g</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-[#DC3714]">
+                          <Avocado size={18} weight="bold" />
+                          <span>{food.fat}g</span>
+                        </div>
+                      </div>
+                      <span className="text-white/70 text-[14px] ml-2">100g</span>
+                    </div>
                   </div>
-                </Card>
-              ))}
+                  {isFavorite && (
+                    <div className="absolute top-2 right-2 text-[#E5C438] opacity-[0.15]">
+                      <Star size={60} weight="bold" />
+                    </div>
+                  )}
+                </button>
+              )})}
+              {/* Sentinel para cargar más */}
+              <div ref={loadMoreRef} />
             </div>
           )
         )}
@@ -235,4 +359,3 @@ export default function AddPage() {
     </div>
   );
 }
-

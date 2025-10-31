@@ -1,9 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
+import { CaretDown, Fish, Bread, Avocado } from '@phosphor-icons/react';
 
 interface FoodLogFormProps {
   food: {
@@ -72,86 +70,97 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
   const calculatedFat = ((food.fat * parseFloat(quantity)) / 100).toFixed(1);
 
   return (
-    <Card className="p-0 overflow-hidden">
-      <div className="bg-gradient-to-r from-[#5FB75D] to-[#4A9244] p-4 text-white">
-        <h3 className="font-semibold text-lg">{food.name}</h3>
-        {food.brand && <p className="text-sm opacity-90">{food.brand}</p>}
-      </div>
+    <div className="space-y-4">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-[15px]">
+          {error}
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit} className="p-6 space-y-4">
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-            {error}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Cantidad y Tipo de Comida en una fila */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-[#131917] text-[14px] font-medium mb-2">
+              Cantidad (g)
+            </label>
+            <input
+              type="number"
+              placeholder="100"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              required
+              min="1"
+              step="0.1"
+              className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+            />
           </div>
-        )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Cantidad (gramos)
-          </label>
-          <Input
-            type="number"
-            placeholder="100"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            required
-            min="1"
-            step="0.1"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tipo de Comida
-          </label>
-          <select
-            value={mealType}
-            onChange={(e) => setMealType(e.target.value)}
-            className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-900 focus:border-[#5FB75D] focus:ring-2 focus:ring-[#5FB75D]/20 transition-all duration-200"
-          >
-            {MEAL_TYPES.map(meal => (
-              <option key={meal.value} value={meal.value}>
-                {meal.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Calculated Values Preview */}
-        <div className="bg-gray-50 rounded-xl p-4">
-          <p className="text-sm font-medium text-gray-700 mb-3">Valores calculados:</p>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <span className="text-gray-500">Calorías:</span>
-              <span className="ml-2 font-semibold text-gray-900">{calculatedCalories} kcal</span>
-            </div>
-            <div>
-              <span className="text-gray-500">Proteína:</span>
-              <span className="ml-2 font-semibold text-gray-900">{calculatedProtein}g</span>
-            </div>
-            <div>
-              <span className="text-gray-500">Carbohidratos:</span>
-              <span className="ml-2 font-semibold text-gray-900">{calculatedCarbs}g</span>
-            </div>
-            <div>
-              <span className="text-gray-500">Grasas:</span>
-              <span className="ml-2 font-semibold text-gray-900">{calculatedFat}g</span>
+          <div>
+            <label className="block text-[#131917] text-[14px] font-medium mb-2">
+              Tipo de Comida
+            </label>
+            <div className="relative">
+            <select
+              value={mealType}
+              onChange={(e) => setMealType(e.target.value)}
+              className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
+            >
+                {MEAL_TYPES.map(meal => (
+                  <option key={meal.value} value={meal.value}>
+                    {meal.label}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-[#5A5B5A]">
+                <CaretDown size={20} weight="bold" />
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex gap-3">
+        {/* Valores Calculados - Fondo oscuro y horizontal */}
+        <div className="bg-[#131917] rounded-[15px] p-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-1 text-[#CEF154] text-[14px]">
+              <Fish size={18} weight="bold" />
+              <span>{calculatedProtein}g</span>
+            </div>
+            <div className="flex items-center gap-1 text-[#E5C438] text-[14px]">
+              <Bread size={18} weight="bold" />
+              <span>{calculatedCarbs}g</span>
+            </div>
+            <div className="flex items-center gap-1 text-[#DC3714] text-[14px]">
+              <Avocado size={18} weight="bold" />
+              <span>{calculatedFat}g</span>
+            </div>
+            <div className="flex items-baseline gap-2 ml-auto">
+              <span className="text-white font-semibold text-[32px] leading-none">{calculatedCalories}</span>
+              <span className="text-white/70 text-[16px] leading-none">kcal</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Botones */}
+        <div className="flex gap-3 pt-2">
           {onCancel && (
-            <Button variant="outline" fullWidth onClick={onCancel} type="button">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 text-[#DC3714] font-semibold text-[16px] hover:opacity-90 transition-opacity"
+            >
               Cancelar
-            </Button>
+            </button>
           )}
-          <Button type="submit" fullWidth isLoading={isSubmitting}>
-            Registrar Alimento
-          </Button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex-1 bg-[#CEFB48] text-[#131917] rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            {isSubmitting ? 'Agregando...' : 'Agregar'}
+          </button>
         </div>
       </form>
-    </Card>
+    </div>
   );
 }
-

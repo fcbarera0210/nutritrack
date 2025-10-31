@@ -135,13 +135,9 @@ export default function LoginPage() {
           {/* Link recuperar contraseña */}
           <div className="flex items-center justify-end gap-1 text-[12px] -mt-[19px]">
             <span className="text-[#5A5B5A]">No puedes iniciar sesión?</span>
-            <button
-              type="button"
-              onClick={() => alert('Funcionalidad en desarrollo')}
-              className="bg-[#CEFB48] text-[#131917] px-3 py-1 rounded-[8px] font-semibold hover:opacity-90 transition-opacity"
-            >
+            <Link href="/forgot-password" className="bg-[#CEFB48] text-[#131917] px-3 py-1 rounded-[8px] font-semibold hover:opacity-90 transition-opacity">
               Recuperar contraseña
-            </button>
+            </Link>
           </div>
 
           {/* Error message */}
