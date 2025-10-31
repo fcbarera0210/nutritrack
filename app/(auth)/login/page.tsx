@@ -26,17 +26,30 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        setError(data.error || 'Email o contraseña incorrectos');
+        let errorMessage = 'Email o contraseña incorrectos';
+        try {
+          const data = await response.json();
+          errorMessage = data.error || errorMessage;
+        } catch (e) {
+          // Si la respuesta no es JSON, usar el status
+          if (response.status === 405) {
+            errorMessage = 'Error de método. Por favor, contacta al administrador.';
+          } else if (response.status === 500) {
+            errorMessage = 'Error del servidor. Por favor, intenta más tarde.';
+          }
+        }
+        setError(errorMessage);
         setIsLoading(false);
-      } else {
-        router.push('/dashboard');
-        router.refresh();
+        return;
       }
-    } catch (error) {
-      setError('Ocurrió un error. Intenta nuevamente.');
+
+      const data = await response.json();
+      router.push('/dashboard');
+      router.refresh();
+    } catch (error: any) {
+      console.error('Login error:', error);
+      setError(error?.message || 'Ocurrió un error. Intenta nuevamente.');
       setIsLoading(false);
     }
   };
@@ -122,9 +135,13 @@ export default function LoginPage() {
           {/* Link recuperar contraseña */}
           <div className="flex items-center justify-end gap-1 text-[12px] -mt-[19px]">
             <span className="text-[#5A5B5A]">No puedes iniciar sesión?</span>
-            <Link href="/forgot-password" className="bg-[#CEFB48] text-[#131917] px-3 py-1 rounded-[8px] font-semibold hover:opacity-90 transition-opacity">
+            <button
+              type="button"
+              onClick={() => alert('Funcionalidad en desarrollo')}
+              className="bg-[#CEFB48] text-[#131917] px-3 py-1 rounded-[8px] font-semibold hover:opacity-90 transition-opacity"
+            >
               Recuperar contraseña
-            </Link>
+            </button>
           </div>
 
           {/* Error message */}

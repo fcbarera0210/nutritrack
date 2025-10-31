@@ -1,9 +1,28 @@
 import { NextResponse } from 'next/server';
 import { register } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'Cuerpo de la solicitud inválido' },
+        { status: 400 }
+      );
+    }
+    
+    if (!body.name || !body.email || !body.password) {
+      return NextResponse.json(
+        { error: 'Nombre, email y contraseña son requeridos' },
+        { status: 400 }
+      );
+    }
+    
     const result = await register(body.name, body.email, body.password);
 
     if (result.error) {

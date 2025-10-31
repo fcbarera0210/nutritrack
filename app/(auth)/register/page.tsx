@@ -41,15 +41,29 @@ export default function RegisterPage() {
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || 'Error al registrar');
+        let errorMessage = 'Error al registrar';
+        try {
+          const data = await response.json();
+          errorMessage = data.error || errorMessage;
+        } catch (e) {
+          // Si la respuesta no es JSON, usar el status
+          if (response.status === 405) {
+            errorMessage = 'Error de método. Por favor, contacta al administrador.';
+          } else if (response.status === 500) {
+            errorMessage = 'Error del servidor. Por favor, intenta más tarde.';
+          }
+        }
+        setError(errorMessage);
+        setIsLoading(false);
+        return;
       }
 
+      const data = await response.json();
       router.push('/login?registered=true');
     } catch (error: any) {
-      setError(error.message);
+      console.error('Register error:', error);
+      setError(error?.message || 'Ocurrió un error. Intenta nuevamente.');
       setIsLoading(false);
     }
   };

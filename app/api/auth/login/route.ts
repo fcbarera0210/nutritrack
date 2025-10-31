@@ -1,9 +1,22 @@
 import { NextResponse } from 'next/server';
 import { login } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'Cuerpo de la solicitud inválido' },
+        { status: 400 }
+      );
+    }
+    
+    const { email, password } = body;
     
     if (!email || !password) {
       return NextResponse.json(
