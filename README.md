@@ -11,7 +11,7 @@ NutriTrack es una aplicación web (Next.js) para registrar comidas y ejercicios,
 ---
 
 ### ✅ Funcionalidades implementadas (MVP completo)
-- **Autenticación**: registro, login, logout, sesiones JWT, middleware de rutas.
+- **Autenticación**: registro, login, logout, sesiones JWT, guards server-side en layouts. Login y Register rediseñados con nuevo header oscuro, logo y formularios estilo moderno.
 - **Dashboard diario** (rediseñado 2025-10): header en caja oscura con calendario semanal, racha y gráficos circulares; sección kcal; cards de ejercicio/agua; cards de comidas con imágenes y botón rápido; navbar inferior actualizado.
 - **Gestión de alimentos**: búsqueda inteligente (sin tildes/mayúsculas), 50+ alimentos chilenos, filtros por categorías, formulario con cantidad y cálculo automático de macros.
 - **Gestión de ejercicios**: 12+ ejercicios, cálculo de calorías por fórmula MET, visualización y eliminación.
@@ -20,7 +20,7 @@ NutriTrack es una aplicación web (Next.js) para registrar comidas y ejercicios,
 - **CRUD completo**: crear/editar/eliminar logs de alimentos y ejercicios con confirmaciones.
 - **Recordatorios y notificaciones**: API CRUD de recordatorios, permisos de notificaciones, notificaciones visuales.
 
-Notas de diseño: migración a `@phosphor-icons/react` v2, tokens de color y utilidades Tailwind personalizadas (espaciados exactos), navbar con fondo #131917 y botón central #CEFB48.
+Notas de diseño: migración a `@phosphor-icons/react` v2, tokens de color y utilidades Tailwind personalizadas (espaciados exactos), navbar con fondo #131917 y botón central #CEFB48. Login/Register con header oscuro, logo de 3 puntos verticales, inputs con Phosphor Icons y borde focus #CEFB48.
 
 ---
 

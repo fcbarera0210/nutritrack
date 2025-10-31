@@ -13,4 +13,3 @@ function getDbUrl() {
 
 const sql = neon(getDbUrl());
 export const db = drizzle(sql, { schema });
-

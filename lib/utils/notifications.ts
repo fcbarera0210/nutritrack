@@ -25,8 +25,6 @@ export function showNotification(title: string, options?: NotificationOptions) {
 
   if (Notification.permission === 'granted') {
     new Notification(title, {
-      icon: '/icon-192x192.png',
-      badge: '/icon-192x192.png',
       ...options,
     });
   }

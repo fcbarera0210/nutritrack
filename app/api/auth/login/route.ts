@@ -26,8 +26,26 @@ export async function POST(req: Request) {
       { status: 200 }
     );
   } catch (error: any) {
+    // Mejor logging para debugging en producción
+    const errorMessage = error?.message || 'Error desconocido';
+    const isDbError = errorMessage.includes('DATABASE_URL') || 
+                      errorMessage.includes('connection') ||
+                      errorMessage.includes('relation') ||
+                      errorMessage.includes('does not exist');
+    
+    console.error('Login error:', {
+      message: errorMessage,
+      isDbError,
+      stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined
+    });
+
     return NextResponse.json(
-      { error: 'Error al iniciar sesión', details: error.message },
+      { 
+        error: isDbError 
+          ? 'Error de conexión con la base de datos. Verifica que las migraciones estén aplicadas.' 
+          : 'Error al iniciar sesión',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     );
   }

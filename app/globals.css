@@ -186,6 +186,12 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 2px var(--primary);
 }
 
+/* Excluir inputs en páginas de auth del box-shadow global */
+[class*="auth"] input:focus,
+input[class*="border-transparent"]:focus {
+  box-shadow: none;
+}
+
 /* Container y secciones para maquetación Figma */
 .container {
   margin-left: auto;

@@ -1,5 +1,14 @@
 Changelog
 
+0.1.2 - Rediseño Login y Register
+- Login y Register rediseñados: header oscuro con logo (3 puntos verticales), formularios con nuevos estilos.
+- Inputs: Phosphor Icons (At, Key, User, Eye/EyeClosed), padding 10px, fuente semibold 16px, placeholder #D9D9D9.
+- Borde de focus: color #CEFB48 (lime verde del nuevo diseño).
+- Sistema de versión centralizado: constante APP_VERSION en `lib/constants.ts` sincronizada con package.json y CHANGELOG.
+- Guards server-side: protección de rutas sin middleware, usando layouts de grupos (app) y (auth).
+- Fix: eliminado box-shadow global de inputs en páginas de auth para evitar doble borde.
+- Fix: eliminadas referencias a iconos inexistentes en manifest.json y notifications.ts (error 404 resuelto).
+
 0.1.1 - Dashboard y Navbar actualizados
 - Cards de Ejercicio y Agua con nuevos estilos, iconografía contorneada y ejemplos.
 - Cards de Comidas: layout, solapamiento de miniaturas, botón “+” destacado, nutrientes en una línea, imágenes demo (picsum).

@@ -6,25 +6,31 @@ import { createSession, deleteSession, getSession } from './session';
 import { registerSchema } from '../validations/auth';
 
 export async function login(email: string, password: string) {
-  const userList = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
+  try {
+    const userList = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
-  if (userList.length === 0) {
-    return { error: 'Email o contraseña incorrectos' };
+    if (userList.length === 0) {
+      return { error: 'Email o contraseña incorrectos' };
+    }
+
+    const user = userList[0];
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+
+    if (!isPasswordValid) {
+      return { error: 'Email o contraseña incorrectos' };
+    }
+
+    await createSession(user.id.toString(), user.email, user.name || undefined);
+    return { success: true, user };
+  } catch (error: any) {
+    // Capturar errores de BD específicos y re-lanzarlos para que el endpoint los maneje
+    console.error('Login DB error:', error?.message);
+    throw error;
   }
-
-  const user = userList[0];
-  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-
-  if (!isPasswordValid) {
-    return { error: 'Email o contraseña incorrectos' };
-  }
-
-  await createSession(user.id.toString(), user.email, user.name || undefined);
-  return { success: true, user };
 }
 
 export async function register(name: string, email: string, password: string) {
