@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { SignOut, User as UserIcon, Target, Gear, PencilSimple, FloppyDisk, DownloadSimple, Bell } from '@phosphor-icons/react';
+import { SignOut, ArrowLeft, User as UserIcon, Target, PencilSimple, FloppyDisk, DownloadSimple, Bell } from '@phosphor-icons/react';
 import { BottomNav } from '@/components/dashboard/BottomNav';
 import { calculateTDEE, calculateMacros } from '@/lib/utils/calories';
 
@@ -95,46 +95,54 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-md">
-      {/* Header */}
-      <div className="text-center mb-8 relative">
-        <div className="w-20 h-20 rounded-full bg-[#5FB75D] flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
-          JD
+    <div className="min-h-screen bg-[#D9D9D9] pb-24">
+      {/* Header oscuro */}
+      <div className="bg-[#131917] rounded-b-[60px]">
+        <div className="px-25 pt-[40px] pb-6">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.push('/dashboard')} className="w-12 h-12 rounded-full bg-[#404040] flex items-center justify-center text-white hover:opacity-90 transition-colors flex-shrink-0">
+              <ArrowLeft size={25} weight="bold" />
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-[#5FB75D] flex items-center justify-center text-[#131917] font-bold">JD</div>
+              <div>
+                <h1 className="text-white font-semibold text-[20px]">Perfil</h1>
+                <p className="text-white/80 text-[14px]">Gestiona tu información y objetivos</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Juan Pérez</h1>
-        <p className="text-gray-500">juan@ejemplo.com</p>
       </div>
 
-      {/* Stats Quick View */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <Card padding="sm" className="text-center">
-          <p className="text-xs text-gray-500 mb-1">Calorías Objetivo</p>
-          <p className="text-xl font-bold text-[#5FB75D]">{profile.targetCalories}</p>
-        </Card>
-        <Card padding="sm" className="text-center">
-          <p className="text-xs text-gray-500 mb-1">Proteína</p>
-          <p className="text-xl font-bold text-[#5FB75D]">{profile.targetProtein}g</p>
-        </Card>
-        <Card padding="sm" className="text-center">
-          <p className="text-xs text-gray-500 mb-1">Peso</p>
-          <p className="text-xl font-bold text-gray-900">{profile.weight} kg</p>
-        </Card>
-      </div>
+      {/* Contenido */}
+      <div className="px-[25px] pt-[25px] pb-[20px] max-w-md mx-auto">
+        {/* Stats Quick View */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <Card padding="sm" className="text-center">
+            <p className="text-xs text-[#5A5B5A] mb-1">Calorías</p>
+            <p className="text-xl font-bold text-[#5FB75D]">{profile.targetCalories}</p>
+          </Card>
+          <Card padding="sm" className="text-center">
+            <p className="text-xs text-[#5A5B5A] mb-1">Proteína</p>
+            <p className="text-xl font-bold text-[#5FB75D]">{profile.targetProtein}g</p>
+          </Card>
+          <Card padding="sm" className="text-center">
+            <p className="text-xs text-[#5A5B5A] mb-1">Peso</p>
+            <p className="text-xl font-bold text-[#131917]">{profile.weight} kg</p>
+          </Card>
+        </div>
 
-      {/* Profile Form */}
-      {isEditing && (
-        <Card className="mb-6">
-          <div className="p-6 space-y-4">
+        {/* Profile Form */}
+        {isEditing && (
+          <div className="bg-white rounded-[30px] p-6 shadow-[0_2px_10px_rgba(0,0,0,0.10)] mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Editar Perfil</h3>
+              <h3 className="text-[#131917] text-[20px] font-semibold">Editar Perfil</h3>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
-                  Cancelar
-                </Button>
-                <Button variant="ghost" size="sm" onClick={handleSave} isLoading={isLoading}>
-                  <FloppyDisk className="w-4 h-4 mr-2" />
+                <button onClick={() => setIsEditing(false)} className="text-[#DC3714] font-semibold text-[14px]">Cancelar</button>
+                <button onClick={handleSave} disabled={isLoading} className="bg-[#CEFB48] text-[#131917] rounded-[10px] px-4 py-[8px] font-semibold text-[14px] hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2">
+                  <FloppyDisk size={16} weight="bold" />
                   Guardar
-                </Button>
+                </button>
               </div>
             </div>
 
@@ -158,7 +166,7 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Edad</label>
+              <label className="block text-[14px] font-medium text-[#131917] mb-2">Edad</label>
               <Input
                 type="number"
                 value={profile.age}
@@ -169,11 +177,11 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Género</label>
+              <label className="block text-[14px] font-medium text-[#131917] mb-2">Género</label>
               <select
                 value={profile.gender}
                 onChange={(e) => setProfile({ ...profile, gender: e.target.value as any })}
-                className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-900 focus:border-[#5FB75D] focus:ring-2 focus:ring-[#5FB75D]/20"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none"
               >
                 <option value="male">Masculino</option>
                 <option value="female">Femenino</option>
@@ -182,11 +190,11 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Nivel de Actividad</label>
+              <label className="block text-[14px] font-medium text-[#131917] mb-2">Nivel de Actividad</label>
               <select
                 value={profile.activityLevel}
                 onChange={(e) => setProfile({ ...profile, activityLevel: e.target.value })}
-                className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-900 focus:border-[#5FB75D] focus:ring-2 focus:ring-[#5FB75D]/20"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none"
               >
                 <option value="sedentary">Sedentario</option>
                 <option value="lightly_active">Actividad Ligera</option>
@@ -197,11 +205,11 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Objetivo</label>
+              <label className="block text-[14px] font-medium text-[#131917] mb-2">Objetivo</label>
               <select
                 value={profile.goal}
                 onChange={(e) => setProfile({ ...profile, goal: e.target.value as any })}
-                className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-900 focus:border-[#5FB75D] focus:ring-2 focus:ring-[#5FB75D]/20"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none"
               >
                 <option value="weight_loss">Pérdida de Peso</option>
                 <option value="maintenance">Mantenimiento</option>
@@ -209,11 +217,10 @@ export default function ProfilePage() {
               </select>
             </div>
           </div>
-        </Card>
-      )}
+        )}
 
-      {/* Menu Options - Only show when NOT editing */}
-      {!isEditing && (
+        {/* Menu Options - Only show when NOT editing */}
+        {!isEditing && (
         <div className="space-y-2 mb-6">
           <Card padding="md" className="cursor-pointer hover:shadow-md transition-all" onClick={() => setIsEditing(true)}>
             <div className="flex items-center gap-3">
@@ -255,18 +262,16 @@ export default function ProfilePage() {
             </div>
           </Card>
         </div>
-      )}
+        )}
 
-      {/* Sign Out */}
-      <Button
-        variant="outline"
-        fullWidth
-        onClick={handleSignOut}
-        className="text-red-600 border-red-200 hover:bg-red-50"
-      >
-        <SignOut className="w-5 h-5 mr-2" />
-        Cerrar Sesión
-      </Button>
+        {/* Sign Out */}
+        <button
+          onClick={handleSignOut}
+          className="w-full bg-white rounded-[15px] px-4 py-[12px] text-[#DC3714] font-semibold shadow-[0_2px_10px_rgba(0,0,0,0.10)] hover:opacity-90 transition-opacity"
+        >
+          <span className="inline-flex items-center gap-2"><SignOut size={18} weight="bold" /> Cerrar Sesión</span>
+        </button>
+      </div>
 
       {/* Bottom Navigation */}
       <BottomNav />
