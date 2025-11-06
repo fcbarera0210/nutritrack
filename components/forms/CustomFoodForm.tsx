@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { CaretDown, Fish, Grains, Avocado, Fire, Sparkle, CircleNotch } from '@phosphor-icons/react';
+import { useState, useEffect } from 'react';
+import { CaretDown, Fish, Grains, Avocado, Fire, Sparkle, CircleNotch, Lightbulb } from '@phosphor-icons/react';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 interface CustomFoodFormProps {
@@ -30,6 +30,24 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
   const [error, setError] = useState('');
   const [isSearchingAI, setIsSearchingAI] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [aiSearchInfo, setAiSearchInfo] = useState<{ matchedFood: string; portionSize: string; portionUnit: string } | null>(null);
+  const [searchesRemaining, setSearchesRemaining] = useState<number | null>(null);
+
+  // Cargar contador de búsquedas al montar el componente
+  useEffect(() => {
+    const fetchSearchLimit = async () => {
+      try {
+        const response = await fetch('/api/foods/ai-search/limit');
+        if (response.ok) {
+          const data = await response.json();
+          setSearchesRemaining(data.searchesRemaining);
+        }
+      } catch (error) {
+        console.error('Error obteniendo límite de búsquedas:', error);
+      }
+    };
+    fetchSearchLimit();
+  }, []);
 
   const handleAISearch = async () => {
     if (!name.trim()) {
@@ -42,39 +60,73 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
     setError('');
 
     try {
+      // Enviar también el tamaño de porción y unidad para que la IA pueda hacer cálculos más específicos
       const response = await fetch('/api/foods/ai-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ foodName: name.trim() }),
+        body: JSON.stringify({ 
+          foodName: name.trim(),
+          servingSize: servingSize ? parseFloat(servingSize) : undefined,
+          servingUnit: servingUnit || 'g'
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        // Manejar límite diario alcanzado (429)
+        if (response.status === 429 && data.limitReached) {
+          throw new Error(data.error || `Has alcanzado el límite diario de ${data.dailyLimit || 15} búsquedas por IA.`);
+        }
         throw new Error(data.error || 'Error al buscar información por IA');
       }
 
       if (data.success && data.data) {
-        // Llenar los campos con los datos obtenidos
-        setCalories(data.data.calories.toString());
-        setProtein(data.data.protein.toString());
-        setCarbs(data.data.carbs.toString());
-        setFat(data.data.fat.toString());
-        
-        // Si viene un tamaño de porción sugerido, actualizarlo
-        if (data.data.servingSize) {
-          setServingSize(data.data.servingSize.toString());
-        }
+        // Verificar si todos los valores son 0 (no es un alimento)
+        if (data.isZeroResult) {
+          setAiError(`No se encontró información nutricional para "${name.trim()}". Esto podría indicar que no es un alimento comestible. Por favor, verifica el nombre e intenta nuevamente o ingresa los valores manualmente.`);
+          setAiSearchInfo(null);
+          // Limpiar los campos
+          setCalories('');
+          setProtein('');
+          setCarbs('');
+          setFat('');
+        } else {
+          // Llenar los campos con los datos obtenidos
+          // Los valores ya vienen calculados para el tamaño de porción especificado
+          setCalories(data.data.calories.toString());
+          setProtein(data.data.protein.toString());
+          setCarbs(data.data.carbs.toString());
+          setFat(data.data.fat.toString());
+          
+          // Si viene un tamaño de porción sugerido y no se había establecido uno, actualizarlo
+          if (data.data.servingSize && !servingSize) {
+            setServingSize(data.data.servingSize.toString());
+          }
 
-        // Limpiar cualquier error previo
-        setAiError('');
-        setError('');
+          // Guardar información sobre la búsqueda
+          setAiSearchInfo({
+            matchedFood: data.data.matchedFood || name.trim(),
+            portionSize: servingSize || data.data.servingSize?.toString() || '100',
+            portionUnit: servingUnit || 'g'
+          });
+
+          // Actualizar contador de búsquedas restantes
+          if (data.searchesRemaining !== undefined) {
+            setSearchesRemaining(data.searchesRemaining);
+          }
+
+          // Limpiar cualquier error previo
+          setAiError('');
+          setError('');
+        }
       } else {
         throw new Error('No se recibieron datos válidos de la IA');
       }
     } catch (error: any) {
       console.error('Error buscando por IA:', error);
       setAiError(error.message || 'Error al buscar información nutricional por IA');
+      setAiSearchInfo(null);
     } finally {
       setIsSearchingAI(false);
     }
@@ -83,6 +135,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setAiSearchInfo(null); // Limpiar información de búsqueda al enviar
 
     // Validaciones básicas
     if (!name.trim()) {
@@ -166,6 +219,10 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
 
       {/* Nombre */}
       <div>
+        <p className="text-[#5A5B5A] text-xs mb-2">
+          <Lightbulb size={14} weight="bold" className="text-[#5A5B5A] inline-block align-middle mr-1" />
+          <span className="font-semibold">Tip:</span> Ajusta el tamaño de porción antes de buscar por IA para obtener resultados más precisos.
+        </p>
         <label className="block text-[#131917] text-[14px] font-medium mb-2">
           Nombre del alimento *
         </label>
@@ -174,7 +231,14 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
             type="text"
             placeholder="Ej: Ensalada de frutas"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              // Limpiar información de búsqueda cuando cambia el nombre
+              if (aiSearchInfo) {
+                setAiSearchInfo(null);
+              }
+            }}
+            maxLength={100}
             className="flex-1 bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
             required
             disabled={isSearchingAI}
@@ -182,9 +246,9 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
           <button
             type="button"
             onClick={handleAISearch}
-            disabled={isSearchingAI || !name.trim()}
+            disabled={isSearchingAI || !name.trim() || (searchesRemaining !== null && searchesRemaining === 0)}
             className="bg-[#6484E2] text-white rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0"
-            title="Buscar información nutricional por IA"
+            title={searchesRemaining === 0 ? "Has alcanzado el límite diario de búsquedas" : "Buscar información nutricional por IA"}
           >
             {isSearchingAI ? (
               <>
@@ -202,28 +266,21 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
         {aiError && (
           <p className="text-[#DC3714] text-xs mt-1">{aiError}</p>
         )}
-        {isSearchingAI && (
-          <div className="mt-2 bg-[#6484E2]/10 border-2 border-[#6484E2] rounded-[15px] px-4 py-3 flex items-center gap-3">
-            <CircleNotch size={18} weight="bold" className="text-[#6484E2] animate-spin" />
-            <span className="text-[#6484E2] text-sm font-semibold">
-              Buscando información nutricional por IA...
-            </span>
+        {aiSearchInfo && !isSearchingAI && !aiError && (
+          <div className="mt-2 bg-[#6484E2]/10 border-2 border-[#6484E2] rounded-[15px] px-4 py-3">
+            <p className="text-[#6484E2] text-xs font-semibold">
+              Búsqueda basada en: <span className="font-bold">{aiSearchInfo.matchedFood}</span> ({aiSearchInfo.portionSize}{aiSearchInfo.portionUnit})
+            </p>
           </div>
         )}
-      </div>
-
-      {/* Marca (opcional) */}
-      <div>
-        <label className="block text-[#131917] text-[14px] font-medium mb-2">
-          Marca (opcional)
-        </label>
-        <input
-          type="text"
-          placeholder="Ej: Marca propia"
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
-          className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
-        />
+        {searchesRemaining !== null && (
+          <p className={`text-xs mt-2 ${searchesRemaining === 0 ? 'text-[#DC3714]' : 'text-[#5A5B5A]'}`}>
+            Búsquedas restantes hoy: <span className={`font-semibold ${searchesRemaining === 0 ? 'text-[#DC3714]' : ''}`}>{searchesRemaining}/15</span>
+            {searchesRemaining === 0 && (
+              <span className="block mt-1 text-[#DC3714] text-xs">Has alcanzado el límite diario. Intenta nuevamente mañana.</span>
+            )}
+          </p>
+        )}
       </div>
 
       {/* Tamaño de porción */}
@@ -236,7 +293,13 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
             type="number"
             placeholder="100"
             value={servingSize}
-            onChange={(e) => setServingSize(e.target.value)}
+            onChange={(e) => {
+              setServingSize(e.target.value);
+              // Limpiar información de búsqueda cuando cambia el tamaño de porción
+              if (aiSearchInfo) {
+                setAiSearchInfo(null);
+              }
+            }}
             required
             min="0.1"
             step="0.1"
@@ -250,7 +313,13 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
           <div className="relative">
             <select
               value={servingUnit}
-              onChange={(e) => setServingUnit(e.target.value)}
+              onChange={(e) => {
+                setServingUnit(e.target.value);
+                // Limpiar información de búsqueda cuando cambia la unidad
+                if (aiSearchInfo) {
+                  setAiSearchInfo(null);
+                }
+              }}
               className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all"
               required
             >
@@ -378,6 +447,20 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Marca (opcional) */}
+      <div>
+        <label className="block text-[#131917] text-[14px] font-medium mb-2">
+          Marca (opcional)
+        </label>
+        <input
+          type="text"
+          placeholder="Ej: Marca propia"
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+          className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
+        />
       </div>
 
       {/* Botones de acción */}

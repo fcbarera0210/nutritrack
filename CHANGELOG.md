@@ -1,5 +1,14 @@
 Changelog
 
+0.2.2 - Límite de Búsquedas por IA y Mejoras de UX
+- **Límite diario de búsquedas por IA**: Implementación de sistema de control con límite de 15 búsquedas diarias por usuario para gestionar el uso gratuito de APIs de IA (Groq/DeepSeek). Tabla `ai_search_logs` para rastrear búsquedas diarias.
+- **Contador de búsquedas restantes**: Visualización en tiempo real del número de búsquedas disponibles en el formulario de alimento personalizado, con actualización automática después de cada búsqueda.
+- **Mensaje informativo sobre IA**: Tip con icono Lightbulb inline que indica la importancia de ajustar el tamaño de porción antes de buscar por IA para obtener resultados más precisos.
+- **Mejoras visuales al alcanzar límite**: Botón de búsqueda por IA se deshabilita cuando no quedan búsquedas, contador cambia a color rojo, y mensaje de advertencia claro para el usuario.
+- **Diseño consistente de iconos informativos**: Iconos Lightbulb y UserCircleCheck ahora inline con el texto en modales de información (cálculo de objetivos y calorías de ejercicio), manteniendo consistencia visual en toda la aplicación.
+- **API Routes nuevas**: `/api/foods/ai-search/limit` para obtener el estado del límite de búsquedas del usuario.
+- **Base de datos**: Nueva tabla `ai_search_logs` con índice para búsquedas rápidas por usuario y fecha.
+
 0.2.1 - Actualización de Paleta de Colores y Animación del Icono HandWaving
 - **Actualización de color principal**: Cambio de color verde de `#CEFB48` a `#3CCC1F` en toda la aplicación para mantener consistencia visual.
 - **Corrección de colores de proteínas**: Actualización de todos los iconos y elementos relacionados con proteínas para usar el nuevo color verde `#3CCC1F`.

@@ -143,17 +143,17 @@ export function CalculationInfo({ isOpen, onClose }: { isOpen: boolean; onClose:
         </div>
 
         <div className="pt-4 border-t border-gray-200 space-y-3">
-          <p className="text-xs text-[#5A5B5A] flex items-start gap-2" style={{ fontFamily: 'Quicksand, sans-serif' }}>
-            <Lightbulb size={18} weight="bold" className="text-[#6484E2] flex-shrink-0 mt-0.5" />
-            <span><strong>Nota:</strong> Estos cálculos son estimaciones basadas en fórmulas científicas reconocidas. 
+          <p className="text-xs text-[#5A5B5A]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
+            <Lightbulb size={14} weight="bold" className="text-[#5A5B5A] inline-block align-middle mr-1" />
+            <strong>Nota:</strong> Estos cálculos son estimaciones basadas en fórmulas científicas reconocidas. 
             Los resultados pueden variar según tu metabolismo individual, y es recomendable ajustarlos según 
-            tu progreso y necesidades específicas.</span>
+            tu progreso y necesidades específicas.
           </p>
-          <p className="text-xs text-[#5A5B5A] flex items-start gap-2" style={{ fontFamily: 'Quicksand, sans-serif' }}>
-            <UserCircleCheck size={18} weight="bold" className="text-[#6484E2] flex-shrink-0 mt-0.5" />
-            <span><strong>Recomendación:</strong> Siempre se recomienda consultar con un profesional de la salud 
+          <p className="text-xs text-[#5A5B5A]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
+            <UserCircleCheck size={14} weight="bold" className="text-[#5A5B5A] inline-block align-middle mr-1" />
+            <strong>Recomendación:</strong> Siempre se recomienda consultar con un profesional de la salud 
             (nutricionista, dietista o médico) para obtener un plan nutricional personalizado que se ajuste 
-            a tus necesidades específicas, condiciones de salud y objetivos personales.</span>
+            a tus necesidades específicas, condiciones de salud y objetivos personales.
           </p>
         </div>
 

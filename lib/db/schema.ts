@@ -125,3 +125,12 @@ export const waterLogs = pgTable('water_logs', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// AI search logs - track daily AI searches per user
+export const aiSearchLogs = pgTable('ai_search_logs', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  foodName: text('food_name').notNull(),
+  date: date('date').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+

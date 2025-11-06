@@ -14,7 +14,7 @@ NutriTrack es una aplicación web (Next.js) para registrar comidas y ejercicios,
 - **Autenticación**: registro, login, logout, sesiones JWT, guards server-side en layouts. Login y Register rediseñados con nuevo header oscuro, logo y formularios estilo moderno.
 - **Dashboard diario** (rediseñado 2025-10): header en caja oscura con calendario semanal, racha y gráficos circulares; sección kcal; cards de ejercicio/agua; cards de comidas con lista de alimentos reales; navbar inferior simplificado; soporte para cambio de fecha con filtrado automático; skeleton de carga.
 - **Gestión de alimentos**: búsqueda inteligente (sin tildes/mayúsculas), 50+ alimentos chilenos, filtros por categorías con íconos de Phosphor, formulario rediseñado con nuevo layout, carga incremental (15 por página), cards de alimentos con diseño oscuro.
-- **Búsqueda nutricional por IA** (DeepSeek + Groq): busca automáticamente macros nutricionales por nombre de alimento usando IA. Sistema híbrido con fallback automático, soporte para múltiples modelos, e indicador visual de carga.
+- **Búsqueda nutricional por IA** (DeepSeek + Groq): busca automáticamente macros nutricionales por nombre de alimento usando IA. Sistema híbrido con fallback automático, soporte para múltiples modelos, indicador visual de carga, y límite diario de 15 búsquedas por usuario con contador en tiempo real.
 - **Sistema de favoritos**: marca alimentos favoritos, filtro de favoritos visible solo cuando hay favoritos, acceso rápido desde la página de agregar alimento.
 - **Alimentos personalizados**: los usuarios pueden crear alimentos con información nutricional personalizada. Alimentos privados por usuario, filtro de alimentos personalizados, y validación mejorada.
 - **Sistema de hidratación**: registro diario de consumo de agua con cards en el dashboard, modal de agregar hidratación con controles de incremento/decremento, y visualización de entradas diarias.
@@ -64,7 +64,7 @@ public/ (PWA manifest e íconos)
 ### 🧪 Endpoints principales (API Routes)
 - `auth`: `login`, `register`, `logout`
 - `dashboard`: `today` (con soporte para fecha específica)
-- `foods`: `search`, `ai-search`, `favorites`, `create`, `custom`, `[id]`
+- `foods`: `search`, `ai-search`, `ai-search/limit`, `favorites`, `create`, `custom`, `[id]`
 - `logs`: `create`, `delete`, `update`
 - `exercises`: `create`, `delete`
 - `hydration`: `create`
@@ -78,7 +78,7 @@ Explora la lista completa en `app/api/` y el desglose en `RESUMEN_COMPLETO_PROYE
 ---
 
 ### 🗄️ Base de datos (Drizzle + PostgreSQL)
-- Tablas: `users`, `user_profiles`, `foods`, `food_logs`, `exercises`, `user_streaks`, `achievements`, `meal_reminders`, `user_favorites`, `water_logs`.
+- Tablas: `users`, `user_profiles`, `foods`, `food_logs`, `exercises`, `user_streaks`, `achievements`, `meal_reminders`, `user_favorites`, `water_logs`, `ai_search_logs`.
 - Campos adicionales: `manual_targets`, `target_weight`, `preferred_sports`, `dietary_preferences`, `food_allergies`, `bio`, `phone` en `user_profiles`; `icon` en `exercises`; `is_custom`, `user_id` en `foods`.
 - Migraciones listas y seeds con 50+ alimentos (ver `drizzle/` y `scripts/`).
 

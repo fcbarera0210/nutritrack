@@ -9,6 +9,7 @@ import { CalculationInfo } from '@/components/ui/CalculationInfo';
 import { SignOut, ArrowLeft, User as UserIcon, Target, PencilSimple, FloppyDisk, DownloadSimple, Bell, Info, X, CloudArrowDown, HandWaving, Fire, Speedometer, Fish, Grains, Avocado, WarningCircle, CaretDown } from '@phosphor-icons/react';
 import { BottomNav } from '@/components/dashboard/BottomNav';
 import { calculateTDEE, calculateMacros } from '@/lib/utils/calories';
+import { APP_VERSION } from '@/lib/constants';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -788,6 +789,11 @@ export default function ProfilePage() {
                     Cerrar Sesión
                   </span>
                 </button>
+                
+                {/* Versión */}
+                <div className="text-center pt-2">
+                  <p className="text-[#5A5B5A] text-[12px]">v{APP_VERSION}</p>
+                </div>
               </div>
             </>
           )}

@@ -144,26 +144,26 @@ export function ExerciseCalculationInfo({ isOpen, onClose }: { isOpen: boolean; 
 
         {/* Nota sobre ejercicios personalizados */}
         <div className="bg-white rounded-[20px] p-4">
-          <p className="text-xs text-[#5A5B5A] flex items-start gap-2" style={{ fontFamily: 'Quicksand, sans-serif' }}>
-            <WarningCircle size={18} weight="bold" className="text-[#E5C438] flex-shrink-0 mt-0.5" />
-            <span><strong>Ejercicios personalizados:</strong> Si seleccionas "Otro ejercicio" y no está en la lista, 
+          <p className="text-xs text-[#5A5B5A]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
+            <WarningCircle size={14} weight="bold" className="text-[#5A5B5A] inline-block align-middle mr-1" />
+            <strong>Ejercicios personalizados:</strong> Si seleccionas "Otro ejercicio" y no está en la lista, 
             se utiliza un valor MET por defecto de 3.5 (actividad ligera). Esto es una estimación conservadora 
-            para ejercicios de intensidad moderada.</span>
+            para ejercicios de intensidad moderada.
           </p>
         </div>
 
         <div className="pt-4 border-t border-gray-200 space-y-3">
-          <p className="text-xs text-[#5A5B5A] flex items-start gap-2" style={{ fontFamily: 'Quicksand, sans-serif' }}>
-            <Lightbulb size={18} weight="bold" className="text-[#6484E2] flex-shrink-0 mt-0.5" />
-            <span><strong>Nota:</strong> Estos cálculos son estimaciones basadas en valores MET estándar. 
+          <p className="text-xs text-[#5A5B5A]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
+            <Lightbulb size={14} weight="bold" className="text-[#5A5B5A] inline-block align-middle mr-1" />
+            <strong>Nota:</strong> Estos cálculos son estimaciones basadas en valores MET estándar. 
             El gasto calórico real puede variar según factores como la intensidad real del ejercicio, 
-            el terreno, la técnica utilizada, el estado físico individual y otros factores personales.</span>
+            el terreno, la técnica utilizada, el estado físico individual y otros factores personales.
           </p>
-          <p className="text-xs text-[#5A5B5A] flex items-start gap-2" style={{ fontFamily: 'Quicksand, sans-serif' }}>
-            <UserCircleCheck size={18} weight="bold" className="text-[#6484E2] flex-shrink-0 mt-0.5" />
-            <span><strong>Recomendación:</strong> Para obtener mediciones más precisas, considera usar dispositivos 
+          <p className="text-xs text-[#5A5B5A]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
+            <UserCircleCheck size={14} weight="bold" className="text-[#5A5B5A] inline-block align-middle mr-1" />
+            <strong>Recomendación:</strong> Para obtener mediciones más precisas, considera usar dispositivos 
             de seguimiento de actividad física (pulseras, relojes inteligentes) o consultar con un profesional 
-            del deporte que pueda evaluar tu gasto calórico específico.</span>
+            del deporte que pueda evaluar tu gasto calórico específico.
           </p>
         </div>
 

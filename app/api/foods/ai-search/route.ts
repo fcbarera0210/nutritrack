@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { aiSearchLogs } from '@/lib/db/schema';
+import { getTodayDateLocal } from '@/lib/utils/date';
+import { eq, and, count } from 'drizzle-orm';
 
 interface AISearchResponse {
   calories: number;
@@ -8,6 +12,7 @@ interface AISearchResponse {
   fat: number;
   servingSize?: number;
   source?: string;
+  matchedFood?: string; // Nombre del alimento que se usó como base para el cálculo
 }
 
 type AIProvider = 'deepseek' | 'groq';
@@ -119,6 +124,9 @@ async function callAIAPI(config: AIConfig, prompt: string): Promise<{ content: s
   }
 }
 
+// Límite diario de búsquedas por usuario
+const DAILY_SEARCH_LIMIT = 15;
+
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
@@ -128,11 +136,48 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { foodName } = body;
+    const { foodName, servingSize, servingUnit } = body;
 
     if (!foodName || typeof foodName !== 'string' || foodName.trim().length === 0) {
       return NextResponse.json({ error: 'El nombre del alimento es requerido' }, { status: 400 });
     }
+
+    // Verificar límite diario de búsquedas
+    const today = getTodayDateLocal();
+    
+    // SIMULACIÓN: Descomentar la siguiente línea para simular que el límite está alcanzado
+    // const SIMULATE_LIMIT_REACHED = true;
+    const SIMULATE_LIMIT_REACHED = false; // Cambiar a true para simular límite alcanzado
+    
+    const todaySearches = await db
+      .select({ count: count() })
+      .from(aiSearchLogs)
+      .where(
+        and(
+          eq(aiSearchLogs.userId, user.id),
+          eq(aiSearchLogs.date, today)
+        )
+      );
+
+    const searchCount = todaySearches[0]?.count || 0;
+    const effectiveSearchCount = SIMULATE_LIMIT_REACHED ? DAILY_SEARCH_LIMIT : searchCount;
+
+    if (effectiveSearchCount >= DAILY_SEARCH_LIMIT) {
+      return NextResponse.json(
+        { 
+          error: `Has alcanzado el límite diario de ${DAILY_SEARCH_LIMIT} búsquedas por IA. Por favor, intenta nuevamente mañana o ingresa los valores manualmente.`,
+          limitReached: true,
+          dailyLimit: DAILY_SEARCH_LIMIT,
+          searchesUsed: effectiveSearchCount
+        },
+        { status: 429 } // 429 Too Many Requests
+      );
+    }
+
+    // Determinar la unidad y tamaño de porción para el prompt
+    const unit = servingUnit || 'g';
+    const portionSize = servingSize || 100;
+    const unitLabel = unit === 'g' ? 'gramos' : unit === 'ml' ? 'mililitros' : 'unidades';
 
     // Obtener configuraciones disponibles (DeepSeek primero, luego Groq)
     const aiConfigs = getAIConfigs();
@@ -144,21 +189,27 @@ export async function POST(req: Request) {
       );
     }
 
-    // Construir el prompt para la IA
+    // Construir el prompt para la IA con el tamaño de porción específico
     const prompt = `Busca información nutricional precisa para "${foodName.trim()}" en español.
     
-Devuelve ÚNICAMENTE un objeto JSON válido con la siguiente estructura (valores por 100g):
+IMPORTANTE: Si "${foodName.trim()}" NO es un alimento o no tiene información nutricional, devuelve todos los valores en 0 y en "matchedFood" indica "No encontrado" o "No es un alimento".
+
+Devuelve ÚNICAMENTE un objeto JSON válido con la siguiente estructura (valores por ${portionSize}${unit}):
 {
-  "calories": número (kcal por 100g),
-  "protein": número (gramos por 100g),
-  "carbs": número (gramos por 100g),
-  "fat": número (gramos por 100g),
-  "servingSize": número (tamaño de porción común en gramos, opcional),
+  "calories": número (kcal por ${portionSize}${unit}),
+  "protein": número (gramos por ${portionSize}${unit}),
+  "carbs": número (gramos por ${portionSize}${unit}),
+  "fat": número (gramos por ${portionSize}${unit}),
+  "servingSize": número (tamaño de porción común en ${unitLabel}, opcional),
+  "matchedFood": "string (nombre exacto del alimento usado como base, ej: 'Manzana roja', 'Pechuga de pollo', etc. Si no es un alimento, usar 'No encontrado')",
   "source": "string (breve descripción de la fuente, opcional)"
 }
 
 Reglas importantes:
-- Si no encuentras información exacta, usa valores aproximados de alimentos similares
+- Los valores deben ser para ${portionSize} ${unitLabel} (${portionSize}${unit})
+- Si "${foodName.trim()}" NO es un alimento comestible, devuelve: {"calories": 0, "protein": 0, "carbs": 0, "fat": 0, "matchedFood": "No encontrado"}
+- Si encuentras información exacta, usa "matchedFood" con el nombre exacto del alimento
+- Si no encuentras información exacta pero es un alimento, usa valores aproximados de alimentos similares y en "matchedFood" indica el alimento similar usado
 - Los valores deben ser realistas y numéricos (no null ni undefined)
 - Las calorías deben ser >= 0
 - Las proteínas, carbohidratos y grasas deben ser >= 0
@@ -225,16 +276,40 @@ Reglas importantes:
       carbs: Math.max(0, Number(aiResponse.carbs) || 0),
       fat: Math.max(0, Number(aiResponse.fat) || 0),
       servingSize: aiResponse.servingSize ? Math.max(0.1, Number(aiResponse.servingSize)) : undefined,
+      matchedFood: aiResponse.matchedFood || foodName.trim(),
       source: aiResponse.source || undefined,
     };
 
-    // Log para debugging (puedes eliminarlo en producción si prefieres)
+    // Detectar si todos los valores son 0 (probablemente no es un alimento)
+    const allZero = validatedResponse.calories === 0 && 
+                     validatedResponse.protein === 0 && 
+                     validatedResponse.carbs === 0 && 
+                     validatedResponse.fat === 0;
+
+    // Registrar la búsqueda en la base de datos (solo si fue exitosa)
+    try {
+      await db.insert(aiSearchLogs).values({
+        userId: user.id,
+        foodName: foodName.trim(),
+        date: today,
+      });
+    } catch (logError) {
+      // No fallar la búsqueda si hay un error al registrar el log
+      console.error('Error registrando búsqueda de IA:', logError);
+    }
+
+    // Log para debugging
     console.log(`✅ Búsqueda nutricional completada usando ${usedProvider} para: ${foodName.trim()}`);
+    if (allZero) {
+      console.log(`⚠️ Todos los valores son 0 - posiblemente "${foodName.trim()}" no es un alimento`);
+    }
 
     return NextResponse.json({ 
       success: true, 
       data: validatedResponse,
-      provider: usedProvider, // Información opcional sobre qué proveedor se usó
+      provider: usedProvider,
+      isZeroResult: allZero, // Indicador de que todos los valores son 0
+      searchesRemaining: Math.max(0, DAILY_SEARCH_LIMIT - effectiveSearchCount - 1), // Búsquedas restantes después de esta
     });
   } catch (error: any) {
     console.error('Error en búsqueda por IA:', error);
