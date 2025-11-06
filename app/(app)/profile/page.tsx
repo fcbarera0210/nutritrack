@@ -63,6 +63,13 @@ export default function ProfilePage() {
     setIsLoadingProfile(true);
     try {
       const response = await fetch('/api/user/profile');
+      
+      // Si la respuesta es 401 o 403, redirigir al login
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = '/login';
+        return;
+      }
+      
       const data = await response.json();
       if (response.ok) {
         // Debug: Log para ver qué datos llegan
@@ -155,10 +162,12 @@ export default function ProfilePage() {
   const handleSignOut = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/login');
-      router.refresh();
+      // Usar window.location para forzar recarga completa y funcionar en PWA
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
+      // Aún así redirigir al login si hay error
+      window.location.href = '/login';
     }
   };
 

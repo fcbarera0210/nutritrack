@@ -60,11 +60,31 @@ export default function DashboardPage() {
   }, [selectedDate]);
 
   const fetchDashboardData = async () => {
+    // Verificar autenticación antes de hacer fetch
+    try {
+      const authCheck = await fetch('/api/user/profile');
+      if (authCheck.status === 401 || authCheck.status === 403) {
+        window.location.href = '/login';
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      window.location.href = '/login';
+      return;
+    }
+    
     try {
       setIsLoading(true);
       // Formatear la fecha seleccionada a YYYY-MM-DD usando la función helper para evitar problemas de zona horaria
       const dateStr = formatDateLocal(selectedDate);
       const response = await fetch(`/api/dashboard/today?date=${dateStr}`);
+      
+      // Si la respuesta es 401 o 403, redirigir al login
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = '/login';
+        return;
+      }
+      
       const data = await response.json();
       
       if (response.ok) {
