@@ -9,7 +9,8 @@ import {
   Avocado, 
   Cookie, 
   ClipboardText,
-  Star
+  Star,
+  NotePencil
 } from '@phosphor-icons/react';
 
 export interface Category {

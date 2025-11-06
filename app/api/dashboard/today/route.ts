@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { foodLogs, foods, exercises, userStreaks } from '@/lib/db/schema';
+import { foodLogs, foods, exercises, userStreaks, userProfiles, waterLogs, users } from '@/lib/db/schema';
 import { eq, and, sql, gte } from 'drizzle-orm';
+import { getTodayDateLocal, formatDateLocal } from '@/lib/utils/date';
 import { format } from 'date-fns';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const user = await getCurrentUser();
     
@@ -13,7 +14,34 @@ export async function GET() {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     }
 
-    const today = format(new Date(), 'yyyy-MM-dd');
+    // Obtener la fecha del query string, o usar la fecha actual si no se especifica
+    const { searchParams } = new URL(req.url);
+    const dateParam = searchParams.get('date');
+    
+    let targetDate: string;
+    if (dateParam) {
+      // Validar formato de fecha YYYY-MM-DD
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (dateRegex.test(dateParam)) {
+        targetDate = dateParam;
+      } else {
+        // Si el formato es inválido, intentar parsear como Date
+        try {
+          const parsedDate = new Date(dateParam);
+          if (!isNaN(parsedDate.getTime())) {
+            targetDate = formatDateLocal(parsedDate);
+          } else {
+            targetDate = getTodayDateLocal();
+          }
+        } catch {
+          targetDate = getTodayDateLocal();
+        }
+      }
+    } else {
+      targetDate = getTodayDateLocal();
+    }
+
+    const today = targetDate;
     
     // Get today's food logs with food details
     const todayLogs = await db
@@ -115,6 +143,54 @@ export async function GET() {
 
     const streak = streakData.length > 0 ? streakData[0].currentStreak : 0;
 
+    // Get user profile with targets
+    const profileData = await db
+      .select()
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, user.id))
+      .limit(1);
+
+    const targets = profileData.length > 0 ? {
+      targetCalories: profileData[0].targetCalories ?? 2000,
+      targetProtein: profileData[0].targetProtein ?? 150,
+      targetCarbs: profileData[0].targetCarbs ?? 250,
+      targetFat: profileData[0].targetFat ?? 67,
+    } : {
+      targetCalories: 2000,
+      targetProtein: 150,
+      targetCarbs: 250,
+      targetFat: 67,
+    };
+
+    // Get water logs for today
+    const todayWaterLogs = await db
+      .select()
+      .from(waterLogs)
+      .where(and(
+        eq(waterLogs.userId, user.id),
+        eq(waterLogs.date, today)
+      ));
+
+    const totalWater = todayWaterLogs.reduce((sum, log) => sum + log.amount, 0);
+
+    // Format water entries for display
+    const waterEntries = todayWaterLogs.map(log => ({
+      id: log.id,
+      amount: log.amount,
+      time: format(new Date(log.createdAt), 'HH:mm'),
+    }));
+
+    // Get user name
+    const userData = await db
+      .select({
+        name: users.name,
+      })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1);
+
+    const userName = userData.length > 0 ? userData[0].name : null;
+
     return NextResponse.json({
       totals: {
         calories: Math.round(totals.calories),
@@ -122,10 +198,14 @@ export async function GET() {
         carbs: Math.round(totals.carbs * 10) / 10,
         fat: Math.round(totals.fat * 10) / 10,
       },
+      targets,
       meals,
       exercises: todayExercises,
       totalCaloriesBurned,
       streak,
+      totalWater,
+      waterEntries,
+      userName,
     });
   } catch (error: any) {
     console.error('Error en dashboard API:', error);

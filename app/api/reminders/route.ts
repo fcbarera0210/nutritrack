@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { mealReminders } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 
 const reminderSchema = z.object({
@@ -54,11 +54,29 @@ export async function POST(req: Request) {
       .select()
       .from(mealReminders)
       .where(
-        eq(mealReminders.userId, user.id)
+        and(
+          eq(mealReminders.userId, user.id),
+          eq(mealReminders.mealType, validatedData.mealType)
+        )
       )
       .limit(1);
 
-    // Si tiene ID, actualizar
+    // Si existe un recordatorio para este tipo de comida, actualizarlo
+    if (existing.length > 0) {
+      await db
+        .update(mealReminders)
+        .set({
+          hour: validatedData.hour,
+          minute: validatedData.minute,
+          enabled: validatedData.enabled ?? true,
+          updatedAt: new Date(),
+        })
+        .where(eq(mealReminders.id, existing[0].id));
+
+      return NextResponse.json({ success: true });
+    }
+
+    // Si tiene ID, actualizar (compatibilidad con código antiguo)
     if (validatedData.id) {
       await db
         .update(mealReminders)

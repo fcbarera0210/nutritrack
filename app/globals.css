@@ -102,6 +102,9 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
 /* Typography improvements */
@@ -134,25 +137,34 @@ button, a, [role="button"] {
   user-select: none;
 }
 
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 0;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  display: none;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 4px;
+  display: none;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4a9244;
+  display: none;
 }
 
 /* Dark mode support */

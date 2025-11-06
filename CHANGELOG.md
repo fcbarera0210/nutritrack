@@ -1,5 +1,21 @@
 Changelog
 
+0.2.0 - Búsqueda por IA, Alimentos Personalizados, Hidratación y Mejoras de UX
+- **Búsqueda nutricional por IA**: Integración con DeepSeek y Groq para buscar automáticamente macros nutricionales por nombre de alimento. Sistema híbrido con fallback automático, soporte para múltiples modelos de Groq, y indicador visual de carga durante la búsqueda.
+- **Sistema de favoritos**: Funcionalidad completa para marcar alimentos favoritos, filtro de favoritos visible solo cuando el usuario tiene favoritos, acceso rápido desde la página de agregar alimento.
+- **Alimentos personalizados**: Los usuarios pueden crear sus propios alimentos con información nutricional personalizada. Alimentos privados por usuario, filtro de alimentos personalizados, y validación de campos mejorada.
+- **Sistema de hidratación**: Registro diario de consumo de agua con cards en el dashboard, modal de agregar hidratación con controles de incremento/decremento, y visualización de entradas diarias.
+- **Mejoras en ejercicios**: Selector de iconos para ejercicios (24+ iconos de Phosphor), cálculo automático de calorías con sistema MET, modal de lista de ejercicios del día, y modal de información sobre cálculo de calorías.
+- **Dashboard mejorado**: Soporte para cambio de fecha en calendario (los datos se filtran por fecha seleccionada), skeleton de carga mientras se obtienen datos, carga del nombre de usuario junto con datos del dashboard para evitar parpadeo de iniciales.
+- **Mejoras en cards de comidas**: Eliminación de macros en cards (solo kcal), lista de alimentos reales en lugar de contador, y mejor layout con información clara.
+- **Mejoras en diseño**: Tamaños de fuente ajustados en cards de ejercicio/hidratación (28px total, 12px unidad), nav inferior simplificado (solo Inicio, Agregar, Perfil), sin scrollbar visible en desktop.
+- **Perfil mejorado**: Campos adicionales (nombre, teléfono con formato automático +56, deportes preferidos, preferencias dietéticas, alergias), validación de teléfono (máx 9 dígitos), y diseño consistente con formularios de la app.
+- **Recordatorios mejorados**: Diseño consistente con nueva paleta, iconos de Phosphor para cada comida (SunHorizon, Sun, MoonStars, Orange), y funcionalidad de activación de recordatorios corregida.
+- **Base de datos**: Nuevas tablas `user_favorites`, `water_logs`, y campos adicionales en `user_profiles` y `exercises`.
+- **API Routes nuevas**: `/api/foods/ai-search`, `/api/foods/favorites`, `/api/foods/create`, `/api/foods/custom`, `/api/foods/[id]`, `/api/hydration/create`, `/api/exercises/delete`.
+- **Utilidades nuevas**: `lib/utils/date.ts` para manejo de fechas locales, `lib/utils/exerciseIcons.ts` para mapeo de iconos de ejercicios.
+- **Componentes nuevos**: `CustomFoodForm`, `HydrationForm`, `ExerciseCalculationInfo`, `DashboardSkeleton`, `FoodListSkeleton`, `ProfileSkeleton` mejorado.
+
 0.1.3 - Rediseño Página Agregar Alimento
 - Página "Agregar Alimento" completamente rediseñada: header oscuro con botón volver, título y descripción.
 - Filtros de categorías: solo íconos de Phosphor (Fish, Cheese, Cherries, Carrot, Plant, Bread, Avocado, Cookie, ClipboardText, Star), sin texto visible.

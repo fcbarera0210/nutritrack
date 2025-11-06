@@ -8,6 +8,13 @@
       "when": 1761527027919,
       "tag": "0000_rapid_rocket_racer",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762353601615,
+      "tag": "0001_ordinary_spot",
+      "breakpoints": true
     }
   ]
 }

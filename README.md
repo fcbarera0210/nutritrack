@@ -12,13 +12,17 @@ NutriTrack es una aplicación web (Next.js) para registrar comidas y ejercicios,
 
 ### ✅ Funcionalidades implementadas (MVP completo)
 - **Autenticación**: registro, login, logout, sesiones JWT, guards server-side en layouts. Login y Register rediseñados con nuevo header oscuro, logo y formularios estilo moderno.
-- **Dashboard diario** (rediseñado 2025-10): header en caja oscura con calendario semanal, racha y gráficos circulares; sección kcal; cards de ejercicio/agua; cards de comidas con imágenes y botón rápido; navbar inferior actualizado.
-- **Gestión de alimentos**: búsqueda inteligente (sin tildes/mayúsculas), 50+ alimentos chilenos, filtros por categorías con íconos de Phosphor, formulario rediseñado con nuevo layout, carga incremental (15 por página), cards de alimentos con diseño oscuro y soporte visual para favoritos.
-- **Gestión de ejercicios**: 12+ ejercicios, cálculo de calorías por fórmula MET, visualización y eliminación.
-- **Perfil de usuario**: datos personales, TDEE (Mifflin‑St Jeor), objetivos y nivel de actividad, ajuste de macros objetivo, exportación CSV, dark mode toggle.
+- **Dashboard diario** (rediseñado 2025-10): header en caja oscura con calendario semanal, racha y gráficos circulares; sección kcal; cards de ejercicio/agua; cards de comidas con lista de alimentos reales; navbar inferior simplificado; soporte para cambio de fecha con filtrado automático; skeleton de carga.
+- **Gestión de alimentos**: búsqueda inteligente (sin tildes/mayúsculas), 50+ alimentos chilenos, filtros por categorías con íconos de Phosphor, formulario rediseñado con nuevo layout, carga incremental (15 por página), cards de alimentos con diseño oscuro.
+- **Búsqueda nutricional por IA** (DeepSeek + Groq): busca automáticamente macros nutricionales por nombre de alimento usando IA. Sistema híbrido con fallback automático, soporte para múltiples modelos, e indicador visual de carga.
+- **Sistema de favoritos**: marca alimentos favoritos, filtro de favoritos visible solo cuando hay favoritos, acceso rápido desde la página de agregar alimento.
+- **Alimentos personalizados**: los usuarios pueden crear alimentos con información nutricional personalizada. Alimentos privados por usuario, filtro de alimentos personalizados, y validación mejorada.
+- **Sistema de hidratación**: registro diario de consumo de agua con cards en el dashboard, modal de agregar hidratación con controles de incremento/decremento, y visualización de entradas diarias.
+- **Gestión de ejercicios**: 12+ ejercicios, cálculo de calorías por fórmula MET, selector de iconos (24+ iconos de Phosphor), visualización y eliminación, modal de lista de ejercicios del día, y modal explicativo sobre cálculo de calorías.
+- **Perfil de usuario**: datos personales, TDEE (Mifflin‑St Jeor), objetivos y nivel de actividad, ajuste de macros objetivo, campos adicionales (nombre, teléfono con formato automático +56, deportes preferidos, preferencias dietéticas, alergias), exportación CSV, modal informativo sobre cálculos nutricionales.
 - **Estadísticas**: gráfico de calorías últimos 7 días con datos reales, logros (gamificación) y animaciones.
 - **CRUD completo**: crear/editar/eliminar logs de alimentos y ejercicios con confirmaciones.
-- **Recordatorios y notificaciones**: API CRUD de recordatorios, permisos de notificaciones, notificaciones visuales.
+- **Recordatorios y notificaciones**: API CRUD de recordatorios, diseño consistente con iconos de Phosphor, funcionalidad de activación corregida.
 
 Notas de diseño: migración a `@phosphor-icons/react` v2, tokens de color y utilidades Tailwind personalizadas (espaciados exactos), navbar con fondo #131917 y botón central #CEFB48. Login/Register con header oscuro, logo de 3 puntos verticales, inputs con Phosphor Icons y borde focus #CEFB48. Página "Agregar Alimento" rediseñada con filtros por íconos, cards oscuras, scroll horizontal y formulario moderno.
 
@@ -26,7 +30,6 @@ Notas de diseño: migración a `@phosphor-icons/react` v2, tokens de color y uti
 
 ### 🟡 Funcionalidades pendientes (roadmap)
 - **APIs externas**: OpenFoodFacts, escáner de código de barras, reconocimiento por foto (IA).
-- **Favoritos**: marcar alimentos y sección "Mis Favoritos" con acceso rápido.
 - **Historial navegable**: días anteriores, selector de fechas y comparaciones.
 - **Búsqueda avanzada**: más filtros, ordenamientos y búsquedas recientes.
 - **Gamificación avanzada**: badges, celebraciones, galería de logros y rankings.
@@ -60,10 +63,11 @@ public/ (PWA manifest e íconos)
 
 ### 🧪 Endpoints principales (API Routes)
 - `auth`: `login`, `register`, `logout`
-- `dashboard`: `today`
-- `foods`: `search`
+- `dashboard`: `today` (con soporte para fecha específica)
+- `foods`: `search`, `ai-search`, `favorites`, `create`, `custom`, `[id]`
 - `logs`: `create`, `delete`, `update`
 - `exercises`: `create`, `delete`
+- `hydration`: `create`
 - `stats`: `weekly`
 - `user`: `profile`
 - `reminders`: `GET/POST`, `PUT/DELETE /[id]`
@@ -74,7 +78,8 @@ Explora la lista completa en `app/api/` y el desglose en `RESUMEN_COMPLETO_PROYE
 ---
 
 ### 🗄️ Base de datos (Drizzle + PostgreSQL)
-- Tablas: `users`, `user_profiles`, `foods`, `food_logs`, `exercises`, `user_streaks`, `achievements`, `meal_reminders`.
+- Tablas: `users`, `user_profiles`, `foods`, `food_logs`, `exercises`, `user_streaks`, `achievements`, `meal_reminders`, `user_favorites`, `water_logs`.
+- Campos adicionales: `manual_targets`, `target_weight`, `preferred_sports`, `dietary_preferences`, `food_allergies`, `bio`, `phone` en `user_profiles`; `icon` en `exercises`; `is_custom`, `user_id` en `foods`.
 - Migraciones listas y seeds con 50+ alimentos (ver `drizzle/` y `scripts/`).
 
 ---
@@ -90,6 +95,30 @@ Explora la lista completa en `app/api/` y el desglose en `RESUMEN_COMPLETO_PROYE
 ### ⚙️ Requisitos y scripts
 Requisitos: Node.js LTS, PostgreSQL (Neon recomendado) y variables de entorno configuradas.
 
+**Configuración de variables de entorno**
+
+Crea un archivo `.env.local` (o `.env`) en la raíz del proyecto con las siguientes variables:
+
+```bash
+# Obligatorio: URL de conexión a PostgreSQL
+DATABASE_URL=postgresql://usuario:contraseña@host:puerto/database?sslmode=require
+
+# Obligatorio: Secret para encriptación de sesiones JWT
+# Genera uno seguro con: openssl rand -base64 32
+NEXTAUTH_SECRET=tu-secret-seguro-aqui
+
+# Opcional: URLs de la aplicación (para producción)
+NEXTAUTH_URL=https://tu-dominio.com
+APP_URL=https://tu-dominio.com
+
+# Opcional: APIs de IA para búsqueda nutricional automática
+# Configura al menos una de las siguientes (recomendado: ambas para fallback)
+DEEPSEEK_API_KEY=sk-...          # Free tier: 5M tokens/mes
+GROQ_API_KEY=gsk_...              # 100% gratis (rate limits)
+```
+
+**Nota**: El formato debe ser `KEY=value` (no `KEY:value`). Ver `.env.example` para referencia.
+
 Desarrollo
 ```bash
 npm run dev
@@ -104,9 +133,10 @@ npm start
 ### 🚀 Deploy en Vercel
 1. Crea un proyecto en Vercel y conecta el repo `fcbarera0210/nutritrack`.
 2. Variables de entorno (Production/Preview/Development):
-   - `DATABASE_URL` (Neon/Postgres)
-   - `JWT_SECRET`
-   - Otros envs que uses localmente.
+   - `DATABASE_URL` (Neon/Postgres) - **Obligatorio**
+   - `NEXTAUTH_SECRET` - **Obligatorio**
+   - `NEXTAUTH_URL` (opcional, para producción)
+   - `APP_URL` (opcional, para producción)
 3. Config por defecto de Next.js (ya incluida):
    - Build Command: `npm run build`
    - Install Command: `npm install`

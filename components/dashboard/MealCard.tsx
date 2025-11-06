@@ -1,14 +1,19 @@
 'use client';
 
-import { Plus, Fish, Bread, Avocado } from '@phosphor-icons/react';
-import Image from 'next/image';
-
 interface MealCardProps {
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   calories: number;
   itemCount: number;
+  items?: Array<{
+    id: number;
+    name: string;
+    calories: number;
+    quantity: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  }>;
   onClick: () => void;
-  imageUrl?: string;
 }
 
 const mealLabels = {
@@ -18,58 +23,45 @@ const mealLabels = {
   snack: 'Snacks',
 };
 
-export function MealCard({ mealType, calories, itemCount, onClick, imageUrl }: MealCardProps) {
-  const demoImages = [
-    `https://picsum.photos/seed/${mealType}-1/46/46`,
-    `https://picsum.photos/seed/${mealType}-2/46/46`,
-  ];
+export function MealCard({ mealType, calories, itemCount, items = [], onClick }: MealCardProps) {
   return (
     <div
       onClick={onClick}
-      className="bg-[#131917] rounded-[30px] px-[20px] py-[15px] mb-3 shadow-[0_2px_10px_rgba(0,0,0,0.10)] flex items-center justify-between gap-3 cursor-pointer"
+      className="bg-[#131917] rounded-[30px] px-[20px] py-[15px] mb-3 shadow-[0_2px_10px_rgba(0,0,0,0.10)] cursor-pointer"
     >
-      {/* Left section */}
-      <div className="flex-1">
-        <p className="text-white font-semibold text-[24px] leading-tight mb-2">{mealLabels[mealType]}</p>
-        <div className="flex items-center gap-1 mb-2">
-          <span className="text-white font-semibold text-[24px] leading-none">{calories || 385}</span>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-white font-semibold text-[24px] leading-tight">{mealLabels[mealType]}</p>
+        {/* Calorías totales */}
+        <div className="flex items-center gap-1">
+          <span className="text-white font-semibold text-[24px] leading-none">{calories}</span>
           <span className="text-white/90 font-light text-base leading-none ml-[2px]">kcal</span>
-        </div>
-        {/* Nutrients */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 whitespace-nowrap">
-            <Fish size={16} weight="bold" className="text-[#CEFB48]" />
-            <span className="text-white text-sm">18&nbsp;g</span>
-          </div>
-          <div className="flex items-center gap-1 whitespace-nowrap">
-            <Bread size={16} weight="bold" className="text-[#E5C438]" />
-            <span className="text-white text-sm">18&nbsp;g</span>
-          </div>
-          <div className="flex items-center gap-1 whitespace-nowrap">
-            <Avocado size={16} weight="bold" className="text-[#DC3714]" />
-            <span className="text-white text-sm">18&nbsp;g</span>
-          </div>
         </div>
       </div>
 
-      {/* Right section */}
-      <div className="w-[140px] flex-shrink-0">
-        <div className="flex justify-end items-center mb-2">
-          <div className="w-[46px] h-[46px] rounded-[10px] overflow-hidden bg-white/20">
-            <Image src={imageUrl || demoImages[0]} alt={mealLabels[mealType]} width={46} height={46} className="object-cover w-full h-full" />
-          </div>
-          <div className="w-[46px] h-[46px] rounded-[10px] overflow-hidden bg-white/20 -ml-4">
-            <Image src={imageUrl || demoImages[1]} alt={mealLabels[mealType]} width={46} height={46} className="object-cover w-full h-full" />
-          </div>
-          <button
-            className="w-[46px] h-[46px] rounded-[10px] bg-[#D9D9D9] flex items-center justify-center text-[#131917] -ml-4 border-2 border-white shadow-[0_2px_10px_rgba(0,0,0,0.10)]"
-            aria-label="Agregar comida"
-          >
-            <Plus size={24} weight="bold" />
-          </button>
+      {/* Lista de alimentos */}
+      {items.length > 0 ? (
+        <div className="space-y-2">
+          {items.slice(0, 3).map((item) => {
+            const itemCalories = Math.round(item.calories * item.quantity / 100);
+            
+            return (
+              <div key={item.id} className="flex items-center justify-between py-1">
+                <span className="text-white text-sm font-medium truncate flex-1 pr-2">{item.name}</span>
+                {/* Calorías */}
+                <span className="text-white/70 text-xs whitespace-nowrap">
+                  {itemCalories} kcal
+                </span>
+              </div>
+            );
+          })}
+          {items.length > 3 && (
+            <p className="text-white/70 text-xs pt-1">+{items.length - 3} más</p>
+          )}
         </div>
-        <p className="text-white/90 font-light text-[10px] text-center">{itemCount || 2} comida{(itemCount || 2) !== 1 ? 's' : ''}</p>
-      </div>
+      ) : (
+        <p className="text-white/50 text-sm">No hay alimentos registrados</p>
+      )}
     </div>
   );
 }

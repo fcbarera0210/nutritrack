@@ -22,6 +22,15 @@ export const userProfiles = pgTable('user_profiles', {
   targetProtein: real('target_protein'),
   targetCarbs: real('target_carbs'),
   targetFat: real('target_fat'),
+  // Manual override flag
+  manualTargets: boolean('manual_targets').default(false), // Si true, los objetivos son manuales y no se recalculan
+  // Additional user information
+  targetWeight: real('target_weight'), // Peso objetivo
+  preferredSports: text('preferred_sports'), // JSON array de deportes preferidos
+  dietaryPreferences: text('dietary_preferences'), // JSON array: 'vegetarian', 'vegan', 'gluten_free', 'keto', etc.
+  foodAllergies: text('food_allergies'), // Texto libre de alergias alimentarias
+  bio: text('bio'), // Descripción breve del usuario
+  phone: text('phone'), // Teléfono del usuario
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
@@ -65,6 +74,7 @@ export const exercises = pgTable('exercises', {
   name: text('name').notNull(),
   durationMinutes: integer('duration_minutes').notNull(),
   caloriesBurned: integer('calories_burned').notNull(),
+  icon: text('icon'), // Nombre del icono de Phosphor Icons
   date: date('date').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -96,5 +106,22 @@ export const mealReminders = pgTable('meal_reminders', {
   enabled: boolean('enabled').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// User food favorites
+export const userFavorites = pgTable('user_favorites', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  foodId: integer('food_id').notNull().references(() => foods.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Water logs - daily hydration
+export const waterLogs = pgTable('water_logs', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  amount: real('amount').notNull(), // Amount in ml
+  date: date('date').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

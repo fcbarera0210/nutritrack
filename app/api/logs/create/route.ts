@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { foodLogs, userStreaks } from '@/lib/db/schema';
-import { eq, gte } from 'drizzle-orm';
+import { foodLogs, userStreaks, foods } from '@/lib/db/schema';
+import { eq, gte, and } from 'drizzle-orm';
 import { foodLogSchema } from '@/lib/validations/food';
-import { format } from 'date-fns';
+import { getTodayDateLocal, formatDateLocal } from '@/lib/utils/date';
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +17,29 @@ export async function POST(req: Request) {
     const body = await req.json();
     const validatedData = foodLogSchema.parse(body);
 
-    const date = validatedData.date || format(new Date(), 'yyyy-MM-dd');
+    const date = validatedData.date || getTodayDateLocal();
+
+    // Verificar que el alimento existe y que el usuario tiene permiso para usarlo
+    // (si es personalizado, debe ser del usuario actual)
+    const food = await db
+      .select()
+      .from(foods)
+      .where(eq(foods.id, validatedData.foodId))
+      .limit(1);
+
+    if (food.length === 0) {
+      return NextResponse.json({ error: 'Alimento no encontrado' }, { status: 404 });
+    }
+
+    const foodData = food[0];
+    
+    // Si el alimento es personalizado, verificar que pertenece al usuario actual
+    if (foodData.isCustom && foodData.userId !== user.id) {
+      return NextResponse.json(
+        { error: 'No tienes permiso para usar este alimento personalizado' },
+        { status: 403 }
+      );
+    }
 
     // Create food log
     const [log] = await db
@@ -63,15 +85,17 @@ async function updateUserStreak(userId: number, date: string) {
   const streak = streakData[0];
   if (!streak) return;
 
-  const yesterday = format(new Date(Date.now() - 24 * 60 * 60 * 1000), 'yyyy-MM-dd');
-  const today = format(new Date(), 'yyyy-MM-dd');
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterdayStr = formatDateLocal(yesterdayDate);
+  const today = getTodayDateLocal();
 
   let newCurrentStreak = streak.currentStreak;
   let newLongestStreak = streak.longestStreak;
 
   if (date === today) {
     // Same day logging - increment streak
-    if (streak.lastLoggedDate === yesterday || streak.lastLoggedDate === today) {
+    if (streak.lastLoggedDate === yesterdayStr || streak.lastLoggedDate === today) {
       newCurrentStreak = streak.currentStreak;
     } else if (streak.lastLoggedDate === date) {
       newCurrentStreak = streak.currentStreak; // Same day

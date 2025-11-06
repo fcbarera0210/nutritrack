@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Bell, BellOff } from 'lucide-react';
+import { Bell, BellSlash } from '@phosphor-icons/react';
 import { requestNotificationPermission, showNotification } from '@/lib/utils/notifications';
 
 export function NotificationPermission() {
@@ -37,33 +36,36 @@ export function NotificationPermission() {
 
   if (permission === 'granted') {
     return (
-      <div className="flex items-center gap-2 text-green-600 text-sm">
-        <Bell className="w-4 h-4" />
-        <span>Notificaciones activadas</span>
+      <div className="bg-[#CEFB48]/70 rounded-[20px] p-4">
+        <div className="flex items-center gap-2 text-[#131917] text-sm">
+          <Bell size={20} weight="bold" />
+          <span style={{ fontFamily: 'Quicksand, sans-serif' }}>Notificaciones activadas</span>
+        </div>
       </div>
     );
   }
 
   if (permission === 'denied') {
     return (
-      <div className="flex items-center gap-2 text-red-600 text-sm">
-        <BellOff className="w-4 h-4" />
-        <span>Notificaciones bloqueadas</span>
+      <div className="bg-[#CEFB48]/70 rounded-[20px] p-4">
+        <div className="flex items-center gap-2 text-[#131917] text-sm">
+          <BellSlash size={20} weight="bold" />
+          <span style={{ fontFamily: 'Quicksand, sans-serif' }}>Notificaciones bloqueadas</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
+    <button
       onClick={handleRequestPermission}
-      isLoading={isLoading}
-      className="w-full"
+      disabled={isLoading}
+      className="w-full bg-[#6484E2] rounded-[15px] px-4 py-[10px] text-white font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+      style={{ fontFamily: 'Quicksand, sans-serif' }}
     >
-      <Bell className="w-4 h-4 mr-2" />
-      Activar notificaciones
-    </Button>
+      <Bell size={20} weight="bold" />
+      {isLoading ? 'Activando...' : 'Activar notificaciones'}
+    </button>
   );
 }
 

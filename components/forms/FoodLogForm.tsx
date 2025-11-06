@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { CaretDown, Fish, Bread, Avocado } from '@phosphor-icons/react';
+import { CaretDown, Fish, Grains, Avocado } from '@phosphor-icons/react';
+import { getTodayDateLocal } from '@/lib/utils/date';
 
 interface FoodLogFormProps {
   food: {
@@ -44,7 +45,7 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
           quantity: parseFloat(quantity),
           servingSize: 100, // Default serving size en gramos
           mealType,
-          date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+          date: getTodayDateLocal(),
         }),
       });
 
@@ -127,7 +128,7 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
               <span>{calculatedProtein}g</span>
             </div>
             <div className="flex items-center gap-1 text-[#E5C438] text-[14px]">
-              <Bread size={18} weight="bold" />
+              <Grains size={18} weight="bold" />
               <span>{calculatedCarbs}g</span>
             </div>
             <div className="flex items-center gap-1 text-[#DC3714] text-[14px]">

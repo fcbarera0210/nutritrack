@@ -21,6 +21,17 @@ export function CircularProgress({
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
+  
+  const roundedValue = Math.round(value);
+  const valueLength = roundedValue.toString().length;
+  
+  // Ajustar tamaño de fuente según la cantidad de dígitos
+  // 1-2 dígitos: 12px, 3 dígitos: 10px, 4+ dígitos: 9px
+  const getValueFontSize = () => {
+    if (valueLength <= 2) return '12px';
+    if (valueLength === 3) return '10px';
+    return '9px';
+  };
 
   return (
     <div className="flex flex-col items-center">
@@ -55,12 +66,16 @@ export function CircularProgress({
             className="transition-all duration-500 ease-out"
           />
         </svg>
-        {/* Center text */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-[12px] font-medium text-white">{percentage}%</span>
+        {/* Center text - en una sola línea */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-white font-medium leading-none" style={{ fontSize: getValueFontSize() }}>
+            {roundedValue}
+            <span className="text-white/70 ml-0.5" style={{ fontSize: '8px' }}>{unit}</span>
+          </span>
         </div>
       </div>
       <p className="text-[10px] font-medium text-white mt-[10px] text-center">{label}</p>
+      <p className="text-[8px] text-white/70 mt-0.5">{percentage.toFixed(0)}%</p>
     </div>
   );
 }

@@ -11,13 +11,23 @@ import { MealCard } from '@/components/dashboard/MealCard';
 import { BottomNav } from '@/components/dashboard/BottomNav';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
-import { Fire, Plus, Minus } from '@phosphor-icons/react';
+import { DashboardSkeleton } from '@/components/ui/Skeleton';
+import { HydrationForm } from '@/components/forms/HydrationForm';
+import { ExerciseForm } from '@/components/forms/ExerciseForm';
+import { ExerciseCalculationInfo } from '@/components/ui/ExerciseCalculationInfo';
+import { getExerciseIcon } from '@/lib/utils/exerciseIcons';
+import { formatDateLocal } from '@/lib/utils/date';
+import { Fire, Plus, Trash, Fish, Grains, Avocado, Clock, WarningCircle } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
+  const [showHydrationModal, setShowHydrationModal] = useState(false);
+  const [showExerciseModal, setShowExerciseModal] = useState(false);
+  const [showExercisesListModal, setShowExercisesListModal] = useState(false);
+  const [showExerciseCalculationInfo, setShowExerciseCalculationInfo] = useState(false);
   
   const [todayStats, setTodayStats] = useState({
     calories: 0,
@@ -42,6 +52,7 @@ export default function DashboardPage() {
   const [totalCaloriesBurned, setTotalCaloriesBurned] = useState(0);
   const [waterEntries, setWaterEntries] = useState([]);
   const [totalWater, setTotalWater] = useState(0);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -50,17 +61,22 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/dashboard/today');
+      // Formatear la fecha seleccionada a YYYY-MM-DD usando la función helper para evitar problemas de zona horaria
+      const dateStr = formatDateLocal(selectedDate);
+      const response = await fetch(`/api/dashboard/today?date=${dateStr}`);
       const data = await response.json();
       
       if (response.ok) {
-        setTodayStats(prev => ({
-          ...prev,
+        setTodayStats({
           calories: data.totals?.calories || 0,
           protein: data.totals?.protein || 0,
           carbs: data.totals?.carbs || 0,
           fat: data.totals?.fat || 0,
-        }));
+          targetCalories: data.targets?.targetCalories || 2000,
+          targetProtein: data.targets?.targetProtein || 150,
+          targetCarbs: data.targets?.targetCarbs || 250,
+          targetFat: data.targets?.targetFat || 67,
+        });
         setStreak(data.streak || 0);
         setMeals(data.meals || {
           breakfast: { totalCalories: 0, items: [] },
@@ -70,8 +86,9 @@ export default function DashboardPage() {
         });
         setExercises(data.exercises || []);
         setTotalCaloriesBurned(data.totalCaloriesBurned || 0);
-        setWaterEntries([]);
-        setTotalWater(0);
+        setWaterEntries(data.waterEntries || []);
+        setTotalWater(data.totalWater || 0);
+        setUserName(data.userName || null);
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -96,188 +113,370 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      {/* Header + dark section wrapper */}
-      <div className="bg-[#131917] rounded-b-[60px]">
-        <div className="px-25 pb-[15px] flex flex-col gap-[30px]">
-          <div>
-            <Header />
-          </div>
-          {/* Weekly Calendar inside dark area */}
-          <div>
-            <WeeklyCalendar
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
-              streakDays={streakDays}
-            />
-          </div>
-          {/* Kcal Box */}
-          <div className="flex flex-col items-center">
-            {streak > 0 && (
+      {isLoading ? (
+        <>
+          <DashboardSkeleton />
+          <BottomNav />
+        </>
+      ) : (
+        <>
+          {/* Header + dark section wrapper */}
+          <div className="bg-[#131917] rounded-b-[60px]">
+            <div className="px-25 pb-[15px] flex flex-col gap-[30px]">
+              <div>
+                <Header userName={userName || undefined} />
+              </div>
+              {/* Weekly Calendar inside dark area */}
+              <div>
+                <WeeklyCalendar
+                  selectedDate={selectedDate}
+                  onDateChange={setSelectedDate}
+                  streakDays={streakDays}
+                />
+              </div>
+              {/* Kcal Box */}
+              <div className="flex flex-col items-center">
+                {/* Mensaje de rachas - Oculto temporalmente */}
+                {/* {streak > 0 && (
               <div className="flex items-center gap-2 mb-[5px]">
                 <Fire size={21} weight="bold" className="text-[#DC3714]" />
                 <p className="text-white text-[14px] font-medium">Llevas {streak} día{streak !== 1 ? 's' : ''} de racha, sigue así !!</p>
               </div>
-            )}
-            <div className="text-white text-[36px] font-semibold">
-              1050 kcal
+            )} */}
+                <div className="text-white text-[36px] font-semibold">
+                  {todayStats.calories} / {todayStats.targetCalories} kcal
+                </div>
+                <div className="text-white/80 text-[14px] mt-1">
+                  {Math.round((todayStats.calories / todayStats.targetCalories) * 100)}% del objetivo
+                </div>
+              </div>
+
+              {/* Circular Macros (inside dark box) */}
+              <div className="grid grid-cols-3 gap-4">
+                <CircularProgress
+                  percentage={Math.min(proteinProgress, 100)}
+                  value={todayStats.protein}
+                  label="Proteínas"
+                  unit="g"
+                  color="#CEF154"
+                />
+                <CircularProgress
+                  percentage={Math.min(carbsProgress, 100)}
+                  value={todayStats.carbs}
+                  label="Carbohidratos"
+                  unit="g"
+                  color="#E5C438"
+                />
+                <CircularProgress
+                  percentage={Math.min(fatProgress, 100)}
+                  value={todayStats.fat}
+                  label="Grasas"
+                  unit="g"
+                  color="#DC3714"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Circular Macros (inside dark box) */}
-          <div className="grid grid-cols-3 gap-4">
-            <CircularProgress
-              percentage={35}
-              value={35}
-              label="Proteínas"
-              unit="%"
-              color="#CEF154"
-            />
-            <CircularProgress
-              percentage={70}
-              value={70}
-              label="Carbohidratos"
-              unit="%"
-              color="#E5C438"
-            />
-            <CircularProgress
-              percentage={55}
-              value={55}
-              label="Grasas"
-              unit="%"
-              color="#DC3714"
-            />
-          </div>
-        </div>
-      </div>
+          <div className="container pb-24 max-w-md mt-[25px]">
 
-      <div className="container pb-24 max-w-md mt-[25px]">
+            
 
-        
+            {/* Activity and Hydration Cards - Side by Side */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <ActivityCard
+                totalCalories={totalCaloriesBurned}
+                exercises={exercises}
+                onAddClick={() => setShowExerciseModal(true)}
+                onClick={() => setShowExercisesListModal(true)}
+              />
+              <HydrationCard
+                totalAmount={totalWater}
+                entries={waterEntries}
+                onAddClick={() => setShowHydrationModal(true)}
+              />
+            </div>
 
-        {/* Activity and Hydration Cards - Side by Side */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <ActivityCard
-            totalCalories={totalCaloriesBurned}
-            exercises={exercises}
-            onAddClick={() => router.push('/add')}
-          />
-          <HydrationCard
-            totalAmount={totalWater}
-            entries={waterEntries}
-            onAddClick={() => {/* TODO: Open water modal */}}
-          />
-        </div>
-
-        {/* Meals Section */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3 px-2">
-            <h3 className="text-[#131917] font-semibold text-[24px]">Comidas del día</h3>
-            <Link href="/add">
-              <button className="w-[38px] h-[38px] rounded-full bg-[#CEFB48] hover:brightness-105 flex items-center justify-center text-[#131917] transition-colors shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
-                <Plus size={20} weight="bold" color="#131917" />
-              </button>
-            </Link>
-          </div>
-
-          <MealCard
-            mealType="breakfast"
-            calories={meals.breakfast.totalCalories}
-            itemCount={meals.breakfast.items.length}
-            onClick={() => setSelectedMeal('breakfast')}
-          />
-          <MealCard
-            mealType="lunch"
-            calories={meals.lunch.totalCalories}
-            itemCount={meals.lunch.items.length}
-            onClick={() => setSelectedMeal('lunch')}
-          />
-          <MealCard
-            mealType="dinner"
-            calories={meals.dinner.totalCalories}
-            itemCount={meals.dinner.items.length}
-            onClick={() => setSelectedMeal('dinner')}
-          />
-          <MealCard
-            mealType="snack"
-            calories={meals.snack.totalCalories}
-            itemCount={meals.snack.items.length}
-            onClick={() => setSelectedMeal('snack')}
-          />
-        </div>
-      </div>
-
-      {/* Meal Details Modal */}
-      <Modal
-        isOpen={!!selectedMeal}
-        onClose={() => setSelectedMeal(null)}
-        title={selectedMeal ? `Detalles - ${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)}` : ''}
-      >
-        {selectedMeal && (
-          <div className="space-y-3">
-            {meals[selectedMeal as keyof typeof meals].items.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">No hay alimentos registrados en esta comida</p>
+            {/* Meals Section */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3 px-2">
+                <h3 className="text-[#131917] font-semibold text-[24px]">Comidas del día</h3>
                 <Link href="/add">
-                  <Button variant="primary" fullWidth>
-                    <Plus size={20} weight="bold" className="mr-2" />
-                    Agregar Alimento
-                  </Button>
+                  <button className="w-[38px] h-[38px] rounded-full bg-[#CEFB48] hover:brightness-105 flex items-center justify-center text-[#131917] transition-colors shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
+                    <Plus size={20} weight="bold" color="#131917" />
+                  </button>
                 </Link>
               </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="bg-[var(--color-primary-50)] border-2 border-[var(--color-primary-100)] rounded-md p-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Total:</span>
-                    <span className="font-bold text-green-600">
-                      {meals[selectedMeal as keyof typeof meals].totalCalories} kcal
-                    </span>
+
+              <MealCard
+                mealType="breakfast"
+                calories={meals.breakfast.totalCalories}
+                itemCount={meals.breakfast.items.length}
+                items={meals.breakfast.items}
+                onClick={() => setSelectedMeal('breakfast')}
+              />
+              <MealCard
+                mealType="lunch"
+                calories={meals.lunch.totalCalories}
+                itemCount={meals.lunch.items.length}
+                items={meals.lunch.items}
+                onClick={() => setSelectedMeal('lunch')}
+              />
+              <MealCard
+                mealType="dinner"
+                calories={meals.dinner.totalCalories}
+                itemCount={meals.dinner.items.length}
+                items={meals.dinner.items}
+                onClick={() => setSelectedMeal('dinner')}
+              />
+              <MealCard
+                mealType="snack"
+                calories={meals.snack.totalCalories}
+                itemCount={meals.snack.items.length}
+                items={meals.snack.items}
+                onClick={() => setSelectedMeal('snack')}
+              />
+            </div>
+          </div>
+
+          {/* Meal Details Modal */}
+          <Modal
+            isOpen={!!selectedMeal}
+            onClose={() => setSelectedMeal(null)}
+            title={selectedMeal ? `Detalles - ${selectedMeal === 'breakfast' ? 'Desayuno' : selectedMeal === 'lunch' ? 'Almuerzo' : selectedMeal === 'dinner' ? 'Cena' : 'Snacks'}` : ''}
+          >
+            {selectedMeal && (
+              <div className="space-y-3">
+                {meals[selectedMeal as keyof typeof meals].items.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 mb-4">No hay alimentos registrados en esta comida</p>
+                    <Link href="/add" className="flex justify-center">
+                      <button className="bg-[#CEFB48]/70 border-2 border-[#CEFB48] rounded-[15px] px-4 py-[10px] text-[#131917] font-semibold text-[16px] hover:opacity-90 transition-opacity inline-flex items-center gap-2">
+                        <Plus size={20} weight="bold" />
+                        <span>Agregar Alimento</span>
+                      </button>
+                    </Link>
                   </div>
-                </div>
-                {meals[selectedMeal as keyof typeof meals].items.map((item: any) => (
-                  <div key={item.id} className="bg-[var(--card-bg)] rounded-md p-4 border border-[var(--border-color)]">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{item.name}</p>
-                        {item.brand && <p className="text-xs text-gray-500">{item.brand}</p>}
-                        <div className="flex gap-3 mt-2 text-xs">
-                          <span className="text-red-600">P: {(item.protein * item.quantity / 100).toFixed(1)}g</span>
-                          <span className="text-yellow-600">C: {(item.carbs * item.quantity / 100).toFixed(1)}g</span>
-                          <span className="text-blue-600">G: {(item.fat * item.quantity / 100).toFixed(1)}g</span>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="bg-[#CEFB48]/70 border-2 border-[#CEFB48] rounded-[15px] p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-[#131917] font-semibold">Total:</span>
+                        <div className="flex items-center gap-3">
+                          {/* Macros totales */}
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              <Fish size={16} weight="bold" className="text-[#131917]" />
+                              <span className="text-[#131917] text-xs font-semibold">
+                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.protein * item.quantity / 100), 0)) * 10) / 10}g
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Grains size={16} weight="bold" className="text-[#131917]" />
+                              <span className="text-[#131917] text-xs font-semibold">
+                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.carbs * item.quantity / 100), 0)) * 10) / 10}g
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Avocado size={16} weight="bold" className="text-[#131917]" />
+                              <span className="text-[#131917] text-xs font-semibold">
+                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.fat * item.quantity / 100), 0)) * 10) / 10}g
+                              </span>
+                            </div>
+                          </div>
+                          {/* Calorías totales */}
+                          <span className="font-bold text-[#131917]">
+                            {meals[selectedMeal as keyof typeof meals].totalCalories} kcal
+                          </span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">Cantidad: {item.quantity}g</p>
-                      </div>
-                      <div className="flex items-center gap-3 ml-4">
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-[var(--primary)]">{Math.round(item.calories * item.quantity / 100)}</p>
-                          <p className="text-xs text-gray-500">kcal</p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={async () => {
-                            if (confirm('¿Eliminar este alimento?')) {
-                              await fetch(`/api/logs/delete?id=${item.id}`, { method: 'DELETE' });
-                              fetchDashboardData();
-                              setSelectedMeal(null);
-                            }
-                          }}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Minus size={16} weight="bold" />
-                        </Button>
                       </div>
                     </div>
+                    {meals[selectedMeal as keyof typeof meals].items.map((item: any) => {
+                      const itemProtein = Math.round((item.protein * item.quantity / 100) * 10) / 10;
+                      const itemCarbs = Math.round((item.carbs * item.quantity / 100) * 10) / 10;
+                      const itemFat = Math.round((item.fat * item.quantity / 100) * 10) / 10;
+                      const itemCalories = Math.round(item.calories * item.quantity / 100);
+                      
+                      return (
+                        <div key={item.id} className="bg-[#131917] rounded-[15px] p-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* Columna izquierda */}
+                            <div className="flex flex-col justify-between">
+                              <p className="text-white font-semibold text-base mb-2">{item.name}</p>
+                              <p className="text-white/70 text-xs">Cantidad: {item.quantity}g</p>
+                            </div>
+                            {/* Columna derecha */}
+                            <div className="flex flex-col justify-between items-end">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-white font-bold text-lg">{itemCalories}</span>
+                                <span className="text-white/70 text-xs">kcal</span>
+                                <button
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    if (confirm('¿Eliminar este alimento?')) {
+                                      await fetch(`/api/logs/delete?id=${item.id}`, { method: 'DELETE' });
+                                      fetchDashboardData();
+                                      setSelectedMeal(null);
+                                    }
+                                  }}
+                                  className="ml-2 text-white/70 hover:text-[#DC3714] transition-colors"
+                                >
+                                  <Trash size={16} weight="bold" />
+                                </button>
+                              </div>
+                              {/* Macros */}
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1">
+                                  <Fish size={14} weight="bold" className="text-[#CEFB48]" />
+                                  <span className="text-white/70 text-xs">{itemProtein}g</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Grains size={14} weight="bold" className="text-[#E5C438]" />
+                                  <span className="text-white/70 text-xs">{itemCarbs}g</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Avocado size={14} weight="bold" className="text-[#DC3714]" />
+                                  <span className="text-white/70 text-xs">{itemFat}g</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                ))}
+                )}
               </div>
             )}
-          </div>
-        )}
-      </Modal>
+          </Modal>
 
-      {/* Bottom Navigation */}
-      <BottomNav />
+          {/* Hydration Modal */}
+          <Modal
+            isOpen={showHydrationModal}
+            onClose={() => setShowHydrationModal(false)}
+            title="Agregar Hidratación"
+          >
+            <HydrationForm
+              onSuccess={() => {
+                setShowHydrationModal(false);
+                fetchDashboardData();
+              }}
+              onCancel={() => setShowHydrationModal(false)}
+            />
+          </Modal>
+
+          {/* Exercise Modal */}
+          <Modal
+            isOpen={showExerciseModal}
+            onClose={() => setShowExerciseModal(false)}
+            title="Registrar Ejercicio"
+          >
+            <ExerciseForm
+              onSuccess={async () => {
+                setShowExerciseModal(false);
+                // Esperar un momento para que la base de datos se actualice
+                await new Promise(resolve => setTimeout(resolve, 100));
+                await fetchDashboardData();
+              }}
+              onCancel={() => setShowExerciseModal(false)}
+            />
+          </Modal>
+
+          {/* Exercises List Modal */}
+          <Modal
+            isOpen={showExercisesListModal}
+            onClose={() => setShowExercisesListModal(false)}
+            title="Ejercicios del día"
+          >
+            <div className="space-y-3">
+              {exercises.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 mb-4">No hay ejercicios registrados hoy</p>
+                  <button
+                    onClick={() => {
+                      setShowExercisesListModal(false);
+                      setShowExerciseModal(true);
+                    }}
+                    className="bg-[#E5C438]/70 border-2 border-[#E5C438] rounded-[15px] px-4 py-[10px] text-[#131917] font-semibold text-[16px] hover:opacity-90 transition-opacity inline-flex items-center gap-2"
+                  >
+                    <Plus size={20} weight="bold" />
+                    <span>Agregar Ejercicio</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="bg-[#E5C438]/70 border-2 border-[#E5C438] rounded-[15px] p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-[#131917] font-semibold">Total:</span>
+                      <span className="font-bold text-[#131917]">
+                        {totalCaloriesBurned} kcal
+                      </span>
+                    </div>
+                  </div>
+                  {exercises.map((exercise: any) => {
+                    const ExerciseIcon = getExerciseIcon(exercise.icon);
+                    return (
+                      <div key={exercise.id} className="bg-[#131917] rounded-[15px] p-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* Columna izquierda */}
+                          <div className="flex flex-col justify-between">
+                            <div className="flex items-center gap-2 mb-2">
+                              <ExerciseIcon size={18} weight="bold" className="text-[#E5C438]" />
+                              <p className="text-white font-semibold text-base">{exercise.name}</p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock size={14} weight="bold" className="text-white/70" />
+                              <p className="text-white/70 text-xs">Duración: {exercise.durationMinutes} min</p>
+                            </div>
+                          </div>
+                          {/* Columna derecha */}
+                          <div className="flex flex-col justify-between items-end">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Fire size={18} weight="bold" className="text-[#DC3714]" />
+                              <span className="text-white font-bold text-lg">{exercise.caloriesBurned}</span>
+                              <span className="text-white/70 text-xs">kcal</span>
+                              <button
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  if (confirm('¿Eliminar este ejercicio?')) {
+                                    await fetch(`/api/exercises/delete?id=${exercise.id}`, { method: 'DELETE' });
+                                    fetchDashboardData();
+                                  }
+                                }}
+                                className="ml-2 text-white/70 hover:text-[#DC3714] transition-colors"
+                              >
+                                <Trash size={16} weight="bold" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              
+              {/* Botón de información sobre cálculo */}
+              <button
+                onClick={() => setShowExerciseCalculationInfo(true)}
+                className="w-full bg-[#6484E2] rounded-[15px] px-4 py-[8px] text-white font-semibold text-[16px] hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mt-4"
+              >
+                <WarningCircle size={18} weight="bold" />
+                <span>¿Cómo se calculan las calorías?</span>
+              </button>
+            </div>
+          </Modal>
+
+          {/* Exercise Calculation Info Modal */}
+          <ExerciseCalculationInfo
+            isOpen={showExerciseCalculationInfo}
+            onClose={() => setShowExerciseCalculationInfo(false)}
+          />
+
+          {/* Bottom Navigation */}
+          <BottomNav />
+        </>
+      )}
     </div>
   );
 }
