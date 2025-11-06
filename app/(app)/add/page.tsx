@@ -10,6 +10,7 @@ import { BottomNav } from '@/components/dashboard/BottomNav';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { categories, categorizeFood } from '@/lib/utils/categories';
+import { useModal } from '@/contexts/ModalContext';
 
 interface FoodItem {
   id: number;
@@ -53,6 +54,14 @@ export default function AddPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { setIsAnyModalOpen } = useModal();
+
+  // Detectar si algún modal está abierto y actualizar el contexto
+  const isAnyModalOpen = showCustomFoodModal || showEditModal || showDeleteConfirm || !!selectedFood;
+  
+  useEffect(() => {
+    setIsAnyModalOpen(isAnyModalOpen);
+  }, [isAnyModalOpen, setIsAnyModalOpen]);
 
   useEffect(() => {
     // Cargar todos los alimentos al inicio

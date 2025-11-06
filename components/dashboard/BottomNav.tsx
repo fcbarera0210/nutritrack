@@ -3,9 +3,17 @@
 import { House, User, ChartBar } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useContext } from 'react';
+import { ModalContext } from '@/contexts/ModalContext';
 
 export function BottomNav() {
   const pathname = usePathname();
+  const modalContext = useContext(ModalContext);
+
+  // Ocultar cuando hay un modal abierto (si el contexto está disponible)
+  if (modalContext?.isAnyModalOpen) {
+    return null;
+  }
 
   const navItems = [
     { href: '/dashboard', icon: House, label: 'Inicio' },

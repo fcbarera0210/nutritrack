@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useModal } from '@/contexts/ModalContext';
 import { Header } from '@/components/dashboard/Header';
 import { WeeklyCalendar } from '@/components/dashboard/WeeklyCalendar';
 import { CircularProgress } from '@/components/dashboard/CircularProgress';
@@ -11,7 +12,6 @@ import { MealCard } from '@/components/dashboard/MealCard';
 import { BottomNav } from '@/components/dashboard/BottomNav';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
-import { DashboardSkeleton } from '@/components/ui/Skeleton';
 import { HydrationForm } from '@/components/forms/HydrationForm';
 import { ExerciseForm } from '@/components/forms/ExerciseForm';
 import { ExerciseCalculationInfo } from '@/components/ui/ExerciseCalculationInfo';
@@ -54,24 +54,14 @@ export default function DashboardPage() {
   const [waterEntries, setWaterEntries] = useState([]);
   const [totalWater, setTotalWater] = useState(0);
   const [userName, setUserName] = useState<string | null>(null);
+  const isFetchingRef = useRef(false);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, [selectedDate]);
-
-  const fetchDashboardData = async () => {
-    // Verificar autenticación antes de hacer fetch
-    try {
-      const authCheck = await fetch('/api/user/profile');
-      if (authCheck.status === 401 || authCheck.status === 403) {
-        window.location.href = '/login';
-        return;
-      }
-    } catch (error) {
-      console.error('Error checking auth:', error);
-      window.location.href = '/login';
+  const fetchDashboardData = useCallback(async () => {
+    // Prevenir doble ejecución
+    if (isFetchingRef.current) {
       return;
     }
+    isFetchingRef.current = true;
     
     try {
       setIsLoading(true);
@@ -125,47 +115,76 @@ export default function DashboardPage() {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setIsLoading(false);
+      isFetchingRef.current = false;
     }
-  };
+  }, [selectedDate]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   useEffect(() => {
     const handleFocus = () => {
-      fetchDashboardData();
+      // Solo recargar si no está cargando para evitar doble carga
+      if (!isLoading) {
+        fetchDashboardData();
+      }
     };
     
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, []);
+  }, [isLoading]);
 
   const proteinProgress = (todayStats.protein / todayStats.targetProtein) * 100;
   const carbsProgress = (todayStats.carbs / todayStats.targetCarbs) * 100;
   const fatProgress = (todayStats.fat / todayStats.targetFat) * 100;
 
+  // Detectar si algún modal está abierto
+  const isAnyModalOpen = !!selectedMeal || showHydrationModal || showExerciseModal || showExercisesListModal || showExerciseCalculationInfo;
+  const { setIsAnyModalOpen } = useModal();
+
+  // Actualizar el contexto cuando cambia el estado de los modales
+  useEffect(() => {
+    setIsAnyModalOpen(isAnyModalOpen);
+  }, [isAnyModalOpen, setIsAnyModalOpen]);
+
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      {isLoading ? (
-        <>
-          <DashboardSkeleton />
-          <BottomNav />
-        </>
-      ) : (
-        <>
-          {/* Header + dark section wrapper */}
-          <div className="bg-[#131917] rounded-b-[60px]">
-            <div className="px-25 pb-[15px] flex flex-col gap-[30px]">
-              <div>
-                <Header userName={userName || undefined} />
+      {/* Header + dark section wrapper - Siempre renderizado */}
+      <div className="bg-[#131917] rounded-b-[60px]">
+        <div className="px-25 pb-[15px] flex flex-col gap-[30px]">
+          <div>
+            {isLoading ? (
+              <div className="flex items-center justify-between pt-[40px]">
+                <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
+                <div className="w-[150px] h-[24px] bg-white/20 animate-pulse rounded" />
+                <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
               </div>
-              {/* Weekly Calendar inside dark area */}
-              <div>
-                <WeeklyCalendar
-                  selectedDate={selectedDate}
-                  onDateChange={setSelectedDate}
-                  streakDays={streakDays}
-                />
-              </div>
-              {/* Kcal Box */}
-              <div className="flex flex-col items-center">
+            ) : (
+              <Header userName={userName || undefined} />
+            )}
+          </div>
+          {/* Weekly Calendar inside dark area */}
+          <div>
+            {isLoading ? (
+              <div className="bg-[#404040] rounded-[30px] h-[60px] animate-pulse" />
+            ) : (
+              <WeeklyCalendar
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+                streakDays={streakDays}
+              />
+            )}
+          </div>
+          {/* Kcal Box */}
+          <div className="flex flex-col items-center">
+            {isLoading ? (
+              <>
+                <div className="w-[200px] h-[36px] bg-white/20 animate-pulse rounded mb-2" />
+                <div className="w-[120px] h-[14px] bg-white/10 animate-pulse rounded" />
+              </>
+            ) : (
+              <>
                 {/* Mensaje de rachas - Solo visible cuando hay 3+ días */}
                 {streak >= 3 && (
                   <div className="flex items-center gap-2 mb-[5px]">
@@ -179,10 +198,22 @@ export default function DashboardPage() {
                 <div className="text-white/80 text-[14px] mt-1">
                   {Math.round((todayStats.calories / todayStats.targetCalories) * 100)}% del objetivo
                 </div>
-              </div>
+              </>
+            )}
+          </div>
 
-              {/* Circular Macros (inside dark box) */}
-              <div className="grid grid-cols-3 gap-4">
+          {/* Circular Macros (inside dark box) */}
+          <div className="grid grid-cols-3 gap-4">
+            {isLoading ? (
+              [...Array(3)].map((_, i) => (
+                <div key={i} className="flex flex-col items-center">
+                  <div className="w-[73px] h-[73px] rounded-full bg-white/10 animate-pulse" />
+                  <div className="w-[60px] h-[10px] bg-white/10 animate-pulse rounded mt-[10px]" />
+                  <div className="w-[30px] h-[8px] bg-white/10 animate-pulse rounded mt-1" />
+                </div>
+              ))
+            ) : (
+              <>
                 <CircularProgress
                   percentage={Math.min(proteinProgress, 100)}
                   value={todayStats.protein}
@@ -204,16 +235,25 @@ export default function DashboardPage() {
                   unit="g"
                   color="#DC3714"
                 />
-              </div>
-            </div>
+              </>
+            )}
           </div>
+        </div>
+      </div>
 
-          <div className="container pb-24 max-w-md mt-[25px]">
-
-            
-
-            {/* Activity and Hydration Cards - Side by Side */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="container pb-24 max-w-md mt-[25px]">
+        {/* Activity and Hydration Cards - Side by Side */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {isLoading ? (
+            [...Array(2)].map((_, i) => (
+              <div key={i} className="bg-white rounded-[30px] p-[10px] min-h-[100px] shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
+                <div className="w-[80px] h-[32px] bg-gray-300 animate-pulse rounded mb-3" />
+                <div className="w-[60px] h-[14px] bg-gray-300 animate-pulse rounded mb-2" />
+                <div className="w-[50px] h-[14px] bg-gray-300 animate-pulse rounded" />
+              </div>
+            ))
+          ) : (
+            <>
               <ActivityCard
                 totalCalories={totalCaloriesBurned}
                 exercises={exercises}
@@ -225,14 +265,26 @@ export default function DashboardPage() {
                 entries={waterEntries}
                 onAddClick={() => setShowHydrationModal(true)}
               />
-            </div>
+            </>
+          )}
+        </div>
 
-            {/* Meals Section */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-3 px-2">
-                <h3 className="text-[#131917] font-semibold text-[24px]">Comidas del día</h3>
+        {/* Meals Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3 px-2">
+            <h3 className="text-[#131917] font-semibold text-[24px]">Comidas del día</h3>
+          </div>
+
+          {isLoading ? (
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-[30px] px-[20px] py-[15px] mb-3 shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
+                <div className="w-[100px] h-[24px] bg-gray-300 animate-pulse rounded mb-2" />
+                <div className="w-[80px] h-[20px] bg-gray-300 animate-pulse rounded mb-2" />
+                <div className="w-[200px] h-[14px] bg-gray-300 animate-pulse rounded" />
               </div>
-
+            ))
+          ) : (
+            <>
               <MealCard
                 mealType="breakfast"
                 calories={meals.breakfast.totalCalories}
@@ -261,11 +313,13 @@ export default function DashboardPage() {
                 items={meals.snack.items}
                 onClick={() => setSelectedMeal('snack')}
               />
-            </div>
-          </div>
+            </>
+          )}
+        </div>
+      </div>
 
-          {/* Meal Details Modal */}
-          <Modal
+      {/* Meal Details Modal */}
+      <Modal
             isOpen={!!selectedMeal}
             onClose={() => setSelectedMeal(null)}
             title={selectedMeal ? `Detalles - ${selectedMeal === 'breakfast' ? 'Desayuno' : selectedMeal === 'lunch' ? 'Almuerzo' : selectedMeal === 'dinner' ? 'Cena' : 'Snacks'}` : ''}
@@ -512,16 +566,14 @@ export default function DashboardPage() {
             </div>
           </Modal>
 
-          {/* Exercise Calculation Info Modal */}
-          <ExerciseCalculationInfo
-            isOpen={showExerciseCalculationInfo}
-            onClose={() => setShowExerciseCalculationInfo(false)}
-          />
+      {/* Exercise Calculation Info Modal */}
+      <ExerciseCalculationInfo
+        isOpen={showExerciseCalculationInfo}
+        onClose={() => setShowExerciseCalculationInfo(false)}
+      />
 
-          {/* Bottom Navigation */}
-          <BottomNav />
-        </>
-      )}
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 }

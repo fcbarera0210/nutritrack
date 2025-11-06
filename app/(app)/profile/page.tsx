@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -55,10 +55,6 @@ export default function ProfilePage() {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [showCalculationInfo, setShowCalculationInfo] = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
   const fetchProfile = async () => {
     setIsLoadingProfile(true);
     try {
@@ -71,6 +67,7 @@ export default function ProfilePage() {
       }
       
       const data = await response.json();
+      
       if (response.ok) {
         // Debug: Log para ver qué datos llegan
         console.log('Datos recibidos del servidor:', data);
@@ -123,6 +120,10 @@ export default function ProfilePage() {
       setIsLoadingProfile(false);
     }
   };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   const handleSave = async () => {
     setIsLoading(true);

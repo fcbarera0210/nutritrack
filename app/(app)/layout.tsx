@@ -1,6 +1,6 @@
 import { getCurrentUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { FloatingAddButtonWrapper } from '@/components/dashboard/FloatingAddButton';
+import { ModalProviderWrapper } from '@/components/providers/ModalProviderWrapper';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser().catch(() => null);
@@ -8,10 +8,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect('/login');
   }
   return (
-    <>
+    <ModalProviderWrapper>
       {children}
-      <FloatingAddButtonWrapper />
-    </>
+    </ModalProviderWrapper>
   );
 }
 

@@ -1,5 +1,11 @@
 Changelog
 
+0.3.1 - Correcciones de UI/UX y Ocultamiento de Botones en Modales
+- **Mejoras de UI/UX**: Los botones de navegación (BottomNav y FloatingAddButton) ahora se ocultan automáticamente cuando hay modales abiertos para mejorar la experiencia de usuario y evitar interferencias visuales
+- **Contexto de Modales**: Implementado sistema de contexto React (`ModalContext`) para gestionar el estado de los modales globalmente, permitiendo que los componentes se oculten automáticamente cuando hay modales activos
+- **Dashboard**: Refactorizado para evitar doble renderizado y animaciones duplicadas, manteniendo la misma estructura durante la carga (skeleton inline) para una transición más suave
+- **Correcciones**: Corregido problema de carga infinita en la página de perfil al eliminar bloqueo innecesario en useEffect. Corregido error de TypeScript donde `fetchProfile` no estaba disponible fuera del useEffect. El botón flotante ahora se oculta correctamente en la página de agregar alimento cuando hay modales abiertos (crear alimento personalizado, editar, eliminar, etc.)
+
 0.3.0 - Sistema de Rachas, Edición de Alimentos Personalizados, Rediseño del Nav Bar y Correcciones de Autenticación
 - **Correcciones críticas de autenticación**: Eliminado bypass de autenticación en producción que permitía acceso sin login. Mejorado el sistema de logout para funcionar correctamente en PWA usando `window.location.href` en lugar de `router.push()`. Agregadas verificaciones de autenticación en el cliente (dashboard y perfil) que redirigen automáticamente al login cuando detectan respuestas 401/403. El logout ahora limpia correctamente las cookies tanto en servidor como en cliente.
 - **Sistema de rachas (streaks)**: Implementación completa de sistema de rachas que se activa cuando el usuario registra al menos 1 ejercicio o 1 comida por día. La racha se activa después de 3 días consecutivos, mostrando un mensaje en el dashboard con el ícono de llama. Los días con racha se muestran con el ícono de llama en el calendario semanal, con animación multicolor similar al HandWaving del header. El ícono alterna con la vocal del día cada 3 segundos (llama) y 2 segundos (vocal) con animación de fade suave.
