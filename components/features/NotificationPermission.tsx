@@ -36,7 +36,7 @@ export function NotificationPermission() {
 
   if (permission === 'granted') {
     return (
-      <div className="bg-[#CEFB48]/70 rounded-[20px] p-4">
+      <div className="bg-[#3CCC1F]/70 rounded-[20px] p-4">
         <div className="flex items-center gap-2 text-[#131917] text-sm">
           <Bell size={20} weight="bold" />
           <span style={{ fontFamily: 'Quicksand, sans-serif' }}>Notificaciones activadas</span>
@@ -47,7 +47,7 @@ export function NotificationPermission() {
 
   if (permission === 'denied') {
     return (
-      <div className="bg-[#CEFB48]/70 rounded-[20px] p-4">
+      <div className="bg-[#3CCC1F]/70 rounded-[20px] p-4">
         <div className="flex items-center gap-2 text-[#131917] text-sm">
           <BellSlash size={20} weight="bold" />
           <span style={{ fontFamily: 'Quicksand, sans-serif' }}>Notificaciones bloqueadas</span>

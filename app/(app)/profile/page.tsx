@@ -210,7 +210,9 @@ export default function ProfilePage() {
               <div>
                 <h1 className="text-white font-semibold text-lg inline-flex items-center gap-2">
                   {profile.name || 'Usuario'}
-                  <HandWaving size={16} weight="bold" color="#CEFB48" />
+                  <span className="animate-color-wave">
+                    <HandWaving size={16} weight="bold" />
+                  </span>
                 </h1>
                 <p className="text-white/70 text-sm mt-0.5">
                   {profile.email || 'Sin email'}
@@ -276,14 +278,14 @@ export default function ProfilePage() {
           {/* Cards de Macros - Tres en fila */}
           <div className="grid grid-cols-3 gap-3 mb-4">
             {/* Proteínas - Verde */}
-            <div className="bg-[#CEFB48] rounded-[30px] py-[8px] px-[15px] relative overflow-hidden">
+            <div className="bg-[#3CCC1F] rounded-[30px] py-[8px] px-[15px] relative overflow-hidden">
               {/* Ícono de fondo */}
               <div className="absolute left-0 bottom-0 opacity-20 pointer-events-none" style={{ filter: 'drop-shadow(0 2px 10px rgba(0, 0, 0, 0.2))' }}>
                 <Fish weight="bold" className="text-white" style={{ width: 70, height: 60 }} />
               </div>
               {/* Contenido */}
               <div className="relative z-10 text-left flex flex-col justify-center h-full">
-                <p className="text-[#131917] truncate" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '20px', fontWeight: 500, lineHeight: '1' }}>Proteínas</p>
+                <p className="text-[#131917] truncate" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '14px', fontWeight: 500, lineHeight: '1' }}>Proteínas</p>
                 <div className="flex items-baseline gap-1">
                   <p className="text-[#131917] leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '32px', fontWeight: 700, lineHeight: '1.3' }}>{profile.targetProtein}</p>
                   <p className="text-[#131917] leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '16px', fontWeight: 300, lineHeight: '1.3' }}>g</p>
@@ -299,7 +301,7 @@ export default function ProfilePage() {
               </div>
               {/* Contenido */}
               <div className="relative z-10 text-left flex flex-col justify-center h-full">
-                <p className="text-[#131917] truncate" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '20px', fontWeight: 500, lineHeight: '1' }}>Carbohidratos</p>
+                <p className="text-[#131917] truncate" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '14px', fontWeight: 500, lineHeight: '1' }}>Carbohidratos</p>
                 <div className="flex items-baseline gap-1">
                   <p className="text-[#131917] leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '32px', fontWeight: 700, lineHeight: '1.3' }}>{profile.targetCarbs}</p>
                   <p className="text-[#131917] leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '16px', fontWeight: 300, lineHeight: '1.3' }}>g</p>
@@ -315,7 +317,7 @@ export default function ProfilePage() {
               </div>
               {/* Contenido */}
               <div className="relative z-10 text-left flex flex-col justify-center h-full">
-                <p className="text-white truncate" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '20px', fontWeight: 500, lineHeight: '1' }}>Grasas</p>
+                <p className="text-white truncate" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '14px', fontWeight: 500, lineHeight: '1' }}>Grasas</p>
                 <div className="flex items-baseline gap-1">
                   <p className="text-white leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '32px', fontWeight: 700, lineHeight: '1.3' }}>{profile.targetFat}</p>
                   <p className="text-white leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '16px', fontWeight: 300, lineHeight: '1.3' }}>g</p>
@@ -352,7 +354,7 @@ export default function ProfilePage() {
                     value={profile.name || ''}
                     onChange={(e) => setProfile({ ...profile, name: e.target.value || null })}
                     placeholder="Tu nombre completo"
-                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                   />
                 </div>
 
@@ -373,7 +375,7 @@ export default function ProfilePage() {
                     }}
                     placeholder="Ej: 912345678"
                     maxLength={9}
-                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                   />
                   <p className="text-xs text-[#5A5B5A] mt-1">
                     Solo números, máximo 9 dígitos. El prefijo +56 se agregará automáticamente.
@@ -396,7 +398,7 @@ export default function ProfilePage() {
                       onChange={(e) => setProfile({ ...profile, weight: parseFloat(e.target.value) })}
                       min="30"
                       max="300"
-                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                     />
                   </div>
 
@@ -410,7 +412,7 @@ export default function ProfilePage() {
                       onChange={(e) => setProfile({ ...profile, height: parseFloat(e.target.value) })}
                       min="100"
                       max="250"
-                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                     />
                   </div>
                 </div>
@@ -425,7 +427,7 @@ export default function ProfilePage() {
                     onChange={(e) => setProfile({ ...profile, age: parseInt(e.target.value) })}
                     min="1"
                     max="120"
-                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                   />
                 </div>
 
@@ -437,7 +439,7 @@ export default function ProfilePage() {
                     <select
                       value={profile.gender}
                       onChange={(e) => setProfile({ ...profile, gender: e.target.value as any })}
-                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
+                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
                     >
                       <option value="male">Masculino</option>
                       <option value="female">Femenino</option>
@@ -457,7 +459,7 @@ export default function ProfilePage() {
                     <select
                       value={profile.activityLevel}
                       onChange={(e) => setProfile({ ...profile, activityLevel: e.target.value })}
-                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
+                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
                     >
                       <option value="sedentary">Sedentario</option>
                       <option value="lightly_active">Actividad Ligera</option>
@@ -479,7 +481,7 @@ export default function ProfilePage() {
                     <select
                       value={profile.goal}
                       onChange={(e) => setProfile({ ...profile, goal: e.target.value as any })}
-                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
+                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
                     >
                       <option value="weight_loss">Pérdida de Peso</option>
                       <option value="maintenance">Mantenimiento</option>
@@ -501,7 +503,7 @@ export default function ProfilePage() {
                       type="checkbox"
                       checked={profile.manualTargets}
                       onChange={(e) => setProfile({ ...profile, manualTargets: e.target.checked })}
-                      className="w-5 h-5 rounded border-2 border-gray-300 checked:bg-[#CEFB48] checked:border-[#CEFB48] focus:ring-2 focus:ring-[#CEFB48] transition-colors"
+                      className="w-5 h-5 rounded border-2 border-gray-300 checked:bg-[#3CCC1F] checked:border-[#3CCC1F] focus:ring-2 focus:ring-[#3CCC1F] transition-colors"
                     />
                     <span className="text-[12px] text-[#5A5B5A]">Editar manualmente</span>
                   </label>
@@ -518,7 +520,7 @@ export default function ProfilePage() {
                         value={profile.targetCalories}
                         onChange={(e) => setProfile({ ...profile, targetCalories: parseFloat(e.target.value) || 0 })}
                         min="0"
-                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                       />
                     </div>
                     <div>
@@ -530,7 +532,7 @@ export default function ProfilePage() {
                         value={profile.targetWeight || ''}
                         onChange={(e) => setProfile({ ...profile, targetWeight: e.target.value ? parseFloat(e.target.value) : null })}
                         min="0"
-                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                       />
                     </div>
                     <div>
@@ -542,7 +544,7 @@ export default function ProfilePage() {
                         value={profile.targetProtein}
                         onChange={(e) => setProfile({ ...profile, targetProtein: parseFloat(e.target.value) || 0 })}
                         min="0"
-                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                       />
                     </div>
                     <div>
@@ -554,7 +556,7 @@ export default function ProfilePage() {
                         value={profile.targetCarbs}
                         onChange={(e) => setProfile({ ...profile, targetCarbs: parseFloat(e.target.value) || 0 })}
                         min="0"
-                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                       />
                     </div>
                     <div>
@@ -566,7 +568,7 @@ export default function ProfilePage() {
                         value={profile.targetFat}
                         onChange={(e) => setProfile({ ...profile, targetFat: parseFloat(e.target.value) || 0 })}
                         min="0"
-                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                        className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                       />
                     </div>
                   </div>
@@ -592,7 +594,7 @@ export default function ProfilePage() {
                     onChange={(e) => setProfile({ ...profile, targetWeight: e.target.value ? parseFloat(e.target.value) : null })}
                     min="0"
                     placeholder="Ej: 65"
-                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                   />
                 </div>
 
@@ -604,7 +606,7 @@ export default function ProfilePage() {
                     {profile.preferredSports.map((sport, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center gap-1 bg-[#CEFB48] text-[#131917] rounded-full px-3 py-1 text-[12px] font-medium"
+                        className="inline-flex items-center gap-1 bg-[#3CCC1F] text-[#131917] rounded-full px-3 py-1 text-[12px] font-medium"
                       >
                         {sport}
                         <button
@@ -623,7 +625,7 @@ export default function ProfilePage() {
                   <input
                     type="text"
                     placeholder="Escribe un deporte y presiona Enter"
-                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -664,7 +666,7 @@ export default function ProfilePage() {
                   </div>
                   <div className="relative">
                     <select
-                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
+                      className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
                       onChange={(e) => {
                         const value = e.target.value;
                         if (value && !profile.dietaryPreferences.includes(value)) {
@@ -698,7 +700,7 @@ export default function ProfilePage() {
                     onChange={(e) => setProfile({ ...profile, foodAllergies: e.target.value || null })}
                     placeholder="Ej: Alergia a maní, mariscos, etc."
                     rows={3}
-                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none resize-none transition-all"
+                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none resize-none transition-all"
                     maxLength={500}
                   />
                 </div>
@@ -712,7 +714,7 @@ export default function ProfilePage() {
                     onChange={(e) => setProfile({ ...profile, bio: e.target.value || null })}
                     placeholder="Escribe algo sobre ti..."
                     rows={3}
-                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none resize-none transition-all"
+                    className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none resize-none transition-all"
                     maxLength={500}
                   />
                   <p className="text-xs text-[#5A5B5A] mt-1">
@@ -733,7 +735,7 @@ export default function ProfilePage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 bg-[#CEFB48] text-[#131917] rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-1 bg-[#3CCC1F] text-[#131917] rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {isLoading ? 'Guardando...' : 'Guardar'}
                 </button>

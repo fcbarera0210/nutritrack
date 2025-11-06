@@ -93,7 +93,7 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
               required
               min="1"
               step="0.1"
-              className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+              className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
             />
           </div>
 
@@ -105,7 +105,7 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
             <select
               value={mealType}
               onChange={(e) => setMealType(e.target.value)}
-              className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
+              className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all [&:focus]:shadow-none"
             >
                 {MEAL_TYPES.map(meal => (
                   <option key={meal.value} value={meal.value}>
@@ -123,7 +123,7 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
         {/* Valores Calculados - Fondo oscuro y horizontal */}
         <div className="bg-[#131917] rounded-[15px] p-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-1 text-[#CEF154] text-[14px]">
+            <div className="flex items-center gap-1 text-[#3CCC1F] text-[14px]">
               <Fish size={18} weight="bold" />
               <span>{calculatedProtein}g</span>
             </div>
@@ -156,7 +156,7 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 bg-[#CEFB48] text-[#131917] rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="flex-1 bg-[#3CCC1F] text-[#131917] rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {isSubmitting ? 'Agregando...' : 'Agregar'}
           </button>

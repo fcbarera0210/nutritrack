@@ -158,7 +158,7 @@ export default function DashboardPage() {
                   value={todayStats.protein}
                   label="Proteínas"
                   unit="g"
-                  color="#CEF154"
+                  color="#3CCC1F"
                 />
                 <CircularProgress
                   percentage={Math.min(carbsProgress, 100)}
@@ -202,7 +202,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between mb-3 px-2">
                 <h3 className="text-[#131917] font-semibold text-[24px]">Comidas del día</h3>
                 <Link href="/add">
-                  <button className="w-[38px] h-[38px] rounded-full bg-[#CEFB48] hover:brightness-105 flex items-center justify-center text-[#131917] transition-colors shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
+                  <button className="w-[38px] h-[38px] rounded-full bg-[#3CCC1F] hover:brightness-105 flex items-center justify-center text-[#131917] transition-colors shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
                     <Plus size={20} weight="bold" color="#131917" />
                   </button>
                 </Link>
@@ -251,7 +251,7 @@ export default function DashboardPage() {
                   <div className="text-center py-8">
                     <p className="text-gray-500 mb-4">No hay alimentos registrados en esta comida</p>
                     <Link href="/add" className="flex justify-center">
-                      <button className="bg-[#CEFB48]/70 border-2 border-[#CEFB48] rounded-[15px] px-4 py-[10px] text-[#131917] font-semibold text-[16px] hover:opacity-90 transition-opacity inline-flex items-center gap-2">
+                      <button className="bg-[#3CCC1F]/70 border-2 border-[#3CCC1F] rounded-[15px] px-4 py-[10px] text-[#131917] font-semibold text-[16px] hover:opacity-90 transition-opacity inline-flex items-center gap-2">
                         <Plus size={20} weight="bold" />
                         <span>Agregar Alimento</span>
                       </button>
@@ -259,7 +259,7 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div className="bg-[#CEFB48]/70 border-2 border-[#CEFB48] rounded-[15px] p-3">
+                    <div className="bg-[#3CCC1F]/70 border-2 border-[#3CCC1F] rounded-[15px] p-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-[#131917] font-semibold">Total:</span>
                         <div className="flex items-center gap-3">
@@ -327,7 +327,7 @@ export default function DashboardPage() {
                               {/* Macros */}
                               <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-1">
-                                  <Fish size={14} weight="bold" className="text-[#CEFB48]" />
+                                  <Fish size={14} weight="bold" className="text-[#3CCC1F]" />
                                   <span className="text-white/70 text-xs">{itemProtein}g</span>
                                 </div>
                                 <div className="flex items-center gap-1">

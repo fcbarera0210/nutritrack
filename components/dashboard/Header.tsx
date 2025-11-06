@@ -57,7 +57,9 @@ export function Header({ userName }: HeaderProps) {
       <div className="flex-1 text-center">
         <h1 className="text-white font-semibold inline-flex items-center gap-2" style={{ fontSize: '20px' }}>
           {getGreeting()}
-          <HandWaving size={16} weight="bold" color="#CEFB48" />
+          <span className="animate-color-wave">
+            <HandWaving size={16} weight="bold" />
+          </span>
         </h1>
       </div>
 

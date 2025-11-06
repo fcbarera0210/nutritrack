@@ -73,7 +73,7 @@ export function WeeklyCalendar({ selectedDate, onDateChange, streakDays = [] }: 
             >
               <span
                 className={`inline-flex flex-col items-center gap-[10px] rounded-full px-[10px] py-[15px] ${
-                  isSelected ? 'bg-[#CEFB48] text-[#131917]' : ''
+                  isSelected ? 'bg-[#3CCC1F] text-[#131917]' : ''
                 }`}
                 style={{ color: isSelected ? '#131917' : dayTextColor }}
               >

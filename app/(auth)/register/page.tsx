@@ -75,7 +75,7 @@ export default function RegisterPage() {
         {/* Logo: 3 puntos verticales con título */}
         <div className="flex items-center gap-3 mb-3">
           <div className="flex flex-col gap-1">
-            <div className="w-3 h-3 rounded-full bg-[#CEFB48]" />
+            <div className="w-3 h-3 rounded-full bg-[#3CCC1F]" />
             <div className="w-3 h-3 rounded-full bg-[#E5C438]" />
             <div className="w-3 h-3 rounded-full bg-[#DC3714]" />
           </div>
@@ -113,7 +113,7 @@ export default function RegisterPage() {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Juan Pérez"
                 required
-                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
               />
             </div>
           </div>
@@ -134,7 +134,7 @@ export default function RegisterPage() {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="correo@dominio.com"
                 required
-                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
               />
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function RegisterPage() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="••••••••"
                 required
-                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-[50px] py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-[50px] py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
               />
               <button
                 type="button"
@@ -183,7 +183,7 @@ export default function RegisterPage() {
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 placeholder="••••••••"
                 required
-                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-[50px] py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-[50px] py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
               />
               <button
                 type="button"
@@ -206,7 +206,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#CEFB48] text-[#131917] rounded-[15px] py-[10px] font-semibold text-[18px] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-md mt-[30px]"
+            className="w-full bg-[#3CCC1F] text-[#131917] rounded-[15px] py-[10px] font-semibold text-[18px] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-md mt-[30px]"
           >
             {isLoading ? 'Cargando...' : 'Registrarse'}
           </button>
@@ -214,7 +214,7 @@ export default function RegisterPage() {
           {/* Link iniciar sesión */}
           <div className="flex items-center justify-center gap-1 text-[12px] mt-[5px]">
             <span className="text-[#5A5B5A]">¿Ya tienes una cuenta?</span>
-            <Link href="/login" className="bg-[#CEFB48] text-[#131917] px-3 py-1 rounded-[8px] font-semibold hover:opacity-90 transition-opacity">
+            <Link href="/login" className="bg-[#3CCC1F] text-[#131917] px-3 py-1 rounded-[8px] font-semibold hover:opacity-90 transition-opacity">
               Iniciar sesión
             </Link>
           </div>

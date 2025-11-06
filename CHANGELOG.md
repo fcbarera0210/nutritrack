@@ -1,5 +1,11 @@
 Changelog
 
+0.2.1 - Actualización de Paleta de Colores y Animación del Icono HandWaving
+- **Actualización de color principal**: Cambio de color verde de `#CEFB48` a `#3CCC1F` en toda la aplicación para mantener consistencia visual.
+- **Corrección de colores de proteínas**: Actualización de todos los iconos y elementos relacionados con proteínas para usar el nuevo color verde `#3CCC1F`.
+- **Mejoras en diseño del perfil**: Ajuste del tamaño de texto del nombre en las cards de macros (Proteínas, Carbohidratos, Grasas) de 20px a 14px para mejor legibilidad.
+- **Animación del icono HandWaving**: Implementación de animación de color continua que cambia entre verde (#3CCC1F), amarillo (#E5C438) y rojo (#DC3714) en el header del dashboard y perfil, creando un efecto visual atractivo y dinámico.
+
 0.2.0 - Búsqueda por IA, Alimentos Personalizados, Hidratación y Mejoras de UX
 - **Búsqueda nutricional por IA**: Integración con DeepSeek y Groq para buscar automáticamente macros nutricionales por nombre de alimento. Sistema híbrido con fallback automático, soporte para múltiples modelos de Groq, y indicador visual de carga durante la búsqueda.
 - **Sistema de favoritos**: Funcionalidad completa para marcar alimentos favoritos, filtro de favoritos visible solo cuando el usuario tiene favoritos, acceso rápido desde la página de agregar alimento.
@@ -32,7 +38,7 @@ Changelog
 0.1.2 - Rediseño Login y Register
 - Login y Register rediseñados: header oscuro con logo (3 puntos verticales), formularios con nuevos estilos.
 - Inputs: Phosphor Icons (At, Key, User, Eye/EyeClosed), padding 10px, fuente semibold 16px, placeholder #D9D9D9.
-- Borde de focus: color #CEFB48 (lime verde del nuevo diseño).
+- Borde de focus: color #3CCC1F (lime verde del nuevo diseño).
 - Sistema de versión centralizado: constante APP_VERSION en `lib/constants.ts` sincronizada con package.json y CHANGELOG.
 - Guards server-side: protección de rutas sin middleware, usando layouts de grupos (app) y (auth).
 - Fix: eliminado box-shadow global de inputs en páginas de auth para evitar doble borde.
@@ -41,7 +47,7 @@ Changelog
 0.1.1 - Dashboard y Navbar actualizados
 - Cards de Ejercicio y Agua con nuevos estilos, iconografía contorneada y ejemplos.
 - Cards de Comidas: layout, solapamiento de miniaturas, botón “+” destacado, nutrientes en una línea, imágenes demo (picsum).
-- Navbar rediseñado: fondo #131917, padding 10/5, radio 15; botón central 38x38 #CEFB48.
+- Navbar rediseñado: fondo #131917, padding 10/5, radio 15; botón central 38x38 #3CCC1F.
 - Migración a `@phosphor-icons/react` v2 en toda la app.
 - Fix build Next 16: actualización de handlers en `/api/reminders/[id]`, export CSV y scripts de seed.
 

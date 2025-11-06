@@ -104,7 +104,7 @@ export function HydrationForm({ onSuccess, onCancel }: HydrationFormProps) {
               onChange={handleAmountChange}
               min="0"
               step="50"
-              className="w-[120px] bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[32px] font-bold text-center focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+              className="w-[120px] bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[32px] font-bold text-center focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
               disabled={isSubmitting}
             />
             <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-[#5A5B5A] text-xs font-medium">

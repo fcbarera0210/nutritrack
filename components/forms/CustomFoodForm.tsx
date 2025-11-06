@@ -175,7 +175,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
             placeholder="Ej: Ensalada de frutas"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="flex-1 bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+            className="flex-1 bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
             required
             disabled={isSearchingAI}
           />
@@ -222,7 +222,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
           placeholder="Ej: Marca propia"
           value={brand}
           onChange={(e) => setBrand(e.target.value)}
-          className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+          className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
         />
       </div>
 
@@ -240,7 +240,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
             required
             min="0.1"
             step="0.1"
-            className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+            className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
           />
         </div>
         <div>
@@ -251,7 +251,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
             <select
               value={servingUnit}
               onChange={(e) => setServingUnit(e.target.value)}
-              className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none transition-all"
+              className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all"
               required
             >
               <option value="g">g (gramos)</option>
@@ -283,7 +283,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Fish size={16} weight="bold" className="text-[#CEFB48]" />
+                <Fish size={16} weight="bold" className="text-[#3CCC1F]" />
                 <Skeleton width="100px" height="12px" className="bg-gray-200" />
               </div>
               <Skeleton width="100%" height="40px" className="rounded-[15px] bg-gray-200" />
@@ -319,14 +319,14 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
                 min="0"
                 step="0.1"
                 disabled={isSearchingAI}
-                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
             {/* Proteínas */}
             <div>
               <label className="block text-[#131917] text-[12px] font-medium mb-1 flex items-center gap-2">
-                <Fish size={16} weight="bold" className="text-[#CEFB48]" />
+                <Fish size={16} weight="bold" className="text-[#3CCC1F]" />
                 Proteínas (g)
               </label>
               <input
@@ -337,7 +337,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
                 min="0"
                 step="0.1"
                 disabled={isSearchingAI}
-                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -355,7 +355,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
                 min="0"
                 step="0.1"
                 disabled={isSearchingAI}
-                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -373,7 +373,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
                 min="0"
                 step="0.1"
                 disabled={isSearchingAI}
-                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -395,7 +395,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
         <button
           type="submit"
           disabled={isSubmitting || !name.trim()}
-          className="flex-1 bg-[#CEFB48] text-[#131917] rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="flex-1 bg-[#3CCC1F] text-[#131917] rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

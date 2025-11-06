@@ -125,7 +125,7 @@ export function CalculationInfo({ isOpen, onClose }: { isOpen: boolean; onClose:
         {/* Ejemplo */}
         <div>
           <h3 className="text-lg font-bold mb-3 text-[#131917]" style={{ fontFamily: 'Quicksand, sans-serif' }}>Ejemplo Práctico</h3>
-          <div className="bg-[#CEFB48]/20 rounded-[20px] p-4 text-xs text-[#131917]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
+          <div className="bg-[#3CCC1F]/20 rounded-[20px] p-4 text-xs text-[#131917]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
             <p className="mb-2"><strong>Usuario:</strong> Hombre, 70kg, 170cm, 30 años, Moderadamente activo, Mantenimiento</p>
             <ol className="space-y-1 ml-4 list-decimal">
               <li>BMR = 10 × 70 + 6.25 × 170 - 5 × 30 + 5 = <strong>1,667 kcal</strong></li>

@@ -86,7 +86,7 @@
   --color-dynamite-red-100: #dc3714;
   --color-eerie-bauhaus-100: #404040;
   --color-eerie-bauhaus-200: #1e1e1e;
-  --color-yellow-green-100: #cefb48;
+  --color-yellow-green-100: #3ccc1f;
   
   /* Accent colors from Figma design */
   --accent-yellow: #FFC107;
@@ -181,8 +181,33 @@ body {
   }
 }
 
+@keyframes colorWave {
+  0% {
+    color: #3CCC1F; /* Verde */
+  }
+  33.33% {
+    color: #E5C438; /* Amarillo */
+  }
+  66.66% {
+    color: #DC3714; /* Rojo */
+  }
+  100% {
+    color: #3CCC1F; /* Verde - vuelve al inicio */
+  }
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+.animate-color-wave {
+  animation: colorWave 3s ease-in-out infinite;
+  display: inline-flex;
+}
+
+.animate-color-wave svg {
+  color: inherit;
+  fill: currentColor;
 }
 
 button {

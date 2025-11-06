@@ -32,7 +32,7 @@ export function BottomNav() {
                 onClick={handleCenterButtonClick}
                 className="flex flex-col items-center justify-center gap-1 relative"
               >
-                <div className="w-[38px] h-[38px] rounded-[10px] bg-[#CEFB48] hover:brightness-105 flex items-center justify-center text-[#131917] transition-colors shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
+                <div className="w-[38px] h-[38px] rounded-[10px] bg-[#3CCC1F] hover:brightness-105 flex items-center justify-center text-[#131917] transition-colors shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
                   <item.icon size={20} weight="bold" />
                 </div>
               </button>

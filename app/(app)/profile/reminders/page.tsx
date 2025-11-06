@@ -197,7 +197,7 @@ export default function RemindersPage() {
           <NotificationPermission />
         </div> */}
 
-        <div className="mb-6 p-4 bg-[#CEFB48]/70 rounded-[20px]">
+        <div className="mb-6 p-4 bg-[#3CCC1F]/70 rounded-[20px]">
           <p className="text-sm text-[#131917] text-center" style={{ fontFamily: 'Quicksand, sans-serif' }}>
             <strong>⚠️</strong> La funcionalidad de recordatorios está temporalmente deshabilitada.
           </p>
@@ -228,7 +228,7 @@ export default function RemindersPage() {
                       onChange={(e) => handleToggle(meal.id, e.target.checked)}
                       disabled={isLoading}
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#CEFB48]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#CEFB48]"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#3CCC1F]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#3CCC1F]"></div>
                   </label>
                 </div>
 
@@ -257,7 +257,7 @@ export default function RemindersPage() {
                     <button
                       onClick={() => handleTimeChange(meal.id, time.hour, time.minute)}
                       disabled={isLoading}
-                      className="w-12 h-12 rounded-[15px] bg-[#CEFB48] text-[#131917] flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50"
+                      className="w-12 h-12 rounded-[15px] bg-[#3CCC1F] text-[#131917] flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
                       <FloppyDisk size={20} weight="bold" />
                     </button>

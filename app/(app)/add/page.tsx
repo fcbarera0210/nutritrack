@@ -242,7 +242,7 @@ export default function AddPage() {
                 placeholder="Buscar alimentos..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
               />
             </div>
           </div>
@@ -339,7 +339,7 @@ export default function AddPage() {
                       onClick={() => handleCategoryChange('todos')}
                       className={`flex-shrink-0 w-9 h-9 rounded-[10px] transition-all flex items-center justify-center ${
                         selectedCategory === 'todos'
-                          ? 'bg-[#CEFB48] text-[#131917]'
+                          ? 'bg-[#3CCC1F] text-[#131917]'
                           : 'bg-white text-[#131917] hover:opacity-90'
                       }`}
                       title="Todos"
@@ -358,7 +358,7 @@ export default function AddPage() {
                     onClick={() => handleCategoryChange('personalizados')}
                     className={`flex-shrink-0 w-9 h-9 rounded-[10px] transition-all flex items-center justify-center ${
                       selectedCategory === 'personalizados'
-                        ? 'bg-[#CEFB48] text-[#131917]'
+                        ? 'bg-[#3CCC1F] text-[#131917]'
                         : 'bg-white text-[#131917] hover:opacity-90'
                     }`}
                     title="Personalizados"
@@ -376,7 +376,7 @@ export default function AddPage() {
                       onClick={() => handleCategoryChange('favoritos')}
                       className={`flex-shrink-0 w-9 h-9 rounded-[10px] transition-all flex items-center justify-center ${
                         selectedCategory === 'favoritos'
-                          ? 'bg-[#CEFB48] text-[#131917]'
+                          ? 'bg-[#3CCC1F] text-[#131917]'
                           : 'bg-white text-[#131917] hover:opacity-90'
                       }`}
                       title="Favoritos"
@@ -398,7 +398,7 @@ export default function AddPage() {
                       onClick={() => handleCategoryChange(category.id)}
                       className={`flex-shrink-0 w-9 h-9 rounded-[10px] transition-all flex items-center justify-center ${
                         selectedCategory === category.id
-                          ? 'bg-[#CEFB48] text-[#131917]'
+                          ? 'bg-[#3CCC1F] text-[#131917]'
                           : 'bg-white text-[#131917] hover:opacity-90'
                       }`}
                       title={category.name}
@@ -423,7 +423,7 @@ export default function AddPage() {
           <div className="mb-4">
             <button
               onClick={() => setShowCustomFoodModal(true)}
-              className="w-full bg-[#CEFB48] text-[#131917] rounded-[10px] px-4 py-[10px] flex items-center justify-center gap-2 font-semibold text-[14px] hover:opacity-90 transition-opacity"
+              className="w-full bg-[#3CCC1F] text-[#131917] rounded-[10px] px-4 py-[10px] flex items-center justify-center gap-2 font-semibold text-[14px] hover:opacity-90 transition-opacity"
             >
               <span>Alimento personalizado</span>
               <Plus size={18} weight="bold" />
@@ -502,7 +502,7 @@ export default function AddPage() {
                       <span className="text-white/70 text-[14px]">100g</span>
                       <div className="flex items-center gap-4 text-[14px]">
                         <div className="flex items-center gap-1">
-                          <Fish size={18} weight="bold" className="text-[#CEF154]" />
+                          <Fish size={18} weight="bold" className="text-[#3CCC1F]" />
                           <span className="text-white">{food.protein}g</span>
                         </div>
                         <div className="flex items-center gap-1">

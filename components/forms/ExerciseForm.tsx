@@ -171,7 +171,7 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
               setExerciseName(e.target.value);
               setCustomExercise(e.target.value === 'custom');
             }}
-            className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none appearance-none transition-all"
+            className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all"
             required
           >
             <option value="">Selecciona un ejercicio</option>
@@ -198,7 +198,7 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
             placeholder="Ej: CrossFit, HIIT, etc."
             value={exerciseName}
             onChange={(e) => setExerciseName(e.target.value)}
-            className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+            className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
             required
           />
         </div>
@@ -251,7 +251,7 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
             onChange={(e) => setDuration(e.target.value)}
             required
             min="1"
-            className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+            className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
           />
         </div>
       </div>
@@ -273,7 +273,7 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
             required
             min="30"
             max="200"
-            className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#CEFB48] focus:shadow-none transition-all"
+            className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
           />
         </div>
       </div>

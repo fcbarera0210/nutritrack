@@ -24,7 +24,7 @@ NutriTrack es una aplicación web (Next.js) para registrar comidas y ejercicios,
 - **CRUD completo**: crear/editar/eliminar logs de alimentos y ejercicios con confirmaciones.
 - **Recordatorios y notificaciones**: API CRUD de recordatorios, diseño consistente con iconos de Phosphor, funcionalidad de activación corregida.
 
-Notas de diseño: migración a `@phosphor-icons/react` v2, tokens de color y utilidades Tailwind personalizadas (espaciados exactos), navbar con fondo #131917 y botón central #CEFB48. Login/Register con header oscuro, logo de 3 puntos verticales, inputs con Phosphor Icons y borde focus #CEFB48. Página "Agregar Alimento" rediseñada con filtros por íconos, cards oscuras, scroll horizontal y formulario moderno.
+Notas de diseño: migración a `@phosphor-icons/react` v2, tokens de color y utilidades Tailwind personalizadas (espaciados exactos), navbar con fondo #131917 y botón central #3CCC1F. Login/Register con header oscuro, logo de 3 puntos verticales, inputs con Phosphor Icons y borde focus #3CCC1F. Página "Agregar Alimento" rediseñada con filtros por íconos, cards oscuras, scroll horizontal y formulario moderno. Icono HandWaving con animación de color continua entre verde, amarillo y rojo.
 
 ---
 
