@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { exercises } from '@/lib/db/schema';
 import { exerciseSchema } from '@/lib/validations/food';
+import { updateUserStreak } from '@/lib/utils/streaks';
 
 export async function POST(req: Request) {
   try {
@@ -27,6 +28,9 @@ export async function POST(req: Request) {
         date: validatedData.date,
       })
       .returning();
+
+    // Update user streak
+    await updateUserStreak(user.id, validatedData.date);
 
     return NextResponse.json({ success: true, log }, { status: 201 });
   } catch (error: any) {

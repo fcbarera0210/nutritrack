@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MagnifyingGlass, Plus, ArrowLeft, Info, Fish, Grains, Avocado, Star, NotePencil } from '@phosphor-icons/react';
+import { MagnifyingGlass, Plus, ArrowLeft, Info, Fish, Grains, Avocado, Star, NotePencil, PencilSimpleLine, Trash } from '@phosphor-icons/react';
 import { FoodLogForm } from '@/components/forms/FoodLogForm';
 import { CustomFoodForm } from '@/components/forms/CustomFoodForm';
 import { Modal } from '@/components/ui/Modal';
@@ -19,7 +19,22 @@ interface FoodItem {
   protein: number;
   carbs: number;
   fat: number;
+  isCustom?: boolean;
+  userId?: number;
+  servingSize?: number;
+  servingUnit?: string;
 }
+
+// Helper function para formatear la unidad de porción
+const formatServingUnit = (servingSize?: number, servingUnit?: string): string => {
+  const size = servingSize || 100;
+  const unit = servingUnit || 'g';
+  
+  if (unit === 'g') return `${size}g`;
+  if (unit === 'ml') return `${size}ml`;
+  if (unit === 'unit') return `${size} unidad${size !== 1 ? 'es' : ''}`;
+  return `${size}g`; // fallback
+};
 
 export default function AddPage() {
   const router = useRouter();
@@ -35,6 +50,9 @@ export default function AddPage() {
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
   const [showCustomFoodModal, setShowCustomFoodModal] = useState(false);
   const [hasCustomFoods, setHasCustomFoods] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     // Cargar todos los alimentos al inicio
@@ -105,6 +123,49 @@ export default function AddPage() {
     } catch (error) {
       console.error('Error toggling favorite:', error);
     }
+  };
+
+  const handleEditFood = () => {
+    setShowEditModal(true);
+  };
+
+  const handleDeleteFood = async () => {
+    if (!selectedFood) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/foods/${selectedFood.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Error al eliminar alimento');
+      }
+
+      // Cerrar modales y limpiar selección
+      setShowDeleteConfirm(false);
+      setSelectedFood(null);
+      
+      // Actualizar lista de resultados
+      handleSearch(searchQuery);
+      
+      // Actualizar estado de alimentos personalizados
+      checkCustomFoods();
+    } catch (error: any) {
+      console.error('Error deleting food:', error);
+      alert(error.message || 'Error al eliminar alimento personalizado');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleEditSuccess = async (updatedFood: FoodItem) => {
+    setShowEditModal(false);
+    // Actualizar el alimento seleccionado con los nuevos datos
+    setSelectedFood(updatedFood);
+    // Actualizar lista de resultados
+    handleSearch(searchQuery);
   };
 
   useEffect(() => {
@@ -448,17 +509,39 @@ export default function AddPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[#131917] text-[24px] font-bold">{selectedFood.name}</h3>
-              <button
-                onClick={() => toggleFavorite(selectedFood.id)}
-                className={`rounded-[15px] px-4 py-[5px] font-semibold text-[16px] hover:opacity-90 transition-opacity flex items-center gap-2 border-[3px] ${
-                  isFavorite
-                    ? 'bg-[#E5C438] border-[#E5C438] text-[#131917]'
-                    : 'bg-transparent border-[#E5C438] text-[#131917]'
-                }`}
-              >
-                <Star size={18} weight={isFavorite ? "fill" : "bold"} />
-                <span>Favorito</span>
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Botones de editar y eliminar - solo para alimentos personalizados */}
+                {selectedFood.isCustom && selectedFood.userId && (
+                  <>
+                    <button
+                      onClick={handleEditFood}
+                      className="w-[38px] h-[38px] rounded-[15px] bg-[#6484E2] hover:opacity-90 transition-opacity flex items-center justify-center text-white shadow-[0_2px_10px_rgba(0,0,0,0.10)]"
+                      title="Editar alimento"
+                    >
+                      <PencilSimpleLine size={18} weight="bold" />
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="w-[38px] h-[38px] rounded-[15px] bg-[#DC3714] hover:opacity-90 transition-opacity flex items-center justify-center text-white shadow-[0_2px_10px_rgba(0,0,0,0.10)]"
+                      title="Eliminar alimento"
+                    >
+                      <Trash size={18} weight="bold" />
+                    </button>
+                  </>
+                )}
+                {/* Botón de favoritos - solo icono */}
+                <button
+                  onClick={() => toggleFavorite(selectedFood.id)}
+                  className={`w-[38px] h-[38px] rounded-[15px] font-semibold hover:opacity-90 transition-opacity flex items-center justify-center border-[3px] ${
+                    isFavorite
+                      ? 'bg-[#E5C438] border-[#E5C438] text-[#131917]'
+                      : 'bg-transparent border-[#E5C438] text-[#131917]'
+                  }`}
+                  title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+                >
+                  <Star size={18} weight={isFavorite ? "fill" : "bold"} />
+                </button>
+              </div>
             </div>
             <FoodLogForm
               food={selectedFood}
@@ -497,9 +580,11 @@ export default function AddPage() {
                       </div>
                     </div>
 
-                    {/* Fila 2: 100g izquierda / Macros derecha */}
+                    {/* Fila 2: Porción izquierda / Macros derecha */}
                     <div className="flex items-center justify-between">
-                      <span className="text-white/70 text-[14px]">100g</span>
+                      <span className="text-white/70 text-[14px]">
+                        {formatServingUnit(food.servingSize, food.servingUnit)}
+                      </span>
                       <div className="flex items-center gap-4 text-[14px]">
                         <div className="flex items-center gap-1">
                           <Fish size={18} weight="bold" className="text-[#3CCC1F]" />
@@ -550,6 +635,65 @@ export default function AddPage() {
           onCancel={() => setShowCustomFoodModal(false)}
         />
       </Modal>
+
+      {/* Edit Food Modal */}
+      {selectedFood && selectedFood.isCustom && (
+        <Modal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          title="Editar Alimento Personalizado"
+        >
+          <CustomFoodForm
+            food={{
+              id: selectedFood.id,
+              name: selectedFood.name,
+              brand: selectedFood.brand,
+              calories: selectedFood.calories,
+              protein: selectedFood.protein,
+              carbs: selectedFood.carbs,
+              fat: selectedFood.fat,
+              servingSize: selectedFood.servingSize || 100,
+              servingUnit: selectedFood.servingUnit || 'g',
+            }}
+            onSuccess={handleEditSuccess}
+            onCancel={() => setShowEditModal(false)}
+          />
+        </Modal>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {selectedFood && selectedFood.isCustom && (
+        <Modal
+          isOpen={showDeleteConfirm}
+          onClose={() => setShowDeleteConfirm(false)}
+          title="Eliminar Alimento Personalizado"
+        >
+          <div className="space-y-4 pb-2">
+            <p className="text-[#131917] text-[16px]">
+              ¿Estás seguro de que deseas eliminar <strong>{selectedFood.name}</strong>?
+            </p>
+            <p className="text-[#5A5B5A] text-[14px]">
+              Esta acción no se puede deshacer. También se eliminarán todos los registros de consumo asociados a este alimento.
+            </p>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+                className="flex-1 text-[#5A5B5A] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteFood}
+                disabled={isDeleting}
+                className="flex-1 bg-[#DC3714] text-white rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isDeleting ? 'Eliminando...' : 'Eliminar'}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {/* Bottom Navigation */}
       <BottomNav />

@@ -242,9 +242,9 @@ export default function ProfilePage() {
               <h2 className="text-[#131917] font-semibold text-xl mb-5">Objetivos actuales</h2>
 
               {/* Cards de Objetivos */}
-              <div className="grid grid-cols-5 gap-4 mb-4">
-            {/* Card Kcal - Grande oscura - Ocupa 3/5 */}
-            <div className="col-span-3 bg-[#131917] rounded-[30px] py-[10px] px-[15px] relative overflow-hidden">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+            {/* Card Kcal - Grande oscura - Ocupa 50% */}
+            <div className="bg-[#131917] rounded-[30px] py-[10px] px-[15px] relative overflow-hidden">
               {/* Ícono de fondo */}
               <div className="absolute left-0 bottom-0 opacity-20 pointer-events-none" style={{ filter: 'drop-shadow(0 2px 10px rgba(255, 255, 255, 0.2))' }}>
                 <Fire weight="bold" className="text-white" style={{ width: 100, height: 85 }} />
@@ -259,8 +259,8 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Card Peso - Blanca - Ocupa 2/5 */}
-            <div className="col-span-2 bg-white rounded-[30px] py-[10px] px-[15px] relative overflow-hidden shadow-md">
+            {/* Card Peso - Blanca - Ocupa 50% */}
+            <div className="bg-white rounded-[30px] py-[10px] px-[15px] relative overflow-hidden shadow-md">
               {/* Ícono de fondo */}
               <div className="absolute left-0 bottom-0 opacity-20 pointer-events-none" style={{ filter: 'drop-shadow(0 2px 10px rgba(0, 0, 0, 0.2))' }}>
                 <Speedometer weight="bold" className="text-[#131917]" style={{ width: 100, height: 85 }} />
@@ -268,8 +268,18 @@ export default function ProfilePage() {
               {/* Contenido */}
               <div className="relative z-10 flex flex-col justify-center h-full">
                 <p className="text-[#131917] truncate" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '24px', fontWeight: 500, lineHeight: '1' }}>Peso</p>
-                <div className="flex items-baseline gap-1">
-                  <p className="text-[#131917] leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '32px', fontWeight: 700, lineHeight: '1.3' }}>{profile.weight}</p>
+                <div className="flex items-baseline gap-0.5">
+                  {/* Peso actual */}
+                  <p className="text-[#131917] leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '28px', fontWeight: 500, lineHeight: '1.3' }}>{profile.weight || '-'}</p>
+                  {/* Separador y peso objetivo */}
+                  {profile.targetWeight && (
+                    <>
+                      <span className="text-[#5A5B5A] leading-none mx-0.5" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '28px', fontWeight: 400, lineHeight: '1.3' }}>/</span>
+                      <p className="text-[#131917] leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '32px', fontWeight: 700, lineHeight: '1.3' }}>
+                        {profile.targetWeight}
+                      </p>
+                    </>
+                  )}
                   <p className="text-[#5A5B5A] leading-none" style={{ fontFamily: 'Quicksand, sans-serif', fontSize: '16px', fontWeight: 300, lineHeight: '1.3' }}>kg</p>
                 </div>
               </div>
@@ -279,7 +289,7 @@ export default function ProfilePage() {
           {/* Cards de Macros - Tres en fila */}
           <div className="grid grid-cols-3 gap-3 mb-4">
             {/* Proteínas - Verde */}
-            <div className="bg-[#3CCC1F] rounded-[30px] py-[8px] px-[15px] relative overflow-hidden">
+            <div className="bg-[#3CCC1F] rounded-[24px] py-[8px] px-[15px] relative overflow-hidden">
               {/* Ícono de fondo */}
               <div className="absolute left-0 bottom-0 opacity-20 pointer-events-none" style={{ filter: 'drop-shadow(0 2px 10px rgba(0, 0, 0, 0.2))' }}>
                 <Fish weight="bold" className="text-white" style={{ width: 70, height: 60 }} />
@@ -295,7 +305,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Carbohidratos - Amarillo */}
-            <div className="bg-[#E5C438] rounded-[30px] py-[8px] px-[15px] relative overflow-hidden">
+            <div className="bg-[#E5C438] rounded-[24px] py-[8px] px-[15px] relative overflow-hidden">
               {/* Ícono de fondo */}
               <div className="absolute left-0 bottom-0 opacity-20 pointer-events-none" style={{ filter: 'drop-shadow(0 2px 10px rgba(0, 0, 0, 0.2))' }}>
                 <Grains weight="bold" className="text-white" style={{ width: 70, height: 60 }} />
@@ -311,7 +321,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Grasas - Rojo */}
-            <div className="bg-[#DC3714] rounded-[30px] py-[8px] px-[15px] relative overflow-hidden">
+            <div className="bg-[#DC3714] rounded-[24px] py-[8px] px-[15px] relative overflow-hidden">
               {/* Ícono de fondo */}
               <div className="absolute left-0 bottom-0 opacity-20 pointer-events-none" style={{ filter: 'drop-shadow(0 2px 10px rgba(0, 0, 0, 0.2))' }}>
                 <Avocado weight="bold" className="text-white" style={{ width: 70, height: 60 }} />

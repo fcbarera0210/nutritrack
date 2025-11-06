@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { foodLogs, userStreaks, foods } from '@/lib/db/schema';
-import { eq, gte, and } from 'drizzle-orm';
+import { foodLogs, foods } from '@/lib/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { foodLogSchema } from '@/lib/validations/food';
-import { getTodayDateLocal, formatDateLocal } from '@/lib/utils/date';
+import { getTodayDateLocal } from '@/lib/utils/date';
+import { updateUserStreak } from '@/lib/utils/streaks';
 
 export async function POST(req: Request) {
   try {
@@ -72,52 +73,6 @@ export async function POST(req: Request) {
       { error: 'Error al registrar alimento', details: error.message },
       { status: 500 }
     );
-  }
-}
-
-async function updateUserStreak(userId: number, date: string) {
-  const streakData = await db
-    .select()
-    .from(userStreaks)
-    .where(eq(userStreaks.userId, userId))
-    .limit(1);
-
-  const streak = streakData[0];
-  if (!streak) return;
-
-  const yesterdayDate = new Date();
-  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-  const yesterdayStr = formatDateLocal(yesterdayDate);
-  const today = getTodayDateLocal();
-
-  let newCurrentStreak = streak.currentStreak;
-  let newLongestStreak = streak.longestStreak;
-
-  if (date === today) {
-    // Same day logging - increment streak
-    if (streak.lastLoggedDate === yesterdayStr || streak.lastLoggedDate === today) {
-      newCurrentStreak = streak.currentStreak;
-    } else if (streak.lastLoggedDate === date) {
-      newCurrentStreak = streak.currentStreak; // Same day
-    } else {
-      // Streak broken - reset
-      newCurrentStreak = 1;
-    }
-
-    // Update longest streak if needed
-    if (newCurrentStreak > newLongestStreak) {
-      newLongestStreak = newCurrentStreak;
-    }
-
-    await db
-      .update(userStreaks)
-      .set({
-        currentStreak: newCurrentStreak,
-        longestStreak: newLongestStreak,
-        lastLoggedDate: date,
-        totalLogs: streak.totalLogs + 1,
-      })
-      .where(eq(userStreaks.userId, userId));
   }
 }
 

@@ -13,6 +13,8 @@ interface FoodLogFormProps {
     protein: number;
     carbs: number;
     fat: number;
+    servingSize?: number;
+    servingUnit?: string;
   };
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -26,7 +28,9 @@ const MEAL_TYPES = [
 ];
 
 export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
-  const [quantity, setQuantity] = useState('100');
+  const servingSize = food.servingSize || 100;
+  const servingUnit = food.servingUnit || 'g';
+  const [quantity, setQuantity] = useState(servingSize.toString());
   const [mealType, setMealType] = useState('breakfast');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -42,8 +46,8 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           foodId: food.id,
-          quantity: parseFloat(quantity),
-          servingSize: 100, // Default serving size en gramos
+          quantity: parseFloat(quantity) / servingSize, // Cantidad como múltiplo del tamaño de porción
+          servingSize: servingSize,
           mealType,
           date: getTodayDateLocal(),
         }),
@@ -65,10 +69,13 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
     }
   };
 
-  const calculatedCalories = Math.round((food.calories * parseFloat(quantity)) / 100);
-  const calculatedProtein = ((food.protein * parseFloat(quantity)) / 100).toFixed(1);
-  const calculatedCarbs = ((food.carbs * parseFloat(quantity)) / 100).toFixed(1);
-  const calculatedFat = ((food.fat * parseFloat(quantity)) / 100).toFixed(1);
+  // Calcular valores nutricionales basados en la cantidad ingresada y el tamaño de porción
+  const quantityValue = parseFloat(quantity) || 0;
+  const multiplier = quantityValue / servingSize;
+  const calculatedCalories = Math.round(food.calories * multiplier);
+  const calculatedProtein = (food.protein * multiplier).toFixed(1);
+  const calculatedCarbs = (food.carbs * multiplier).toFixed(1);
+  const calculatedFat = (food.fat * multiplier).toFixed(1);
 
   return (
     <div className="space-y-4">
@@ -83,15 +90,15 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-[#131917] text-[14px] font-medium mb-2">
-              Cantidad (g)
+              Cantidad ({servingUnit === 'g' ? 'g' : servingUnit === 'ml' ? 'ml' : 'unidades'})
             </label>
             <input
               type="number"
-              placeholder="100"
+              placeholder={servingSize.toString()}
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               required
-              min="1"
+              min="0.1"
               step="0.1"
               className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
             />

@@ -5,6 +5,17 @@ import { CaretDown, Fish, Grains, Avocado, Fire, Sparkle, CircleNotch, Lightbulb
 import { Skeleton } from '@/components/ui/Skeleton';
 
 interface CustomFoodFormProps {
+  food?: {
+    id: number;
+    name: string;
+    brand: string | null;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    servingSize: number;
+    servingUnit: string;
+  };
   onSuccess?: (food: {
     id: number;
     name: string;
@@ -13,19 +24,24 @@ interface CustomFoodFormProps {
     protein: number;
     carbs: number;
     fat: number;
+    servingSize?: number;
+    servingUnit?: string;
+    isCustom?: boolean;
+    userId?: number;
   }) => void;
   onCancel?: () => void;
 }
 
-export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
-  const [name, setName] = useState('');
-  const [brand, setBrand] = useState('');
-  const [calories, setCalories] = useState('');
-  const [protein, setProtein] = useState('');
-  const [carbs, setCarbs] = useState('');
-  const [fat, setFat] = useState('');
-  const [servingSize, setServingSize] = useState('100');
-  const [servingUnit, setServingUnit] = useState('g');
+export function CustomFoodForm({ food: initialFood, onSuccess, onCancel }: CustomFoodFormProps) {
+  const isEditMode = !!initialFood;
+  const [name, setName] = useState(initialFood?.name || '');
+  const [brand, setBrand] = useState(initialFood?.brand || '');
+  const [calories, setCalories] = useState(initialFood?.calories.toString() || '');
+  const [protein, setProtein] = useState(initialFood?.protein.toString() || '');
+  const [carbs, setCarbs] = useState(initialFood?.carbs.toString() || '');
+  const [fat, setFat] = useState(initialFood?.fat.toString() || '');
+  const [servingSize, setServingSize] = useState(initialFood?.servingSize.toString() || '100');
+  const [servingUnit, setServingUnit] = useState(initialFood?.servingUnit || 'g');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [isSearchingAI, setIsSearchingAI] = useState(false);
@@ -178,8 +194,11 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/foods/create', {
-        method: 'POST',
+      const url = isEditMode ? `/api/foods/${initialFood!.id}` : '/api/foods/create';
+      const method = isEditMode ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: name.trim(),
@@ -196,14 +215,14 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al crear alimento personalizado');
+        throw new Error(data.error || (isEditMode ? 'Error al actualizar alimento personalizado' : 'Error al crear alimento personalizado'));
       }
 
       if (onSuccess) {
         onSuccess(data.food);
       }
     } catch (error: any) {
-      setError(error.message || 'Error al crear alimento personalizado');
+      setError(error.message || (isEditMode ? 'Error al actualizar alimento personalizado' : 'Error al crear alimento personalizado'));
     } finally {
       setIsSubmitting(false);
     }
@@ -486,7 +505,7 @@ export function CustomFoodForm({ onSuccess, onCancel }: CustomFoodFormProps) {
             </>
           ) : (
             <>
-              <span>Crear Alimento</span>
+              <span>{isEditMode ? 'Guardar' : 'Crear Alimento'}</span>
             </>
           )}
         </button>

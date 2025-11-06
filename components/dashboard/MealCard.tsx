@@ -27,7 +27,7 @@ export function MealCard({ mealType, calories, itemCount, items = [], onClick }:
   return (
     <div
       onClick={onClick}
-      className="bg-[#131917] rounded-[30px] px-[20px] py-[15px] mb-3 shadow-[0_2px_10px_rgba(0,0,0,0.10)] cursor-pointer"
+      className="bg-[#131917] rounded-[30px] px-[20px] py-[15px] mb-3 shadow-[0_2px_10px_rgba(0,0,0,0.10)] cursor-pointer relative"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
@@ -43,7 +43,8 @@ export function MealCard({ mealType, calories, itemCount, items = [], onClick }:
       {items.length > 0 ? (
         <div className="space-y-2">
           {items.slice(0, 3).map((item) => {
-            const itemCalories = Math.round(item.calories * item.quantity / 100);
+            // quantity is already a multiplier of servingSize
+            const itemCalories = Math.round(item.calories * item.quantity);
             
             return (
               <div key={item.id} className="flex items-center justify-between py-1">

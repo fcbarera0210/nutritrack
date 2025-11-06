@@ -1,5 +1,18 @@
 Changelog
 
+0.3.0 - Sistema de Rachas, Edición de Alimentos Personalizados y Rediseño del Nav Bar
+- **Sistema de rachas (streaks)**: Implementación completa de sistema de rachas que se activa cuando el usuario registra al menos 1 ejercicio o 1 comida por día. La racha se activa después de 3 días consecutivos, mostrando un mensaje en el dashboard con el ícono de llama. Los días con racha se muestran con el ícono de llama en el calendario semanal, con animación multicolor similar al HandWaving del header. El ícono alterna con la vocal del día cada 3 segundos (llama) y 2 segundos (vocal) con animación de fade suave.
+- **Edición y eliminación de alimentos personalizados**: Los usuarios ahora pueden editar y eliminar sus alimentos personalizados desde la vista de detalles del alimento. Botones de editar (azul con ícono PencilSimpleLine) y eliminar (rojo con ícono Trash) visibles solo para alimentos personalizados del usuario. Modal de confirmación para eliminar con diseño mejorado.
+- **Rediseño completo del nav bar**: Nav bar completamente rediseñado con botones individuales que tienen su propio fondo, borde y sombra. El botón activo muestra ícono + texto, mientras que los inactivos solo muestran el ícono. Espacio visible entre botones mostrando el fondo de la página. Animaciones suaves al cambiar entre pantallas (escala, fade, slide). Borde sólido de 3px color #404040 y sombra proyectada en cada botón.
+- **Botón flotante para agregar alimentos**: Nuevo botón flotante redondo verde (#3CCC1F) con ícono Plus en la esquina inferior derecha de todas las páginas, navegando a la página de agregar alimento. Posicionado a 90px del bottom y 20px del right.
+- **Correcciones en unidades de porción**: Corrección completa del sistema de unidades de porción (servingUnit) para que se muestre correctamente en todas las vistas (cards de alimentos, formulario de registro, modal de detalles en dashboard). Los cálculos ahora usan correctamente el servingSize y servingUnit del alimento.
+- **Mejoras en el perfil**: El peso ahora muestra tanto el peso actual como el peso objetivo (formato: "86/75 kg"), con el peso objetivo en negrita y tamaño mayor. Layout de cards de Kcal y Peso cambiado a 50/50 horizontal. Border-radius de las cards de macros cambiado a 24px.
+- **Botón de agregar comida en modal de detalles**: Agregado botón "Agregar Alimento" al final de la lista de alimentos en el modal de detalles de comidas del dashboard.
+- **Mejoras en el calendario**: Animación de fade suave (0.8s) al alternar entre ícono de llama y vocal del día. El ícono de llama tiene animación multicolor cuando no está seleccionado, y color oscuro cuando está seleccionado.
+- **Utilidades nuevas**: `lib/utils/streaks.ts` para manejo centralizado de rachas de usuario.
+- **Componentes nuevos**: `FloatingAddButton` para el botón flotante de agregar alimentos.
+- **API Routes actualizadas**: `/api/foods/[id]` ahora soporta PUT y DELETE para editar y eliminar alimentos personalizados. `/api/dashboard/today` ahora retorna `streakDays` y `servingUnit` correctamente. `/api/logs/create` y `/api/exercises/create` actualizan automáticamente las rachas del usuario.
+
 0.2.2 - Límite de Búsquedas por IA y Mejoras de UX
 - **Límite diario de búsquedas por IA**: Implementación de sistema de control con límite de 15 búsquedas diarias por usuario para gestionar el uso gratuito de APIs de IA (Groq/DeepSeek). Tabla `ai_search_logs` para rastrear búsquedas diarias.
 - **Contador de búsquedas restantes**: Visualización en tiempo real del número de búsquedas disponibles en el formulario de alimento personalizado, con actualización automática después de cada búsqueda.

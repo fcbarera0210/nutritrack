@@ -56,6 +56,7 @@ export async function GET(req: Request) {
         carbs: foods.carbs,
         fat: foods.fat,
         brand: foods.brand,
+        servingUnit: foods.servingUnit,
       })
       .from(foodLogs)
       .innerJoin(foods, eq(foodLogs.foodId, foods.id))
@@ -66,8 +67,8 @@ export async function GET(req: Request) {
 
     // Calculate totals
     const totals = todayLogs.reduce((acc, log) => {
-      // Calories and macros are per 100g, so we calculate based on quantity
-      const multiplier = log.quantity / 100;
+      // quantity is a multiplier of servingSize, so we calculate based on that
+      const multiplier = log.quantity; // quantity is already the multiplier
       acc.calories += log.calories * multiplier;
       acc.protein += log.protein * multiplier;
       acc.carbs += log.carbs * multiplier;
@@ -111,7 +112,8 @@ export async function GET(req: Request) {
     Object.keys(meals).forEach(mealType => {
       const meal = meals[mealType as keyof typeof meals];
       meal.items.forEach(log => {
-        const multiplier = log.quantity / 100;
+        // quantity is already the multiplier of servingSize
+        const multiplier = log.quantity;
         meal.totalCalories += log.calories * multiplier;
         meal.totalProtein += log.protein * multiplier;
         meal.totalCarbs += log.carbs * multiplier;
@@ -142,6 +144,42 @@ export async function GET(req: Request) {
       .limit(1);
 
     const streak = streakData.length > 0 ? streakData[0].currentStreak : 0;
+
+    // Get all dates with logged food or exercise (for streak visualization)
+    // Obtener fechas únicas de los últimos 30 días donde hay comida o ejercicio
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const thirtyDaysAgoStr = formatDateLocal(thirtyDaysAgo);
+
+    // Obtener todas las fechas de comidas (luego filtrar únicas en JS)
+    const allFoodLogs = await db
+      .select({ date: foodLogs.date })
+      .from(foodLogs)
+      .where(
+        and(
+          eq(foodLogs.userId, user.id),
+          gte(foodLogs.date, thirtyDaysAgoStr)
+        )
+      );
+
+    // Obtener todas las fechas de ejercicios (luego filtrar únicas en JS)
+    const allExerciseLogs = await db
+      .select({ date: exercises.date })
+      .from(exercises)
+      .where(
+        and(
+          eq(exercises.userId, user.id),
+          gte(exercises.date, thirtyDaysAgoStr)
+        )
+      );
+
+    // Combinar y obtener fechas únicas
+    const allDates = new Set<string>();
+    allFoodLogs.forEach(item => allDates.add(item.date));
+    allExerciseLogs.forEach(item => allDates.add(item.date));
+    
+    // Devolver como array de strings de fecha (YYYY-MM-DD)
+    const streakDays = Array.from(allDates);
 
     // Get user profile with targets
     const profileData = await db
@@ -203,6 +241,7 @@ export async function GET(req: Request) {
       exercises: todayExercises,
       totalCaloriesBurned,
       streak,
+      streakDays,
       totalWater,
       waterEntries,
       userName,

@@ -41,6 +41,7 @@ export default function DashboardPage() {
   });
 
   const [streak, setStreak] = useState(0);
+  const [streakDays, setStreakDays] = useState<Date[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [meals, setMeals] = useState({
     breakfast: { totalCalories: 0, items: [] },
@@ -78,6 +79,16 @@ export default function DashboardPage() {
           targetFat: data.targets?.targetFat || 67,
         });
         setStreak(data.streak || 0);
+        // Convertir fechas string a Date objects para streakDays
+        if (data.streakDays && Array.isArray(data.streakDays)) {
+          const dates = data.streakDays.map((dateStr: string) => {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            return new Date(year, month - 1, day);
+          });
+          setStreakDays(dates);
+        } else {
+          setStreakDays([]);
+        }
         setMeals(data.meals || {
           breakfast: { totalCalories: 0, items: [] },
           lunch: { totalCalories: 0, items: [] },
@@ -106,7 +117,6 @@ export default function DashboardPage() {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
-  const streakDays = streak > 0 ? [new Date()] : [];
   const proteinProgress = (todayStats.protein / todayStats.targetProtein) * 100;
   const carbsProgress = (todayStats.carbs / todayStats.targetCarbs) * 100;
   const fatProgress = (todayStats.fat / todayStats.targetFat) * 100;
@@ -136,13 +146,13 @@ export default function DashboardPage() {
               </div>
               {/* Kcal Box */}
               <div className="flex flex-col items-center">
-                {/* Mensaje de rachas - Oculto temporalmente */}
-                {/* {streak > 0 && (
-              <div className="flex items-center gap-2 mb-[5px]">
-                <Fire size={21} weight="bold" className="text-[#DC3714]" />
-                <p className="text-white text-[14px] font-medium">Llevas {streak} día{streak !== 1 ? 's' : ''} de racha, sigue así !!</p>
-              </div>
-            )} */}
+                {/* Mensaje de rachas - Solo visible cuando hay 3+ días */}
+                {streak >= 3 && (
+                  <div className="flex items-center gap-2 mb-[5px]">
+                    <Fire size={21} weight="bold" className="text-[#DC3714]" />
+                    <p className="text-white text-[14px] font-medium">Llevas {streak} días de racha, sigue así !!</p>
+                  </div>
+                )}
                 <div className="text-white text-[36px] font-semibold">
                   {todayStats.calories} / {todayStats.targetCalories} kcal
                 </div>
@@ -201,11 +211,6 @@ export default function DashboardPage() {
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3 px-2">
                 <h3 className="text-[#131917] font-semibold text-[24px]">Comidas del día</h3>
-                <Link href="/add">
-                  <button className="w-[38px] h-[38px] rounded-full bg-[#3CCC1F] hover:brightness-105 flex items-center justify-center text-[#131917] transition-colors shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
-                    <Plus size={20} weight="bold" color="#131917" />
-                  </button>
-                </Link>
               </div>
 
               <MealCard
@@ -268,19 +273,19 @@ export default function DashboardPage() {
                             <div className="flex items-center gap-1">
                               <Fish size={16} weight="bold" className="text-[#131917]" />
                               <span className="text-[#131917] text-xs font-semibold">
-                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.protein * item.quantity / 100), 0)) * 10) / 10}g
+                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.protein * item.quantity), 0)) * 10) / 10}g
                               </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Grains size={16} weight="bold" className="text-[#131917]" />
                               <span className="text-[#131917] text-xs font-semibold">
-                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.carbs * item.quantity / 100), 0)) * 10) / 10}g
+                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.carbs * item.quantity), 0)) * 10) / 10}g
                               </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Avocado size={16} weight="bold" className="text-[#131917]" />
                               <span className="text-[#131917] text-xs font-semibold">
-                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.fat * item.quantity / 100), 0)) * 10) / 10}g
+                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.fat * item.quantity), 0)) * 10) / 10}g
                               </span>
                             </div>
                           </div>
@@ -292,10 +297,21 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     {meals[selectedMeal as keyof typeof meals].items.map((item: any) => {
-                      const itemProtein = Math.round((item.protein * item.quantity / 100) * 10) / 10;
-                      const itemCarbs = Math.round((item.carbs * item.quantity / 100) * 10) / 10;
-                      const itemFat = Math.round((item.fat * item.quantity / 100) * 10) / 10;
-                      const itemCalories = Math.round(item.calories * item.quantity / 100);
+                      // quantity is a multiplier of servingSize, so actual amount is quantity * servingSize
+                      const actualQuantity = item.quantity * (item.servingSize || 100);
+                      const servingUnit = item.servingUnit || 'g';
+                      const itemProtein = Math.round((item.protein * item.quantity) * 10) / 10;
+                      const itemCarbs = Math.round((item.carbs * item.quantity) * 10) / 10;
+                      const itemFat = Math.round((item.fat * item.quantity) * 10) / 10;
+                      const itemCalories = Math.round(item.calories * item.quantity);
+                      
+                      // Helper para formatear la unidad
+                      const formatUnit = (unit: string) => {
+                        if (unit === 'g') return 'g';
+                        if (unit === 'ml') return 'ml';
+                        if (unit === 'unit') return ' unidad' + (actualQuantity !== 1 ? 'es' : '');
+                        return 'g';
+                      };
                       
                       return (
                         <div key={item.id} className="bg-[#131917] rounded-[15px] p-4">
@@ -303,7 +319,7 @@ export default function DashboardPage() {
                             {/* Columna izquierda */}
                             <div className="flex flex-col justify-between">
                               <p className="text-white font-semibold text-base mb-2">{item.name}</p>
-                              <p className="text-white/70 text-xs">Cantidad: {item.quantity}g</p>
+                              <p className="text-white/70 text-xs">Cantidad: {actualQuantity}{formatUnit(servingUnit)}</p>
                             </div>
                             {/* Columna derecha */}
                             <div className="flex flex-col justify-between items-end">
@@ -344,6 +360,15 @@ export default function DashboardPage() {
                         </div>
                       );
                     })}
+                    {/* Botón para agregar comida al final de la lista */}
+                    <div className="pt-2">
+                      <Link href="/add" className="flex justify-center">
+                        <button className="w-full bg-[#3CCC1F]/70 border-2 border-[#3CCC1F] rounded-[15px] px-4 py-[10px] text-[#131917] font-semibold text-[16px] hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2">
+                          <Plus size={20} weight="bold" />
+                          <span>Agregar Alimento</span>
+                        </button>
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
