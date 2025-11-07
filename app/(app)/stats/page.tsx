@@ -202,7 +202,14 @@ export default function StatsPage() {
           fill="#DC3714"
         />
         {adjustedHeight > 20 && (
-          <foreignObject x={x + width / 2 - 30} y={y + adjustedHeight / 2 - 30} width={60} height={60}>
+          <foreignObject 
+            x={x + width / 2 - 30} 
+            y={y + adjustedHeight / 2 - 30} 
+            width={60} 
+            height={60}
+            clipPath={`url(#${clipId})`}
+            style={{ overflow: 'hidden' }}
+          >
             <div style={{ 
               position: 'relative', 
               width: '100%', 
@@ -211,7 +218,8 @@ export default function StatsPage() {
               alignItems: 'center',
               justifyContent: 'center',
               pointerEvents: 'none',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              clipPath: 'inset(0)'
             }}>
               <Avocado 
                 weight="bold" 
@@ -249,30 +257,36 @@ export default function StatsPage() {
           fill="#E5C438"
         />
         {safeHeight > 20 && (
-          <g clipPath={`url(#${clipId})`}>
-            <foreignObject x={x + width / 2 - 30} y={y + safeHeight / 2 - 30} width={60} height={60}>
-              <div style={{ 
-                position: 'relative', 
-                width: '100%', 
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                pointerEvents: 'none',
-                overflow: 'hidden'
-              }}>
-                <Grains 
-                  weight="bold" 
-                  style={{ 
-                    width: 60, 
-                    height: 60,
-                    color: 'rgba(255, 255, 255, 0.2)',
-                    filter: 'drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.2))'
-                  }} 
-                />
-              </div>
-            </foreignObject>
-          </g>
+          <foreignObject 
+            x={x + width / 2 - 30} 
+            y={y + safeHeight / 2 - 30} 
+            width={60} 
+            height={60}
+            clipPath={`url(#${clipId})`}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ 
+              position: 'relative', 
+              width: '100%', 
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+              overflow: 'hidden',
+              clipPath: 'inset(0)'
+            }}>
+              <Grains 
+                weight="bold" 
+                style={{ 
+                  width: 60, 
+                  height: 60,
+                  color: 'rgba(255, 255, 255, 0.2)',
+                  filter: 'drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.2))'
+                }} 
+              />
+            </div>
+          </foreignObject>
         )}
       </g>
     );
@@ -321,7 +335,14 @@ export default function StatsPage() {
           fill="#3CCC1F"
         />
         {safeHeight > 20 && (
-          <foreignObject x={x + width / 2 - 30} y={y + safeHeight / 2 - 30} width={60} height={60}>
+          <foreignObject 
+            x={x + width / 2 - 30} 
+            y={y + safeHeight / 2 - 30} 
+            width={60} 
+            height={60}
+            clipPath={`url(#${iconClipId})`}
+            style={{ overflow: 'hidden' }}
+          >
             <div style={{ 
               position: 'relative', 
               width: '100%', 
@@ -330,7 +351,8 @@ export default function StatsPage() {
               alignItems: 'center',
               justifyContent: 'center',
               pointerEvents: 'none',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              clipPath: 'inset(0)'
             }}>
               <Fish 
                 weight="bold" 
