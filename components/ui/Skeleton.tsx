@@ -161,3 +161,97 @@ export function FoodListSkeleton() {
   );
 }
 
+export function StatsSkeleton() {
+  return (
+    <div className="min-h-screen bg-[#D9D9D9] pb-24">
+      {/* Header oscuro con ícono de perfil y textos */}
+      <div className="bg-[#131917] rounded-b-[30px]">
+        <div className="px-25 pb-[15px] pt-[40px]">
+          <div className="flex items-center gap-4">
+            {/* User Avatar skeleton */}
+            <Skeleton width="48px" height="48px" className="rounded-full bg-white/10" />
+            {/* Título y descripción skeleton */}
+            <div className="flex-1">
+              <Skeleton width="120px" height="24px" className="mb-2 bg-white/20" />
+              <Skeleton width="180px" height="16px" className="bg-white/10" />
+            </div>
+          </div>
+        </div>
+        
+        {/* Navegador de semanas skeleton */}
+        <div className="px-6 pb-4">
+          <div className="bg-[#404040] rounded-[30px] pt-[15px] pr-[20px] pb-[10px] pl-[20px]">
+            <div className="flex items-center justify-between">
+              <Skeleton width="150px" height="20px" className="bg-white/10" />
+              <div className="flex items-center gap-3">
+                <Skeleton width="28px" height="28px" className="rounded-full bg-white/10" />
+                <Skeleton width="28px" height="28px" className="rounded-full bg-white/10" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-6 pt-6 pb-20 max-w-md mx-auto">
+        {/* Summary Cards skeleton */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {/* Card Promedio Semanal - Oscura */}
+          <div className="bg-[#131917] rounded-[30px] py-[10px] px-[15px] relative overflow-hidden">
+            <Skeleton width="100px" height="14px" className="mb-2 bg-white/20" />
+            <div className="flex items-baseline gap-1">
+              <Skeleton width="80px" height="32px" className="bg-white/20" />
+              <Skeleton width="40px" height="16px" className="bg-white/10" />
+            </div>
+          </div>
+
+          {/* Card Total Registrado - Blanca */}
+          <div className="bg-white rounded-[30px] py-[10px] px-[15px] relative overflow-hidden shadow-md">
+            <Skeleton width="100px" height="14px" className="mb-2" />
+            <div className="flex items-baseline gap-1">
+              <Skeleton width="60px" height="32px" />
+              <Skeleton width="60px" height="16px" />
+            </div>
+          </div>
+        </div>
+
+        {/* Charts Section skeleton */}
+        <div className="mb-6">
+          <Skeleton width="150px" height="24px" className="mb-4" />
+          <Skeleton width="100%" height="300px" className="rounded-lg" />
+          
+          {/* Botón skeleton */}
+          <Skeleton width="100%" height="44px" className="rounded-[15px] mt-4" />
+        </div>
+
+        {/* Entrenamientos recientes skeleton */}
+        <div className="mb-6">
+          <Skeleton width="180px" height="24px" className="mb-4" />
+          
+          {/* Card amarilla con total semanal skeleton */}
+          <Skeleton width="100%" height="50px" className="rounded-[15px] mb-3" />
+          
+          {/* Cards de ejercicios skeleton */}
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-[#131917] rounded-[15px] p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <Skeleton width="120px" height="18px" className="bg-white/20" />
+                    <Skeleton width="80px" height="14px" className="bg-white/10" />
+                  </div>
+                  <div className="flex items-end justify-end">
+                    <Skeleton width="60px" height="20px" className="bg-white/20" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Botón de información skeleton */}
+          <Skeleton width="100%" height="44px" className="rounded-[15px] mt-4" />
+        </div>
+      </div>
+    </div>
+  );
+}
+

@@ -12,6 +12,7 @@ import { format, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getExerciseIcon } from '@/lib/utils/exerciseIcons';
 import { ExerciseCalculationInfo } from '@/components/ui/ExerciseCalculationInfo';
+import { StatsSkeleton } from '@/components/ui/Skeleton';
 
 export default function StatsPage() {
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
@@ -346,6 +347,10 @@ export default function StatsPage() {
       </g>
     );
   };
+
+  if (isLoading) {
+    return <StatsSkeleton />;
+  }
 
   return (
     <div className="min-h-screen bg-[#D9D9D9] pb-24">

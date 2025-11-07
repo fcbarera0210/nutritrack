@@ -1,5 +1,10 @@
 Changelog
 
+0.4.1 - Correcciones de UI y Skeleton de Carga en Estadísticas
+- **Skeleton de carga en estadísticas**: Implementado skeleton de carga completo para la pantalla de estadísticas, mostrando estructura similar al contenido real mientras se cargan los datos, mejorando la experiencia de usuario durante la carga inicial
+- **Corrección de colores de iconos en gráfico**: Ajuste temporal del color de los iconos en las barras del gráfico para facilitar la visualización del problema de overflow en dispositivos móviles
+- **Mejoras de consistencia**: La pantalla de estadísticas ahora tiene el mismo comportamiento de carga que las pantallas de dashboard y perfil, mostrando skeleton en lugar de contenido vacío
+
 0.4.0 - Rediseño Completo de Estadísticas y Mejoras de UI/UX
 - **Rediseño completo de la pantalla de estadísticas**: Header oscuro (#131917) con icono de perfil, navegador semanal con calendario, y diseño consistente con el resto de la aplicación
 - **Gráfico de barras apiladas semanales**: Nuevo gráfico de barras apiladas que muestra calorías semanales desglosadas por macros (proteínas verde, carbohidratos amarillo, grasas rojo) con iconos translúcidos en cada segmento
