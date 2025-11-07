@@ -33,25 +33,25 @@ export function WeeklyCalendar({ selectedDate, onDateChange, streakDays = [] }: 
         
         // Programar el siguiente cambio
         if (nextState) {
-          // Mostrar ícono por 3 segundos
-          timeoutRef.current = setTimeout(() => {
-            scheduleNext();
-          }, 3000);
-        } else {
-          // Mostrar vocal por 2 segundos
+          // Mostrar ícono por 2 segundos
           timeoutRef.current = setTimeout(() => {
             scheduleNext();
           }, 2000);
+        } else {
+          // Mostrar vocal por 3 segundos
+          timeoutRef.current = setTimeout(() => {
+            scheduleNext();
+          }, 3000);
         }
         
         return nextState;
       });
     };
 
-    // Iniciar el ciclo: empezar mostrando el ícono por 3 segundos
+    // Iniciar el ciclo: empezar mostrando el ícono por 2 segundos
     timeoutRef.current = setTimeout(() => {
       scheduleNext();
-    }, 3000);
+    }, 2000);
 
     return () => {
       if (timeoutRef.current) {

@@ -1,5 +1,19 @@
 Changelog
 
+0.4.0 - Rediseño Completo de Estadísticas y Mejoras de UI/UX
+- **Rediseño completo de la pantalla de estadísticas**: Header oscuro (#131917) con icono de perfil, navegador semanal con calendario, y diseño consistente con el resto de la aplicación
+- **Gráfico de barras apiladas semanales**: Nuevo gráfico de barras apiladas que muestra calorías semanales desglosadas por macros (proteínas verde, carbohidratos amarillo, grasas rojo) con iconos translúcidos en cada segmento
+- **Border radius en barras del gráfico**: Barra verde (proteínas) con border radius de 10px en esquinas superiores, barra roja (grasas) con border radius de 10px en esquinas inferiores
+- **Modales mejorados de comidas**: Modal de comidas diarias con diseño unificado, modal de comidas semanales con totales semanales y agrupación por día, eliminación de botones de eliminar en modales de stats (solo permitido en dashboard)
+- **Navegador semanal**: Navegador de semanas en stats con formato "3 al 9 de nov 2025", botones de navegación anterior/siguiente, y diseño consistente con el navegador diario del dashboard
+- **Correcciones de fechas y zona horaria**: Corrección completa del cálculo de fechas para evitar desajustes por zona horaria, uso de `formatDateLocal` en lugar de `toISOString()`, y orden correcto de días (lunes a domingo)
+- **Sección de entrenamientos recientes**: Rediseño de la sección de entrenamientos en stats sin card contenedora, cards de ejercicios adaptadas al diseño web, card amarilla con total semanal de calorías quemadas, y botón de información sobre cálculo de calorías
+- **Mejoras en el perfil**: Tamaño del icono de iniciales reducido de 64px a 48px, logo de la app agregado junto a la versión con tamaño ajustado (22px de altura)
+- **Correcciones de errores**: Eliminación de valores negativos en alturas de barras del gráfico, corrección de artefactos visuales en etiquetas del eje X, y corrección de errores de TypeScript en build
+- **Ocultamiento de secciones**: Sección de logros oculta temporalmente en stats hasta su implementación completa
+- **API Routes actualizadas**: `/api/stats/weekly` ahora acepta parámetro `weekStart` para navegación entre semanas, cálculo correcto de macros y calorías por día, y agrupación de comidas por tipo de comida
+- **Componentes nuevos**: Componentes personalizados de barras (`FatBarShape`, `CarbsBarShape`, `ProteinBarShape`) con iconos integrados y border radius personalizado
+
 0.3.1 - Correcciones de UI/UX y Ocultamiento de Botones en Modales
 - **Mejoras de UI/UX**: Los botones de navegación (BottomNav y FloatingAddButton) ahora se ocultan automáticamente cuando hay modales abiertos para mejorar la experiencia de usuario y evitar interferencias visuales
 - **Contexto de Modales**: Implementado sistema de contexto React (`ModalContext`) para gestionar el estado de los modales globalmente, permitiendo que los componentes se oculten automáticamente cuando hay modales activos

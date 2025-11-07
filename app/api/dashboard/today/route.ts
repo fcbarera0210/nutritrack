@@ -136,15 +136,6 @@ export async function GET(req: Request) {
 
     const totalCaloriesBurned = todayExercises.reduce((sum, ex) => sum + ex.caloriesBurned, 0);
 
-    // Get user streak
-    const streakData = await db
-      .select()
-      .from(userStreaks)
-      .where(eq(userStreaks.userId, user.id))
-      .limit(1);
-
-    const streak = streakData.length > 0 ? streakData[0].currentStreak : 0;
-
     // Get all dates with logged food or exercise (for streak visualization)
     // Obtener fechas únicas de los últimos 30 días donde hay comida o ejercicio
     const thirtyDaysAgo = new Date();
@@ -178,8 +169,34 @@ export async function GET(req: Request) {
     allFoodLogs.forEach(item => allDates.add(item.date));
     allExerciseLogs.forEach(item => allDates.add(item.date));
     
-    // Devolver como array de strings de fecha (YYYY-MM-DD)
-    const streakDays = Array.from(allDates);
+    // Calcular días consecutivos desde hoy hacia atrás
+    const currentDate = getTodayDateLocal();
+    const sortedDates = Array.from(allDates).sort().reverse(); // Ordenar de más reciente a más antiguo
+    
+    // Calcular racha consecutiva desde hoy
+    let consecutiveStreak = 0;
+    const consecutiveStreakDays: string[] = [];
+    const todayDate = new Date(currentDate + 'T00:00:00');
+    
+    for (let i = 0; i < 30; i++) { // Revisar hasta 30 días hacia atrás
+      const checkDate = new Date(todayDate);
+      checkDate.setDate(checkDate.getDate() - i);
+      const checkDateStr = formatDateLocal(checkDate);
+      
+      if (sortedDates.includes(checkDateStr)) {
+        consecutiveStreak++;
+        consecutiveStreakDays.push(checkDateStr);
+      } else {
+        // Si encontramos un día sin registro, la racha se rompe
+        break;
+      }
+    }
+    
+    // Solo devolver días consecutivos para el calendario
+    const streakDays = consecutiveStreakDays;
+    
+    // Calcular racha: solo mostrar si hay 3+ días consecutivos
+    const streak = consecutiveStreak >= 3 ? consecutiveStreak : 0;
 
     // Get user profile with targets
     const profileData = await db

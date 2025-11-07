@@ -131,6 +131,62 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
+/* Eliminar outline en elementos SVG y gráficos */
+svg:focus,
+svg:focus-visible,
+svg:active,
+svg:focus-within,
+svg rect:focus,
+svg rect:focus-visible,
+svg g:focus,
+svg g:focus-visible {
+  outline: none !important;
+  border: none !important;
+}
+
+/* Eliminar outline en contenedores de gráficos */
+.recharts-wrapper:focus,
+.recharts-wrapper:focus-visible,
+.recharts-wrapper:active {
+  outline: none !important;
+  border: none !important;
+}
+
+/* Asegurar que las etiquetas del eje X no tengan estilos no deseados */
+.recharts-xAxis .recharts-cartesian-axis-tick text {
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.recharts-xAxis .recharts-cartesian-axis-tick {
+  background: transparent !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.recharts-xAxis .recharts-cartesian-axis-tick tspan {
+  background: transparent !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+}
+
+/* Asegurar que los paths SVG no afecten las etiquetas */
+.recharts-xAxis path,
+.recharts-xAxis line {
+  fill: none;
+  stroke: #5A5B5A;
+}
+
+/* Asegurar que los grupos de barras no se extiendan más allá de sus límites */
+.recharts-bar-rectangle {
+  overflow: hidden;
+}
+
 /* Better hover states */
 button, a, [role="button"] {
   cursor: pointer;

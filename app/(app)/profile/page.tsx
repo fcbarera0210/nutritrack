@@ -200,7 +200,7 @@ export default function ProfilePage() {
         <div className="bg-[#131917] rounded-b-[30px] px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-white/10 animate-pulse" />
+              <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
               <div className="space-y-2">
                 <div className="w-32 h-5 bg-white/20 animate-pulse rounded" />
                 <div className="w-40 h-4 bg-white/10 animate-pulse rounded" />
@@ -214,7 +214,7 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               {/* Foto de perfil circular */}
-              <div className="w-16 h-16 rounded-full bg-[#404040] flex items-center justify-center text-white font-bold text-xl">
+              <div className="w-12 h-12 rounded-full bg-[#404040] flex items-center justify-center text-white font-bold text-xl">
                 {profile.name ? profile.name.substring(0, 2).toUpperCase() : 'JD'}
               </div>
               {/* Información del usuario */}
@@ -810,8 +810,16 @@ export default function ProfilePage() {
                   </span>
                 </button>
                 
-                {/* Versión */}
-                <div className="text-center pt-2">
+                {/* Versión con logo */}
+                <div className="flex items-center justify-center gap-2 pt-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex flex-col gap-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#3CCC1F]" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#E5C438]" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#DC3714]" />
+                    </div>
+                    <h2 className="text-[#5A5B5A] font-bold text-[14px] leading-tight">NutriTrack</h2>
+                  </div>
                   <p className="text-[#5A5B5A] text-[12px]">v{APP_VERSION}</p>
                 </div>
               </div>
