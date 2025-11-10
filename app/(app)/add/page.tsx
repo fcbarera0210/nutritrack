@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MagnifyingGlass, Plus, ArrowLeft, Info, Fish, Grains, Avocado, Star, NotePencil, PencilSimpleLine, Trash } from '@phosphor-icons/react';
+import { MagnifyingGlass, Plus, ArrowLeft, Info, Fish, Grains, Avocado, Star, NotePencil, PencilSimpleLine, Trash, X } from '@phosphor-icons/react';
 import { FoodLogForm } from '@/components/forms/FoodLogForm';
 import { CustomFoodForm } from '@/components/forms/CustomFoodForm';
 import { Modal } from '@/components/ui/Modal';
@@ -9,7 +9,7 @@ import { FoodListSkeleton } from '@/components/ui/Skeleton';
 import { BottomNav } from '@/components/dashboard/BottomNav';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { categories, categorizeFood } from '@/lib/utils/categories';
+import { categories, categorizeFood, getCategoryIdFromDbCategory } from '@/lib/utils/categories';
 import { useModal } from '@/contexts/ModalContext';
 
 interface FoodItem {
@@ -24,6 +24,7 @@ interface FoodItem {
   userId?: number;
   servingSize?: number;
   servingUnit?: string;
+  category?: string | null;
 }
 
 // Helper function para formatear la unidad de porción
@@ -34,7 +35,8 @@ const formatServingUnit = (servingSize?: number, servingUnit?: string): string =
   if (unit === 'g') return `${size}g`;
   if (unit === 'ml') return `${size}ml`;
   if (unit === 'unit') return `${size} unidad${size !== 1 ? 'es' : ''}`;
-  return `${size}g`; // fallback
+  // Si la unidad no es reconocida, tratarla como 'unit' en lugar de 'g'
+  return `${size} unidad${size !== 1 ? 'es' : ''}`;
 };
 
 export default function AddPage() {
@@ -222,7 +224,10 @@ export default function AddPage() {
     setIsSearching(true);
     
     try {
-      const response = await fetch(`/api/foods/search?q=${encodeURIComponent(query)}`);
+      // Si hay una categoría seleccionada (que no sea todos, favoritos o personalizados),
+      // necesitamos obtener más resultados para asegurarnos de encontrar todos los alimentos de esa categoría
+      const limit = (category !== 'todos' && category !== 'favoritos' && category !== 'personalizados') ? 500 : 50;
+      const response = await fetch(`/api/foods/search?q=${encodeURIComponent(query)}&limit=${limit}`);
       const data = await response.json();
       
       // Filtrar por categoría si no es "todos", "favoritos" o "personalizados"
@@ -233,7 +238,7 @@ export default function AddPage() {
         // Filtrar solo favoritos usando los IDs ya cargados
         if (favoriteIds.length > 0) {
           // Obtener todos los alimentos y filtrar por favoritos
-          const allFoodsResponse = await fetch(`/api/foods/search?q=`);
+          const allFoodsResponse = await fetch(`/api/foods/search?q=&limit=500`);
           if (allFoodsResponse.ok) {
             const allFoods = await allFoodsResponse.json();
             const favorites = allFoods.filter((food: FoodItem) => favoriteIds.includes(food.id));
@@ -247,7 +252,7 @@ export default function AddPage() {
         setVisibleCount(15);
       } else if (category === 'personalizados') {
         // Filtrar solo alimentos personalizados del usuario
-        const customFoodsResponse = await fetch(`/api/foods/search?q=${encodeURIComponent(query)}&customOnly=true`);
+        const customFoodsResponse = await fetch(`/api/foods/search?q=${encodeURIComponent(query)}&customOnly=true&limit=500`);
         if (customFoodsResponse.ok) {
           const customFoods = await customFoodsResponse.json();
           setSearchResults(customFoods);
@@ -257,7 +262,10 @@ export default function AddPage() {
         setVisibleCount(15);
       } else {
         const filtered = data.filter((food: FoodItem) => {
-          const foodCategoryId = categorizeFood(food.name);
+          // Usar el campo category si existe, sino usar la función legacy
+          const foodCategoryId = food.category 
+            ? getCategoryIdFromDbCategory(food.category)
+            : categorizeFood(food.name);
           return foodCategoryId === category;
         });
         setSearchResults(filtered);
@@ -280,7 +288,7 @@ export default function AddPage() {
     <div className="min-h-screen bg-[#D9D9D9] pb-24">
       {/* Header oscuro con botón volver, título y descripción */}
       <div className="bg-[#131917] rounded-b-[60px]">
-        <div className="px-25 pt-[40px] pb-6">
+        <div className="px-25 pt-[25px] pb-6">
           <div className="flex items-center gap-3">
             <Link href="/dashboard">
               <button className="w-12 h-12 rounded-full bg-[#404040] flex items-center justify-center text-white hover:opacity-90 transition-colors flex-shrink-0">
@@ -312,8 +320,17 @@ export default function AddPage() {
                 placeholder="Buscar alimentos..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
+                className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-[50px] py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => handleSearch('')}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#5A5B5A] hover:text-[#131917] transition-colors"
+                  aria-label="Limpiar búsqueda"
+                >
+                  <X size={20} weight="bold" />
+                </button>
+              )}
             </div>
           </div>
         )}

@@ -50,6 +50,7 @@ export const foods = pgTable('foods', {
   servingUnit: text('serving_unit').notNull(), // 'g', 'ml', 'unit', etc.
   barcode: text('barcode'),
   source: text('source'), // 'openfoodfacts', 'custom', 'local'
+  category: text('category'), // Categoría del alimento
   isCustom: boolean('is_custom').default(false),
   userId: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -64,6 +65,15 @@ export const foodLogs = pgTable('food_logs', {
   servingSize: real('serving_size').notNull(),
   date: date('date').notNull(),
   mealType: text('meal_type').notNull(), // 'breakfast', 'lunch', 'dinner', 'snack'
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Exercise types - catálogo de ejercicios disponibles
+export const exerciseTypes = pgTable('exercise_types', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  met: real('met').notNull(), // Metabolic Equivalent of Task
+  icon: text('icon'), // Nombre del icono de Phosphor Icons por defecto
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

@@ -255,7 +255,7 @@ export default function StatsPage() {
     <div className="min-h-screen bg-[#D9D9D9] pb-24">
       {/* Header oscuro con ícono de perfil y textos */}
       <div className="bg-[#131917] rounded-b-[30px]">
-        <div className="px-25 pb-[15px] pt-[40px]">
+        <div className="px-25 pb-[15px] pt-[25px]">
           <div className="flex items-center gap-4">
             {/* User Avatar with Initials */}
             <Link href="/profile">
@@ -593,7 +593,8 @@ export default function StatsPage() {
                                     if (unit === 'g') return 'g';
                                     if (unit === 'ml') return 'ml';
                                     if (unit === 'unit') return ' unidad' + (actualQuantity !== 1 ? 'es' : '');
-                                    return 'g';
+                                    // Si la unidad no es reconocida, tratarla como 'unit'
+                                    return ' unidad' + (actualQuantity !== 1 ? 'es' : '');
                                   };
                                   
                                   return (
@@ -666,14 +667,21 @@ export default function StatsPage() {
         <div className="space-y-2">
               {recentWorkouts.map((workout: any) => {
                 const ExerciseIcon = getExerciseIcon(workout.icon);
+                // Formatear fecha a dd-mm-yyyy (parsear directamente del string para evitar problemas de zona horaria)
+                const workoutDate = workout.date ? (() => {
+                  // workout.date viene como string "YYYY-MM-DD", parsearlo directamente
+                  const dateStr = String(workout.date).split('T')[0]; // Asegurar que solo tomamos la parte de fecha
+                  const [year, month, day] = dateStr.split('-');
+                  return `${day}-${month}-${year}`;
+                })() : '';
               return (
                   <div key={workout.id} className="bg-[#131917] rounded-[15px] p-4">
                     <div className="grid grid-cols-2 gap-4">
                       {/* Columna izquierda */}
-                      <div className="flex flex-col justify-between">
-                        <div className="flex items-center gap-2 mb-2">
-                          <ExerciseIcon size={18} weight="bold" className="text-[#E5C438]" />
-                          <p className="text-white font-semibold text-base">{workout.name}</p>
+                      <div className="flex flex-col justify-between min-w-0">
+                        <div className="flex items-center gap-2 mb-2 min-w-0">
+                          <ExerciseIcon size={18} weight="bold" className="text-[#E5C438] flex-shrink-0" />
+                          <p className="text-white font-semibold text-base truncate">{workout.name}</p>
                         </div>
                         <div className="flex items-center gap-1">
                           <Clock size={14} weight="bold" className="text-white/70" />
@@ -686,6 +694,9 @@ export default function StatsPage() {
                           <Fire size={18} weight="bold" className="text-[#DC3714]" />
                           <span className="text-white font-bold text-lg">{workout.caloriesBurned}</span>
                           <span className="text-white/70 text-xs">kcal</span>
+                        </div>
+                        <div className="flex items-center">
+                          <p className="text-white/70 text-xs">{workoutDate}</p>
                         </div>
                       </div>
                     </div>
@@ -917,7 +928,8 @@ export default function StatsPage() {
                                   if (unit === 'g') return 'g';
                                   if (unit === 'ml') return 'ml';
                                   if (unit === 'unit') return ' unidad' + (actualQuantity !== 1 ? 'es' : '');
-                                  return 'g';
+                                  // Si la unidad no es reconocida, tratarla como 'unit'
+                                  return ' unidad' + (actualQuantity !== 1 ? 'es' : '');
                                 };
                                 
                                 return (

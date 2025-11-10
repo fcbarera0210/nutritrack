@@ -33,21 +33,12 @@ const EXERCISE_ICONS = [
   { name: 'Volleyball', component: Volleyball, label: 'Vóleibol' },
 ];
 
-// Common exercises with MET values (Metabolic Equivalent of Task)
-const COMMON_EXERCISES = [
-  { name: 'Caminata rápida', met: 4.5 },
-  { name: 'Trotar', met: 7.0 },
-  { name: 'Correr', met: 11.5 },
-  { name: 'Ciclismo', met: 8.0 },
-  { name: 'Natación', met: 10.0 },
-  { name: 'Bicicleta estática', met: 7.0 },
-  { name: 'Elíptica', met: 7.0 },
-  { name: 'Escalar escaleras', met: 9.0 },
-  { name: 'Yoga', met: 3.0 },
-  { name: 'Pilates', met: 3.5 },
-  { name: 'Baile', met: 5.0 },
-  { name: 'CrossFit', met: 12.0 },
-];
+interface ExerciseType {
+  id: number;
+  name: string;
+  met: number;
+  icon: string | null;
+}
 
 export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; onCancel?: () => void }) {
   const [exerciseName, setExerciseName] = useState('');
@@ -57,6 +48,31 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
   const [customExercise, setCustomExercise] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [exerciseTypes, setExerciseTypes] = useState<ExerciseType[]>([]);
+  const [isLoadingExercises, setIsLoadingExercises] = useState(true);
+
+  // Cargar ejercicios desde la BD
+  useEffect(() => {
+    const fetchExercises = async () => {
+      try {
+        const response = await fetch('/api/exercises/types');
+        if (response.ok) {
+          const data = await response.json();
+          setExerciseTypes(data);
+        } else {
+          console.error('Error fetching exercises');
+          // Fallback a lista vacía si falla
+          setExerciseTypes([]);
+        }
+      } catch (error) {
+        console.error('Error fetching exercises:', error);
+        setExerciseTypes([]);
+      } finally {
+        setIsLoadingExercises(false);
+      }
+    };
+    fetchExercises();
+  }, []);
 
   // Cargar peso del usuario desde el perfil
   useEffect(() => {
@@ -84,14 +100,25 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
   const calculateCalories = () => {
     if (!duration || parseFloat(duration) <= 0) return 0;
     
-    const selectedExercise = COMMON_EXERCISES.find(e => e.name === exerciseName);
-    const met = selectedExercise?.met || 3.5; // Default MET
+    // Buscar el ejercicio en la lista de tipos de ejercicios
+    const selectedExercise = exerciseTypes.find(e => e.name === exerciseName);
+    const met = selectedExercise?.met || 3.5; // Default MET si no se encuentra
     const weightKg = parseFloat(weight) || 70;
     const durationHours = parseFloat(duration) / 60;
     
     // Formula: METs × weight (kg) × duration (hours)
     return Math.round(met * weightKg * durationHours);
   };
+
+  // Actualizar el icono cuando se selecciona un ejercicio
+  useEffect(() => {
+    if (exerciseName && !customExercise) {
+      const selectedExercise = exerciseTypes.find(e => e.name === exerciseName);
+      if (selectedExercise?.icon) {
+        setSelectedIcon(selectedExercise.icon);
+      }
+    }
+  }, [exerciseName, customExercise, exerciseTypes]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,9 +201,9 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
             className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all"
             required
           >
-            <option value="">Selecciona un ejercicio</option>
-            {COMMON_EXERCISES.map(ex => (
-              <option key={ex.name} value={ex.name}>
+            <option value="">{isLoadingExercises ? 'Cargando ejercicios...' : 'Selecciona un ejercicio'}</option>
+            {exerciseTypes.map(ex => (
+              <option key={ex.id} value={ex.name}>
                 {ex.name}
               </option>
             ))}

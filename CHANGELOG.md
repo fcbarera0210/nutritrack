@@ -1,5 +1,20 @@
 Changelog
 
+0.5.0 - Migración de Ejercicios a Base de Datos, Nuevo Sistema de Categorías y Mejoras de UI/UX
+- **Migración de ejercicios a base de datos**: Sistema de ejercicios migrado de constante hardcodeada a tabla `exercise_types` en base de datos. 37 ejercicios predefinidos con valores MET e iconos. API endpoint `/api/exercises/types` para obtener ejercicios dinámicamente. Formulario de ejercicios actualizado para cargar desde base de datos.
+- **Nuevo sistema de categorías de alimentos**: Campo `category` agregado a tabla `foods`. Reemplazo completo de alimentos con nueva lista de 200+ alimentos chilenos. Sistema de mapeo de categorías JSON a IDs internos. Filtros actualizados para usar categoría de base de datos en lugar de keywords.
+- **Nuevas categorías de alimentos**: Agregadas categorías Platos Preparados, Congelados, Conservas, Frutos Secos, Bebidas, Aderezos con iconos correspondientes. Eliminada categoría Legumbres (integrada en Cereales).
+- **Normalización de unidades de porción**: Unidades de porción normalizadas a 'g', 'ml' o 'unit'. Script SQL para actualizar unidades existentes. Frontend actualizado para mostrar unidades correctamente en todas las vistas.
+- **Modal de lista de hidratación**: Nuevo modal para ver todos los registros de agua del día. Click en card azul de hidratación abre modal con lista completa. Funcionalidad de eliminar entradas de agua con actualización optimista. Endpoint `/api/hydration/delete` para eliminar registros.
+- **Mejoras en cards de ejercicios e hidratación**: Texto truncado con ellipsis para nombres largos. Iconos mantienen tamaño fijo independiente del texto. Aplicado en dashboard, stats y modal de lista.
+- **Correcciones de fecha en ejercicios**: Formato de fecha corregido para evitar problemas de zona horaria. Fechas se muestran correctamente como dd-mm-yyyy parseando directamente del string.
+- **Corrección de cálculo de calorías**: Calorías de ejercicios ya no se restan del total de calorías consumidas. Ejercicios y alimentos se calculan por separado.
+- **Mejoras en eliminación**: Eliminación optimista de ejercicios e hidratación. Los elementos desaparecen inmediatamente sin necesidad de recargar. Solo se recarga en caso de error.
+- **Ajustes de UI en headers**: Padding top reducido de 40px a 25px en todas las pantallas (dashboard, stats, add). Border radius inferior del header en dashboard cambiado de 80px a 30px.
+- **Base de datos**: Nueva tabla `exercise_types` con campos id, name, met, icon, created_at. Campo `category` agregado a tabla `foods`. Scripts de migración y seed para ejercicios.
+- **API Routes nuevas**: `/api/exercises/types` para obtener tipos de ejercicios, `/api/hydration/delete` para eliminar entradas de agua.
+- **Scripts nuevos**: `scripts/seed-exercises.ts` para poblar ejercicios desde JSON, `scripts/replace-foods.ts` para reemplazar alimentos (ya no necesario después de migración).
+
 0.4.1 - Correcciones de UI y Skeleton de Carga en Estadísticas
 - **Skeleton de carga en estadísticas**: Implementado skeleton de carga completo para la pantalla de estadísticas, mostrando estructura similar al contenido real mientras se cargan los datos, mejorando la experiencia de usuario durante la carga inicial
 - **Corrección de colores de iconos en gráfico**: Ajuste temporal del color de los iconos en las barras del gráfico para facilitar la visualización del problema de overflow en dispositivos móviles

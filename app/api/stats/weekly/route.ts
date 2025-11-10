@@ -92,11 +92,8 @@ export async function GET(req: Request) {
       dailyCalories[date] = (dailyCalories[date] || 0) + calories;
     });
 
-    // Subtract calories burned from exercises
-    exercisesData.forEach((ex) => {
-      const date = getDateStr(ex.date);
-      dailyCalories[date] = (dailyCalories[date] || 0) - ex.caloriesBurned;
-    });
+    // Note: Exercise calories are NOT subtracted from consumed calories
+    // They are tracked separately for informational purposes only
 
     // Generate data for Monday to Sunday (current week)
     const chartData = [];
@@ -172,13 +169,18 @@ export async function GET(req: Request) {
       });
     }
 
-    // Get latest completed workouts (all time)
+    // Get workouts for the current week (filtered by week range)
     const recentWorkouts = await db
       .select()
       .from(exercises)
-      .where(eq(exercises.userId, user.id))
-      .orderBy(desc(exercises.date))
-      .limit(5);
+      .where(
+        and(
+          eq(exercises.userId, user.id),
+          gte(exercises.date, mondayStr),
+          lte(exercises.date, sundayStr)
+        )
+      )
+      .orderBy(desc(exercises.date));
 
     // Count total food logs in the last 7 days
     const totalFoodLogs = logs.length;

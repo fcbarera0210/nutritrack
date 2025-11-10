@@ -17,7 +17,7 @@ import { ExerciseForm } from '@/components/forms/ExerciseForm';
 import { ExerciseCalculationInfo } from '@/components/ui/ExerciseCalculationInfo';
 import { getExerciseIcon } from '@/lib/utils/exerciseIcons';
 import { formatDateLocal } from '@/lib/utils/date';
-import { Fire, Plus, Trash, Fish, Grains, Avocado, Clock, WarningCircle } from '@phosphor-icons/react';
+import { Fire, Plus, Trash, Fish, Grains, Avocado, Clock, WarningCircle, Drop, PintGlass } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
@@ -25,6 +25,7 @@ export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const [showHydrationModal, setShowHydrationModal] = useState(false);
+  const [showHydrationListModal, setShowHydrationListModal] = useState(false);
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [showExercisesListModal, setShowExercisesListModal] = useState(false);
   const [showExerciseCalculationInfo, setShowExerciseCalculationInfo] = useState(false);
@@ -49,9 +50,9 @@ export default function DashboardPage() {
     dinner: { totalCalories: 0, items: [] },
     snack: { totalCalories: 0, items: [] },
   });
-  const [exercises, setExercises] = useState([]);
+  const [exercises, setExercises] = useState<any[]>([]);
   const [totalCaloriesBurned, setTotalCaloriesBurned] = useState(0);
-  const [waterEntries, setWaterEntries] = useState([]);
+  const [waterEntries, setWaterEntries] = useState<any[]>([]);
   const [totalWater, setTotalWater] = useState(0);
   const [userName, setUserName] = useState<string | null>(null);
   const isFetchingRef = useRef(false);
@@ -140,7 +141,7 @@ export default function DashboardPage() {
   const fatProgress = (todayStats.fat / todayStats.targetFat) * 100;
 
   // Detectar si algún modal está abierto
-  const isAnyModalOpen = !!selectedMeal || showHydrationModal || showExerciseModal || showExercisesListModal || showExerciseCalculationInfo;
+  const isAnyModalOpen = !!selectedMeal || showHydrationModal || showHydrationListModal || showExerciseModal || showExercisesListModal || showExerciseCalculationInfo;
   const { setIsAnyModalOpen } = useModal();
 
   // Actualizar el contexto cuando cambia el estado de los modales
@@ -155,7 +156,7 @@ export default function DashboardPage() {
         <div className="px-25 pb-[15px] flex flex-col gap-[30px]">
           <div>
             {isLoading ? (
-              <div className="flex items-center justify-between pt-[40px]">
+              <div className="flex items-center justify-between pt-[25px]">
                 <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
                 <div className="w-[150px] h-[24px] bg-white/20 animate-pulse rounded" />
                 <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
@@ -264,6 +265,7 @@ export default function DashboardPage() {
                 totalAmount={totalWater}
                 entries={waterEntries}
                 onAddClick={() => setShowHydrationModal(true)}
+                onClick={() => setShowHydrationListModal(true)}
               />
             </>
           )}
@@ -384,7 +386,8 @@ export default function DashboardPage() {
                         if (unit === 'g') return 'g';
                         if (unit === 'ml') return 'ml';
                         if (unit === 'unit') return ' unidad' + (actualQuantity !== 1 ? 'es' : '');
-                        return 'g';
+                        // Si la unidad no es reconocida, tratarla como 'unit'
+                        return ' unidad' + (actualQuantity !== 1 ? 'es' : '');
                       };
                       
                       return (
@@ -464,6 +467,100 @@ export default function DashboardPage() {
             />
           </Modal>
 
+          {/* Hydration List Modal */}
+          <Modal
+            isOpen={showHydrationListModal}
+            onClose={() => setShowHydrationListModal(false)}
+            title="Hidratación del día"
+          >
+            <div className="space-y-3">
+              {waterEntries.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 mb-4">No hay registros de hidratación hoy</p>
+                  <button
+                    onClick={() => {
+                      setShowHydrationListModal(false);
+                      setShowHydrationModal(true);
+                    }}
+                    className="bg-[#6484E2]/70 border-2 border-[#6484E2] rounded-[15px] px-4 py-[10px] text-white font-semibold text-[16px] hover:opacity-90 transition-opacity inline-flex items-center gap-2"
+                  >
+                    <Plus size={20} weight="bold" />
+                    <span>Agregar Agua</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="bg-[#6484E2]/70 border-2 border-[#6484E2] rounded-[15px] p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-white font-semibold">Total:</span>
+                      <span className="font-bold text-white">
+                        {totalWater} ml
+                      </span>
+                    </div>
+                  </div>
+                  {waterEntries.map((entry: any) => (
+                    <div key={entry.id} className="bg-[#131917] rounded-[15px] p-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* Columna izquierda */}
+                        <div className="flex flex-col justify-between min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <PintGlass size={18} weight="bold" className="text-[#6484E2] flex-shrink-0" />
+                            <p className="text-white font-semibold text-base whitespace-nowrap">Vaso de agua</p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock size={14} weight="bold" className="text-white/70" />
+                            <p className="text-white/70 text-xs">Hora: {entry.time}</p>
+                          </div>
+                        </div>
+                        {/* Columna derecha */}
+                        <div className="flex flex-col justify-between items-end">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Drop size={18} weight="bold" className="text-[#6484E2]" />
+                            <span className="text-white font-bold text-lg">{entry.amount}</span>
+                            <span className="text-white/70 text-xs">ml</span>
+                          </div>
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (confirm('¿Eliminar este registro de agua?')) {
+                                // Guardar el ID y cantidad para revertir si falla
+                                const entryId = entry.id;
+                                const amountToRemove = entry.amount || 0;
+                                
+                                // Actualización optimista: eliminar del estado inmediatamente
+                                setWaterEntries((prev: any[]) => prev.filter((e: any) => e.id !== entryId));
+                                setTotalWater((prev: number) => prev - amountToRemove);
+                                
+                                try {
+                                  const response = await fetch(`/api/hydration/delete?id=${entryId}`, { method: 'DELETE' });
+                                  if (!response.ok) {
+                                    // Si falla, revertir la actualización optimista y recargar
+                                    const data = await response.json();
+                                    alert(data.error || 'Error al eliminar registro de agua');
+                                    await fetchDashboardData();
+                                  }
+                                  // Si es exitoso, no recargamos para evitar que vuelva a aparecer
+                                } catch (error) {
+                                  console.error('Error deleting water entry:', error);
+                                  alert('Error al eliminar registro de agua');
+                                  // Revertir actualización optimista en caso de error
+                                  await fetchDashboardData();
+                                }
+                              }
+                            }}
+                            className="text-white/70 hover:text-[#DC3714] transition-colors"
+                          >
+                            <Trash size={16} weight="bold" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Modal>
+
           {/* Exercise Modal */}
           <Modal
             isOpen={showExerciseModal}
@@ -518,10 +615,10 @@ export default function DashboardPage() {
                       <div key={exercise.id} className="bg-[#131917] rounded-[15px] p-4">
                         <div className="grid grid-cols-2 gap-4">
                           {/* Columna izquierda */}
-                          <div className="flex flex-col justify-between">
-                            <div className="flex items-center gap-2 mb-2">
-                              <ExerciseIcon size={18} weight="bold" className="text-[#E5C438]" />
-                              <p className="text-white font-semibold text-base">{exercise.name}</p>
+                          <div className="flex flex-col justify-between min-w-0">
+                            <div className="flex items-center gap-2 mb-2 min-w-0">
+                              <ExerciseIcon size={18} weight="bold" className="text-[#E5C438] flex-shrink-0" />
+                              <p className="text-white font-semibold text-base truncate">{exercise.name}</p>
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock size={14} weight="bold" className="text-white/70" />
@@ -538,8 +635,29 @@ export default function DashboardPage() {
                                 onClick={async (e) => {
                                   e.stopPropagation();
                                   if (confirm('¿Eliminar este ejercicio?')) {
-                                    await fetch(`/api/exercises/delete?id=${exercise.id}`, { method: 'DELETE' });
-                                    fetchDashboardData();
+                                    // Guardar el ID y calorías para revertir si falla
+                                    const exerciseId = exercise.id;
+                                    const caloriesToRemove = exercise.caloriesBurned || 0;
+                                    
+                                    // Actualización optimista: eliminar del estado inmediatamente
+                                    setExercises((prev: any[]) => prev.filter((ex: any) => ex.id !== exerciseId));
+                                    setTotalCaloriesBurned((prev: number) => prev - caloriesToRemove);
+                                    
+                                    try {
+                                      const response = await fetch(`/api/exercises/delete?id=${exerciseId}`, { method: 'DELETE' });
+                                      if (!response.ok) {
+                                        // Si falla, revertir la actualización optimista y recargar
+                                        const data = await response.json();
+                                        alert(data.error || 'Error al eliminar ejercicio');
+                                        await fetchDashboardData();
+                                      }
+                                      // Si es exitoso, no recargamos para evitar que vuelva a aparecer
+                                    } catch (error) {
+                                      console.error('Error deleting exercise:', error);
+                                      alert('Error al eliminar ejercicio');
+                                      // Revertir actualización optimista en caso de error
+                                      await fetchDashboardData();
+                                    }
                                   }
                                 }}
                                 className="ml-2 text-white/70 hover:text-[#DC3714] transition-colors"

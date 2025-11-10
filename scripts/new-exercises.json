@@ -1,0 +1,150 @@
+[
+  {
+    "actividad": "Baloncesto (juego completo, partido)",
+    "valor_met": 8.0
+  },
+  {
+    "actividad": "Baloncesto (lanzando canastas)",
+    "valor_met": 4.5
+  },
+  {
+    "actividad": "Bádminton (competitivo)",
+    "valor_met": 7.0
+  },
+  {
+    "actividad": "Baile",
+    "valor_met": 5.0
+  },
+  {
+    "actividad": "Bicicleta estática / Elíptica",
+    "valor_met": 7.0
+  },
+  {
+    "actividad": "Boxeo (en el ring, combate)",
+    "valor_met": 12.8
+  },
+  {
+    "actividad": "Boxeo (golpeando el saco)",
+    "valor_met": 5.5
+  },
+  {
+    "actividad": "Boxeo (sparring, combate ligero)",
+    "valor_met": 7.8
+  },
+  {
+    "actividad": "Calistenia (moderada)",
+    "valor_met": 3.8
+  },
+  {
+    "actividad": "Calistenia (vigorosa, ej. burpees)",
+    "valor_met": 8.0
+  },
+  {
+    "actividad": "Caminata rápida",
+    "valor_met": 4.5
+  },
+  {
+    "actividad": "Ciclismo (general)",
+    "valor_met": 8.0
+  },
+  {
+    "actividad": "Correr (aprox. 11.5 km/h)",
+    "valor_met": 11.5
+  },
+  {
+    "actividad": "CrossFit",
+    "valor_met": 12.0
+  },
+  {
+    "actividad": "Escalar escaleras",
+    "valor_met": 9.0
+  },
+  {
+    "actividad": "Fútbol (casual, \"pichanga\")",
+    "valor_met": 7.0
+  },
+  {
+    "actividad": "Fútbol (competitivo)",
+    "valor_met": 10.0
+  },
+  {
+    "actividad": "Golf (caminando y cargando palos)",
+    "valor_met": 4.8
+  },
+  {
+    "actividad": "Judo, Karate, Taekwondo (competitivo)",
+    "valor_met": 10.3
+  },
+  {
+    "actividad": "Kayak (moderado)",
+    "valor_met": 5.0
+  },
+  {
+    "actividad": "Levantamiento de pesas (moderado)",
+    "valor_met": 3.5
+  },
+  {
+    "actividad": "Levantamiento de pesas (vigoroso)",
+    "valor_met": 6.0
+  },
+  {
+    "actividad": "Natación (general)",
+    "valor_met": 10.0
+  },
+  {
+    "actividad": "Pádel",
+    "valor_met": 6.5
+  },
+  {
+    "actividad": "Patinaje (rollerblading)",
+    "valor_met": 9.0
+  },
+  {
+    "actividad": "Pilates",
+    "valor_met": 3.5
+  },
+  {
+    "actividad": "Remo (máquina, moderado)",
+    "valor_met": 7.0
+  },
+  {
+    "actividad": "Remo (máquina, vigoroso)",
+    "valor_met": 12.0
+  },
+  {
+    "actividad": "Senderismo (terreno irregular)",
+    "valor_met": 6.0
+  },
+  {
+    "actividad": "Squash (general)",
+    "valor_met": 12.0
+  },
+  {
+    "actividad": "Tenis (dobles)",
+    "valor_met": 6.0
+  },
+  {
+    "actividad": "Tenis (individual)",
+    "valor_met": 8.0
+  },
+  {
+    "actividad": "Trotar (general)",
+    "valor_met": 7.0
+  },
+  {
+    "actividad": "Voleibol (competitivo, en cancha)",
+    "valor_met": 8.0
+  },
+  {
+    "actividad": "Voleibol (no competitivo, recreativo)",
+    "valor_met": 3.0
+  },
+  {
+    "actividad": "Voleibol (playa)",
+    "valor_met": 8.0
+  },
+  {
+    "actividad": "Yoga",
+    "valor_met": 3.0
+  }
+]

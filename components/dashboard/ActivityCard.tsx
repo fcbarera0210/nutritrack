@@ -51,10 +51,10 @@ export function ActivityCard({ totalCalories, exercises, onAddClick, onClick }: 
         {exercises.slice(0, 2).map((exercise) => {
           const Icon = getExerciseIcon(exercise.icon);
           return (
-            <div key={exercise.id} className="px-1 py-1 flex items-end justify-between">
-              <div className="flex items-center gap-1">
-                <Icon size={18} weight="bold" className="text-[#131917]" />
-                <p className="text-[#131917] font-medium text-sm">{exercise.name}</p>
+            <div key={exercise.id} className="px-1 py-1 flex items-end justify-between min-w-0">
+              <div className="flex items-center gap-1 min-w-0 flex-1">
+                <Icon size={18} weight="bold" className="text-[#131917] flex-shrink-0" />
+                <p className="text-[#131917] font-medium text-sm truncate">{exercise.name}</p>
               </div>
               <div className="flex items-baseline gap-0">
                 <span className="text-[#131917] font-semibold text-m">{exercise.caloriesBurned}</span>
