@@ -38,3 +38,24 @@ export function formatTimeLocal(timestamp: Date | string): string {
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 }
+
+/**
+ * Formatea una hora (timestamp) a formato HH:mm usando la zona horaria de Chile (America/Santiago)
+ * Esta función convierte correctamente timestamps UTC de la BD a la zona horaria de Chile
+ * La app está destinada solo para uso en Chile, por lo que siempre usamos esta zona horaria
+ */
+export function formatTimeChile(timestamp: Date | string): string {
+  // Si es string, crear Date object
+  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  
+  // Usar Intl.DateTimeFormat para convertir a la zona horaria de Chile
+  // Esto maneja correctamente el horario de verano (UTC-3 o UTC-4)
+  const formatter = new Intl.DateTimeFormat('es-CL', {
+    timeZone: 'America/Santiago',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+  
+  return formatter.format(date);
+}

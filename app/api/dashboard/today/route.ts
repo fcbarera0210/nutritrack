@@ -3,7 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { foodLogs, foods, exercises, userStreaks, userProfiles, waterLogs, users } from '@/lib/db/schema';
 import { eq, and, sql, gte } from 'drizzle-orm';
-import { getTodayDateLocal, formatDateLocal, formatTimeLocal } from '@/lib/utils/date';
+import { getTodayDateLocal, formatDateLocal, formatTimeChile } from '@/lib/utils/date';
 
 export async function GET(req: Request) {
   try {
@@ -230,10 +230,11 @@ export async function GET(req: Request) {
     const totalWater = todayWaterLogs.reduce((sum, log) => sum + log.amount, 0);
 
     // Format water entries for display
+    // Usar formatTimeChile para convertir correctamente de UTC a la zona horaria de Chile
     const waterEntries = todayWaterLogs.map(log => ({
       id: log.id,
       amount: log.amount,
-      time: formatTimeLocal(log.createdAt),
+      time: formatTimeChile(log.createdAt),
     }));
 
     // Get user name
