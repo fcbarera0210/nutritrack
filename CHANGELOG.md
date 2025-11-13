@@ -1,5 +1,9 @@
 Changelog
 
+0.5.2 - Correcciones de Zona Horaria y Exportación CSV
+- **Corrección de zona horaria en hidratación**: Nueva función `formatTimeChile` que convierte timestamps UTC a la zona horaria de Chile (America/Santiago) usando `Intl.DateTimeFormat`. Soluciona problema donde la hora se mostraba con 3 horas de diferencia en producción móvil. La función maneja correctamente el horario de verano (UTC-3 o UTC-4).
+- **Mejoras en exportación CSV**: Corrección completa del sistema de exportación de historial. Agregado BOM UTF-8 para caracteres especiales (tildes, ñ, etc.) y charset UTF-8 en headers. Función `escapeCsvValue` para manejar correctamente nombres largos con comas o comillas. Uso correcto de `servingUnit` del alimento (g, ml, unit, etc.) en lugar de hardcodear "g". Eliminada columna de fibra que no se estaba utilizando. Hora ahora usa `formatTimeChile` con `createdAt` del log para mostrar la hora correcta en zona horaria de Chile. Formato de fecha corregido a DD/MM/YYYY.
+
 0.5.1 - Funcionalidad de Swipe para Editar/Eliminar, Campo de Fecha en Formularios y Correcciones de Timezone
 - **Funcionalidad de swipe para editar/eliminar**: Reemplazo completo de iconos de editar/eliminar con funcionalidad de deslizar (swipe) en cards de alimentos, ejercicios e hidratación. Desliza de derecha a izquierda para revelar botones de acción. Soporte para touch (móvil) y mouse (desktop). Solo una card puede estar abierta a la vez. Componentes nuevos: `SwipeableFoodCard`, `SwipeableExerciseCard`, `SwipeableHydrationCard`.
 - **Edición de alimentos desde dashboard**: Los usuarios ahora pueden editar alimentos registrados desde el modal de detalles de comidas. Botón de editar abre modal con formulario prellenado. Soporte para editar cantidad, tipo de comida y fecha. Endpoint `/api/logs/update` actualizado para soportar `servingSize` y `date`.

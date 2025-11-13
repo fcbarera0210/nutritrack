@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { foodLogs, foods, exercises } from '@/lib/db/schema';
 import { eq, gte, lte, desc, and } from 'drizzle-orm';
+import { formatDateLocal, formatTimeChile } from '@/lib/utils/date';
 
 export async function GET(req: Request) {
   try {
@@ -21,13 +22,15 @@ export async function GET(req: Request) {
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
-    // Fetch food logs with foods
+    // Fetch food logs with foods (including createdAt and servingSize)
     const logs = await db
       .select({
         id: foodLogs.id,
         date: foodLogs.date,
         mealType: foodLogs.mealType,
         quantity: foodLogs.quantity,
+        servingSize: foodLogs.servingSize,
+        createdAt: foodLogs.createdAt,
         food: foods,
       })
       .from(foodLogs)
@@ -35,56 +38,82 @@ export async function GET(req: Request) {
       .where(
         and(
           eq(foodLogs.userId, user.id),
-          gte(foodLogs.date, startDate.toISOString()),
-          lte(foodLogs.date, today.toISOString())
+          gte(foodLogs.date, formatDateLocal(startDate)),
+          lte(foodLogs.date, formatDateLocal(today))
         )
       )
       .orderBy(desc(foodLogs.date));
 
-    // Fetch exercises
+    // Fetch exercises (including createdAt)
     const exercisesData = await db
       .select()
       .from(exercises)
       .where(
         and(
           eq(exercises.userId, user.id),
-          gte(exercises.date, startDate.toISOString()),
-          lte(exercises.date, today.toISOString())
+          gte(exercises.date, formatDateLocal(startDate)),
+          lte(exercises.date, formatDateLocal(today))
         )
       )
       .orderBy(desc(exercises.date));
 
-    // Generate CSV
-    let csv = 'Fecha,Hora,Tipo,Item,Cantidad,Calorias,Proteina (g),Carbohidratos (g),Grasas (g),Fibra (g)\n';
+    // Función para escapar valores CSV (maneja comas y comillas)
+    const escapeCsvValue = (value: string | number): string => {
+      const str = String(value);
+      // Si contiene comas, comillas o saltos de línea, envolver en comillas y escapar comillas internas
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    // Generar CSV con BOM UTF-8 para caracteres especiales (tildes, ñ, etc.)
+    // BOM UTF-8: 0xEF, 0xBB, 0xBF
+    let csv = '\uFEFF'; // BOM UTF-8
+    csv += 'Fecha,Hora,Tipo,Item,Cantidad,Calorias,Proteina (g),Carbohidratos (g),Grasas (g)\n';
 
     // Add food logs
     logs.forEach((log) => {
-      const date = new Date(log.date);
-      const dateStr = date.toLocaleDateString('es-CL');
-      const timeStr = date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+      // Usar createdAt para la hora y date para la fecha
+      // log.date viene en formato YYYY-MM-DD, convertir a DD/MM/YYYY
+      const [year, month, day] = log.date.split('-');
+      const dateStr = `${day}/${month}/${year}`;
+      const timeStr = formatTimeChile(log.createdAt);
       
-      const multiplier = log.quantity / 100;
+      // Calcular cantidad real: quantity es el multiplicador, servingSize es el tamaño de porción
+      const actualQuantity = log.quantity * log.servingSize;
+      const servingUnit = log.food.servingUnit || 'g';
+      
+      // Calcular valores nutricionales
+      const multiplier = log.quantity; // quantity ya es el multiplicador del servingSize
       const calories = Math.round(log.food.calories * multiplier);
       const protein = (log.food.protein * multiplier).toFixed(1);
       const carbs = (log.food.carbs * multiplier).toFixed(1);
       const fat = (log.food.fat * multiplier).toFixed(1);
-      const fiber = (((log.food as any).fiber ?? 0) * multiplier).toFixed(1);
 
-      csv += `${dateStr},${timeStr},Comida,${log.food.name},${log.quantity}g,${calories},${protein},${carbs},${fat},${fiber}\n`;
+      // Escapar valores que puedan contener comas o comillas
+      const foodName = escapeCsvValue(log.food.name);
+      const quantityStr = `${actualQuantity.toFixed(1)}${servingUnit}`;
+
+      csv += `${dateStr},${timeStr},Comida,${foodName},${quantityStr},${calories},${protein},${carbs},${fat}\n`;
     });
 
     // Add exercises
     exercisesData.forEach((ex) => {
-      const date = new Date(ex.date);
-      const dateStr = date.toLocaleDateString('es-CL');
-      const timeStr = date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+      // ex.date viene en formato YYYY-MM-DD, convertir a DD/MM/YYYY
+      const [year, month, day] = ex.date.split('-');
+      const dateStr = `${day}/${month}/${year}`;
+      const timeStr = formatTimeChile(ex.createdAt);
 
-      csv += `${dateStr},${timeStr},Ejercicio,${ex.name},${ex.durationMinutes} min,-${ex.caloriesBurned},0,0,0,0\n`;
+      // Escapar nombre del ejercicio
+      const exerciseName = escapeCsvValue(ex.name);
+
+      csv += `${dateStr},${timeStr},Ejercicio,${exerciseName},${ex.durationMinutes} min,-${ex.caloriesBurned},0,0,0\n`;
     });
 
     return new NextResponse(csv, {
       headers: {
-        'Content-Type': 'text/csv',
+        'Content-Type': 'text/csv; charset=utf-8',
         'Content-Disposition': `attachment; filename="nutritrack-historial-${new Date().toISOString().split('T')[0]}.csv"`,
       },
     });
