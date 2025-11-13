@@ -18,6 +18,8 @@ export function SwipeableExerciseCard({ exercise, onEdit, onDelete, isOpen, onOp
   const startX = useRef(0);
   const currentX = useRef(0);
   const cardRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const actionButtonsRef = useRef<HTMLDivElement>(null);
   
   const SWIPE_THRESHOLD = 80;
   const ACTION_WIDTH = 140;
@@ -107,7 +109,9 @@ export function SwipeableExerciseCard({ exercise, onEdit, onDelete, isOpen, onOp
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      // Verificar que el click no sea en el contenedor (que incluye los botones de acción)
+      if (containerRef.current && !containerRef.current.contains(target)) {
         if (isOpen) {
           setTranslateX(0);
           onOpenChange(null);
@@ -116,26 +120,42 @@ export function SwipeableExerciseCard({ exercise, onEdit, onDelete, isOpen, onOp
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside);
-    }
+      // Usar un pequeño delay para evitar que se cierre antes de que se ejecute el onClick
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
+      }, 100);
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-    };
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('touchstart', handleClickOutside);
+      };
+    }
   }, [isOpen, onOpenChange]);
 
   return (
-    <div className="relative overflow-hidden rounded-[15px]">
+    <div ref={containerRef} className="relative overflow-hidden rounded-[15px]">
       {/* Botones de acción (fondo) */}
-      <div className="absolute top-0 bottom-0 right-0 flex flex-row z-0" style={{ width: '140px' }}>
+      <div ref={actionButtonsRef} className="absolute top-0 bottom-0 right-0 flex flex-row z-0" style={{ width: '140px' }}>
         <button
           onClick={(e) => {
             e.stopPropagation();
+            e.preventDefault();
             setTranslateX(0);
             onOpenChange(null);
-            onEdit(exercise);
+            setTimeout(() => {
+              onEdit(exercise);
+            }, 0);
+          }}
+          onTouchEnd={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setTranslateX(0);
+            onOpenChange(null);
+            setTimeout(() => {
+              onEdit(exercise);
+            }, 0);
           }}
           className="flex-1 bg-[#6484E2] px-6 flex items-center justify-center hover:bg-[#5a75d0] transition-colors h-full"
         >
@@ -144,11 +164,25 @@ export function SwipeableExerciseCard({ exercise, onEdit, onDelete, isOpen, onOp
         <button
           onClick={async (e) => {
             e.stopPropagation();
+            e.preventDefault();
             setTranslateX(0);
             onOpenChange(null);
-            if (confirm('¿Eliminar este ejercicio?')) {
-              await onDelete(exercise);
-            }
+            setTimeout(async () => {
+              if (confirm('¿Eliminar este ejercicio?')) {
+                await onDelete(exercise);
+              }
+            }, 0);
+          }}
+          onTouchEnd={async (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setTranslateX(0);
+            onOpenChange(null);
+            setTimeout(async () => {
+              if (confirm('¿Eliminar este ejercicio?')) {
+                await onDelete(exercise);
+              }
+            }, 0);
           }}
           className="flex-1 bg-[#DC3714] px-6 flex items-center justify-center hover:bg-[#c02e11] transition-colors rounded-r-[15px] h-full"
         >
