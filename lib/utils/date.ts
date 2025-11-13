@@ -24,3 +24,17 @@ export function formatDateLocal(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+
+/**
+ * Formatea una hora (timestamp) a formato HH:mm usando la zona horaria local
+ * Esta función convierte correctamente timestamps de la BD a la zona horaria local
+ */
+export function formatTimeLocal(timestamp: Date | string): string {
+  // Si es string, crear Date object
+  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  
+  // Usar métodos locales para obtener hora y minutos en la zona horaria local
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}

@@ -12,7 +12,7 @@ NutriTrack es una aplicación web (Next.js) para registrar comidas y ejercicios,
 
 ### ✅ Funcionalidades implementadas (MVP completo)
 - **Autenticación**: registro, login, logout, sesiones JWT, guards server-side en layouts. Login y Register rediseñados con nuevo header oscuro, logo y formularios estilo moderno.
-- **Dashboard diario** (rediseñado 2025-10): header en caja oscura con calendario semanal, sistema de rachas con ícono de llama animado, y gráficos circulares; sección kcal; cards de ejercicio/agua; cards de comidas con lista de alimentos reales; navbar inferior rediseñado con botones individuales y animaciones; botón flotante para agregar alimentos; soporte para cambio de fecha con filtrado automático; skeleton de carga.
+- **Dashboard diario** (rediseñado 2025-10): header en caja oscura con calendario semanal, sistema de rachas con ícono de llama animado, y gráficos circulares; sección kcal; cards de ejercicio/agua; cards de comidas con lista de alimentos reales; navbar inferior rediseñado con botones individuales y animaciones; botón flotante para agregar alimentos; soporte para cambio de fecha con filtrado automático; skeleton de carga; funcionalidad de swipe para editar/eliminar alimentos, ejercicios e hidratación.
 - **Gestión de alimentos**: búsqueda inteligente (sin tildes/mayúsculas), 50+ alimentos chilenos, filtros por categorías con íconos de Phosphor, formulario rediseñado con nuevo layout, carga incremental (15 por página), cards de alimentos con diseño oscuro.
 - **Búsqueda nutricional por IA** (DeepSeek + Groq): busca automáticamente macros nutricionales por nombre de alimento usando IA. Sistema híbrido con fallback automático, soporte para múltiples modelos, indicador visual de carga, y límite diario de 15 búsquedas por usuario con contador en tiempo real.
 - **Sistema de favoritos**: marca alimentos favoritos, filtro de favoritos visible solo cuando hay favoritos, acceso rápido desde la página de agregar alimento.
@@ -21,7 +21,7 @@ NutriTrack es una aplicación web (Next.js) para registrar comidas y ejercicios,
 - **Gestión de ejercicios**: 12+ ejercicios, cálculo de calorías por fórmula MET, selector de iconos (24+ iconos de Phosphor), visualización y eliminación, modal de lista de ejercicios del día, y modal explicativo sobre cálculo de calorías.
 - **Perfil de usuario**: datos personales, TDEE (Mifflin‑St Jeor), objetivos y nivel de actividad, ajuste de macros objetivo, visualización de peso actual y objetivo, campos adicionales (nombre, teléfono con formato automático +56, deportes preferidos, preferencias dietéticas, alergias), exportación CSV, modal informativo sobre cálculos nutricionales.
 - **Estadísticas** (rediseñado 2025-11): gráfico de barras apiladas semanales con desglose de macros (proteínas, carbohidratos, grasas), navegador semanal, modales de comidas diarias y semanales, sección de entrenamientos recientes con total semanal, y diseño consistente con el resto de la aplicación.
-- **CRUD completo**: crear/editar/eliminar logs de alimentos y ejercicios con confirmaciones. Edición y eliminación de alimentos personalizados.
+- **CRUD completo**: crear/editar/eliminar logs de alimentos y ejercicios con confirmaciones. Edición y eliminación de alimentos personalizados. Edición de alimentos registrados desde el dashboard con soporte para cambiar cantidad, tipo de comida y fecha. Funcionalidad de swipe para editar/eliminar en móvil y desktop.
 - **Sistema de rachas**: seguimiento automático de días consecutivos con registro de alimentos o ejercicios. Rachas activas después de 3 días consecutivos, visualización en calendario con ícono de llama animado, y mensaje motivacional en el dashboard.
 - **Recordatorios y notificaciones**: API CRUD de recordatorios, diseño consistente con iconos de Phosphor, funcionalidad de activación corregida.
 
@@ -66,7 +66,7 @@ public/ (PWA manifest e íconos)
 - `auth`: `login`, `register`, `logout`
 - `dashboard`: `today` (con soporte para fecha específica)
 - `foods`: `search`, `ai-search`, `ai-search/limit`, `favorites`, `create`, `custom`, `[id]`
-- `logs`: `create`, `delete`, `update`
+- `logs`: `create`, `delete`, `update` (soporta edición de cantidad, tipo de comida, fecha y tamaño de porción)
 - `exercises`: `create`, `delete`
 - `hydration`: `create`
 - `stats`: `weekly`

@@ -175,7 +175,7 @@ export default function RemindersPage() {
   return (
     <div className="min-h-screen bg-[#D9D9D9] pb-24">
       {/* Header oscuro */}
-      <div className="bg-[#131917] rounded-b-[30px] px-6 py-6">
+      <div className="bg-[#131917] rounded-b-[30px] px-6 pt-[24px] pb-6">
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push('/profile')}

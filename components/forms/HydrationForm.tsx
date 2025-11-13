@@ -2,14 +2,15 @@
 
 import { useState } from 'react';
 import { Drop, CaretUp, CaretDown } from '@phosphor-icons/react';
-import { getTodayDateLocal } from '@/lib/utils/date';
+import { getTodayDateLocal, formatDateLocal } from '@/lib/utils/date';
 
 interface HydrationFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
+  selectedDate?: Date; // Fecha seleccionada en el dashboard
 }
 
-export function HydrationForm({ onSuccess, onCancel }: HydrationFormProps) {
+export function HydrationForm({ onSuccess, onCancel, selectedDate }: HydrationFormProps) {
   const [amount, setAmount] = useState(200);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -51,7 +52,7 @@ export function HydrationForm({ onSuccess, onCancel }: HydrationFormProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: amount,
-          date: getTodayDateLocal(),
+          date: selectedDate ? formatDateLocal(selectedDate) : getTodayDateLocal(),
         }),
       });
 

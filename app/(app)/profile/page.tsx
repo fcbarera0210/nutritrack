@@ -10,6 +10,7 @@ import { SignOut, ArrowLeft, User as UserIcon, Target, PencilSimple, FloppyDisk,
 import { BottomNav } from '@/components/dashboard/BottomNav';
 import { calculateTDEE, calculateMacros } from '@/lib/utils/calories';
 import { APP_VERSION } from '@/lib/constants';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -54,6 +55,15 @@ export default function ProfilePage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [showCalculationInfo, setShowCalculationInfo] = useState(false);
+  
+  // Detectar si algún modal está abierto
+  const isAnyModalOpen = showCalculationInfo;
+  const { setIsAnyModalOpen } = useModal();
+
+  // Actualizar el contexto cuando cambia el estado de los modales
+  useEffect(() => {
+    setIsAnyModalOpen(isAnyModalOpen);
+  }, [isAnyModalOpen, setIsAnyModalOpen]);
 
   const fetchProfile = async () => {
     setIsLoadingProfile(true);
@@ -197,7 +207,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#D9D9D9] pb-24">
       {/* Header oscuro con información del usuario */}
       {isLoadingProfile ? (
-        <div className="bg-[#131917] rounded-b-[30px] px-6 py-6">
+        <div className="bg-[#131917] rounded-b-[30px] px-6 pt-[24px] pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
@@ -210,7 +220,7 @@ export default function ProfilePage() {
           </div>
         </div>
       ) : profile ? (
-        <div className="bg-[#131917] rounded-b-[30px] px-6 py-6">
+        <div className="bg-[#131917] rounded-b-[30px] px-6 pt-[24px] pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               {/* Foto de perfil circular */}
@@ -245,7 +255,7 @@ export default function ProfilePage() {
       {isLoadingProfile ? (
         <ProfileSkeleton />
       ) : profile ? (
-        <div className="px-6 pt-6 pb-20 max-w-md mx-auto">
+        <div className="px-6 pt-[25px] pb-20 max-w-md mx-auto">
           {/* Título Objetivos actuales - Solo visible cuando NO se está editando */}
           {!isEditing && (
             <>

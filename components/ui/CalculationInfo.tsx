@@ -59,11 +59,11 @@ export function CalculationInfo({ isOpen, onClose }: { isOpen: boolean; onClose:
                 <p className="text-[#5A5B5A] mt-1">Crea un déficit calórico para perder peso gradualmente</p>
               </div>
               <div>
-                <strong className="text-[#9A7F1F]">Mantenimiento:</strong> TDEE sin cambios
+                <strong className="text-[#E5C438]">Mantenimiento:</strong> TDEE sin cambios
                 <p className="text-[#5A5B5A] mt-1">Mantiene tu peso actual</p>
               </div>
               <div>
-                <strong className="text-[#7A8F2E]">Ganancia Muscular:</strong> TDEE + 300 kcal
+                <strong className="text-[#3CCC1F]">Ganancia Muscular:</strong> TDEE + 300 kcal
                 <p className="text-[#5A5B5A] mt-1">Proporciona energía extra para ganar músculo</p>
               </div>
             </div>
@@ -95,13 +95,13 @@ export function CalculationInfo({ isOpen, onClose }: { isOpen: boolean; onClose:
                   <td className="px-3 py-2 text-center text-[#131917]">35%</td>
                 </tr>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <td className="px-3 py-2 font-semibold text-[#9A7F1F]">Mantenimiento</td>
+                  <td className="px-3 py-2 font-semibold text-[#E5C438]">Mantenimiento</td>
                   <td className="px-3 py-2 text-center text-[#131917]">25%</td>
                   <td className="px-3 py-2 text-center text-[#131917]">40%</td>
                   <td className="px-3 py-2 text-center text-[#131917]">35%</td>
                 </tr>
                 <tr className="bg-white">
-                  <td className="px-3 py-2 font-semibold text-[#7A8F2E]">Ganancia Muscular</td>
+                  <td className="px-3 py-2 font-semibold text-[#3CCC1F]">Ganancia Muscular</td>
                   <td className="px-3 py-2 text-center text-[#131917]">30%</td>
                   <td className="px-3 py-2 text-center text-[#131917]">45%</td>
                   <td className="px-3 py-2 text-center text-[#131917]">25%</td>

@@ -255,7 +255,7 @@ export default function StatsPage() {
     <div className="min-h-screen bg-[#D9D9D9] pb-24">
       {/* Header oscuro con ícono de perfil y textos */}
       <div className="bg-[#131917] rounded-b-[30px]">
-        <div className="px-25 pb-[15px] pt-[25px]">
+        <div className="px-25 pb-[15px] pt-[24px]">
           <div className="flex items-center gap-4">
             {/* User Avatar with Initials */}
             <Link href="/profile">
@@ -599,20 +599,20 @@ export default function StatsPage() {
                                   
                                   return (
                                     <div key={item.id} className="bg-[#131917] rounded-[15px] p-4">
-                                      <div className="grid grid-cols-2 gap-4">
-                                        {/* Columna izquierda */}
-                                        <div className="flex flex-col justify-between">
-                                          <p className="text-white font-semibold text-base mb-2">{item.name}</p>
-                                          <p className="text-white/70 text-xs">Cantidad: {actualQuantity}{formatUnit(servingUnit)}</p>
-                                        </div>
-                                        {/* Columna derecha */}
-                                        <div className="flex flex-col justify-between items-end">
-                                          <div className="flex items-center gap-2 mb-2">
+                                      <div className="flex flex-col gap-3">
+                                        {/* Fila 1: Nombre del alimento y kcal */}
+                                        <div className="flex items-center justify-between">
+                                          <p className="text-white font-semibold text-base min-w-0 truncate">{item.name}</p>
+                                          <div className="flex items-center gap-2 flex-shrink-0">
                                             <span className="text-white font-bold text-lg">{itemCalories}</span>
                                             <span className="text-white/70 text-xs">kcal</span>
                                           </div>
+                                        </div>
+                                        {/* Fila 2: Cantidad y macros */}
+                                        <div className="flex items-center justify-between">
+                                          <p className="text-white/70 text-xs flex-shrink-0">Cantidad: {actualQuantity}{formatUnit(servingUnit)}</p>
                                           {/* Macros */}
-                                          <div className="flex items-center gap-2">
+                                          <div className="flex items-center gap-2 flex-shrink-0">
                                             <div className="flex items-center gap-1">
                                               <Fish size={14} weight="bold" className="text-[#3CCC1F]" />
                                               <span className="text-white/70 text-xs">{itemProtein}g</span>
@@ -676,26 +676,26 @@ export default function StatsPage() {
                 })() : '';
               return (
                   <div key={workout.id} className="bg-[#131917] rounded-[15px] p-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* Columna izquierda */}
-                      <div className="flex flex-col justify-between min-w-0">
-                        <div className="flex items-center gap-2 mb-2 min-w-0">
+                    <div className="flex flex-col gap-3">
+                      {/* Fila 1: Nombre del ejercicio y kcal */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 min-w-0">
                           <ExerciseIcon size={18} weight="bold" className="text-[#E5C438] flex-shrink-0" />
                           <p className="text-white font-semibold text-base truncate">{workout.name}</p>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Clock size={14} weight="bold" className="text-white/70" />
-                          <p className="text-white/70 text-xs">Duración: {workout.durationMinutes || 0} min</p>
-                        </div>
-                      </div>
-                      {/* Columna derecha */}
-                      <div className="flex flex-col justify-between items-end">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <Fire size={18} weight="bold" className="text-[#DC3714]" />
                           <span className="text-white font-bold text-lg">{workout.caloriesBurned}</span>
                           <span className="text-white/70 text-xs">kcal</span>
                         </div>
-                        <div className="flex items-center">
+                      </div>
+                      {/* Fila 2: Duración y fecha */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <Clock size={14} weight="bold" className="text-white/70" />
+                          <p className="text-white/70 text-xs">Duración: {workout.durationMinutes || 0} min</p>
+                        </div>
+                        <div className="flex items-center flex-shrink-0">
                           <p className="text-white/70 text-xs">{workoutDate}</p>
                         </div>
                       </div>
@@ -934,20 +934,20 @@ export default function StatsPage() {
                                 
                                 return (
                                   <div key={item.id} className="bg-[#131917] rounded-[15px] p-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                      {/* Columna izquierda */}
-                                      <div className="flex flex-col justify-between">
-                                        <p className="text-white font-semibold text-base mb-2">{item.name}</p>
-                                        <p className="text-white/70 text-xs">Cantidad: {actualQuantity}{formatUnit(servingUnit)}</p>
-                                      </div>
-                                      {/* Columna derecha */}
-                                      <div className="flex flex-col justify-between items-end">
-                                        <div className="flex items-center gap-2 mb-2">
+                                    <div className="flex flex-col gap-3">
+                                      {/* Fila 1: Nombre del alimento y kcal */}
+                                      <div className="flex items-center justify-between">
+                                        <p className="text-white font-semibold text-base min-w-0 truncate">{item.name}</p>
+                                        <div className="flex items-center gap-2 flex-shrink-0">
                                           <span className="text-white font-bold text-lg">{itemCalories}</span>
                                           <span className="text-white/70 text-xs">kcal</span>
                                         </div>
+                                      </div>
+                                      {/* Fila 2: Cantidad y macros */}
+                                      <div className="flex items-center justify-between">
+                                        <p className="text-white/70 text-xs flex-shrink-0">Cantidad: {actualQuantity}{formatUnit(servingUnit)}</p>
                                         {/* Macros */}
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-shrink-0">
                                           <div className="flex items-center gap-1">
                                             <Fish size={14} weight="bold" className="text-[#3CCC1F]" />
                                             <span className="text-white/70 text-xs">{itemProtein}g</span>

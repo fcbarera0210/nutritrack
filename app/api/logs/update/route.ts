@@ -8,7 +8,9 @@ import { z } from 'zod';
 const updateLogSchema = z.object({
   id: z.number(),
   quantity: z.number().min(0.1).optional(),
+  servingSize: z.number().min(1).optional(),
   mealType: z.enum(['breakfast', 'lunch', 'dinner', 'snack']).optional(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha inválido').optional(),
 });
 
 export async function PUT(req: Request) {
@@ -41,8 +43,14 @@ export async function PUT(req: Request) {
     if (validatedData.quantity !== undefined) {
       updates.quantity = validatedData.quantity;
     }
+    if (validatedData.servingSize !== undefined) {
+      updates.servingSize = validatedData.servingSize;
+    }
     if (validatedData.mealType !== undefined) {
       updates.mealType = validatedData.mealType;
+    }
+    if (validatedData.date !== undefined) {
+      updates.date = validatedData.date;
     }
 
     await db

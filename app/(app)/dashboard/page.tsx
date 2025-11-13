@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { useModal } from '@/contexts/ModalContext';
 import { Header } from '@/components/dashboard/Header';
 import { WeeklyCalendar } from '@/components/dashboard/WeeklyCalendar';
@@ -11,17 +10,18 @@ import { HydrationCard } from '@/components/dashboard/HydrationCard';
 import { MealCard } from '@/components/dashboard/MealCard';
 import { BottomNav } from '@/components/dashboard/BottomNav';
 import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/Button';
 import { HydrationForm } from '@/components/forms/HydrationForm';
 import { ExerciseForm } from '@/components/forms/ExerciseForm';
+import { FoodLogForm } from '@/components/forms/FoodLogForm';
 import { ExerciseCalculationInfo } from '@/components/ui/ExerciseCalculationInfo';
-import { getExerciseIcon } from '@/lib/utils/exerciseIcons';
+import { SwipeableFoodCard } from '@/components/dashboard/SwipeableFoodCard';
+import { SwipeableExerciseCard } from '@/components/dashboard/SwipeableExerciseCard';
+import { SwipeableHydrationCard } from '@/components/dashboard/SwipeableHydrationCard';
 import { formatDateLocal } from '@/lib/utils/date';
-import { Fire, Plus, Trash, Fish, Grains, Avocado, Clock, WarningCircle, Drop, PintGlass } from '@phosphor-icons/react';
+import { Fire, Plus, Fish, Grains, Avocado, WarningCircle, Lightbulb } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const [showHydrationModal, setShowHydrationModal] = useState(false);
@@ -29,6 +29,12 @@ export default function DashboardPage() {
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [showExercisesListModal, setShowExercisesListModal] = useState(false);
   const [showExerciseCalculationInfo, setShowExerciseCalculationInfo] = useState(false);
+  const [editingExercise, setEditingExercise] = useState<{ id: number; name: string; durationMinutes: number; caloriesBurned: number; icon: string; date: string } | null>(null);
+  const [showFoodEditModal, setShowFoodEditModal] = useState(false);
+  const [editingFoodItem, setEditingFoodItem] = useState<{ id: number; foodId: number; quantity: number; servingSize: number; mealType: string; date: string; name: string; brand: string | null; calories: number; protein: number; carbs: number; fat: number; servingUnit?: string } | null>(null);
+  const [openSwipeableCard, setOpenSwipeableCard] = useState<number | null>(null);
+  const [openSwipeableExercise, setOpenSwipeableExercise] = useState<number | null>(null);
+  const [openSwipeableHydration, setOpenSwipeableHydration] = useState<number | null>(null);
   
   const [todayStats, setTodayStats] = useState({
     calories: 0,
@@ -50,11 +56,12 @@ export default function DashboardPage() {
     dinner: { totalCalories: 0, items: [] },
     snack: { totalCalories: 0, items: [] },
   });
-  const [exercises, setExercises] = useState<any[]>([]);
+  const [exercises, setExercises] = useState<Array<{ id: number; name: string; durationMinutes: number; caloriesBurned: number; icon: string; date: string }>>([]);
   const [totalCaloriesBurned, setTotalCaloriesBurned] = useState(0);
-  const [waterEntries, setWaterEntries] = useState<any[]>([]);
+  const [waterEntries, setWaterEntries] = useState<Array<{ id: number; amount: number; time: string }>>([]);
   const [totalWater, setTotalWater] = useState(0);
   const [userName, setUserName] = useState<string | null>(null);
+  const [isDeletingExercise, setIsDeletingExercise] = useState(false);
   const isFetchingRef = useRef(false);
 
   const fetchDashboardData = useCallback(async () => {
@@ -141,7 +148,7 @@ export default function DashboardPage() {
   const fatProgress = (todayStats.fat / todayStats.targetFat) * 100;
 
   // Detectar si algún modal está abierto
-  const isAnyModalOpen = !!selectedMeal || showHydrationModal || showHydrationListModal || showExerciseModal || showExercisesListModal || showExerciseCalculationInfo;
+  const isAnyModalOpen = !!selectedMeal || showHydrationModal || showHydrationListModal || showExerciseModal || showExercisesListModal || showExerciseCalculationInfo || showFoodEditModal;
   const { setIsAnyModalOpen } = useModal();
 
   // Actualizar el contexto cuando cambia el estado de los modales
@@ -156,7 +163,7 @@ export default function DashboardPage() {
         <div className="px-25 pb-[15px] flex flex-col gap-[30px]">
           <div>
             {isLoading ? (
-              <div className="flex items-center justify-between pt-[25px]">
+              <div className="flex items-center justify-between pt-[24px]">
                 <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
                 <div className="w-[150px] h-[24px] bg-white/20 animate-pulse rounded" />
                 <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
@@ -340,6 +347,10 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="space-y-2">
+                    <p className="text-xs text-[#5A5B5A]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
+                      <Lightbulb size={14} weight="bold" className="text-[#5A5B5A] inline-block align-middle mr-1" />
+                      <strong>Nota:</strong> Desliza cada alimento hacia la izquierda para editar o eliminar.
+                    </p>
                     <div className="bg-[#3CCC1F]/70 border-2 border-[#3CCC1F] rounded-[15px] p-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-[#131917] font-semibold">Total:</span>
@@ -349,19 +360,19 @@ export default function DashboardPage() {
                             <div className="flex items-center gap-1">
                               <Fish size={16} weight="bold" className="text-[#131917]" />
                               <span className="text-[#131917] text-xs font-semibold">
-                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.protein * item.quantity), 0)) * 10) / 10}g
+                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: { protein: number; quantity: number }) => sum + (item.protein * item.quantity), 0)) * 10) / 10}g
                               </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Grains size={16} weight="bold" className="text-[#131917]" />
                               <span className="text-[#131917] text-xs font-semibold">
-                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.carbs * item.quantity), 0)) * 10) / 10}g
+                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: { carbs: number; quantity: number }) => sum + (item.carbs * item.quantity), 0)) * 10) / 10}g
                               </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Avocado size={16} weight="bold" className="text-[#131917]" />
                               <span className="text-[#131917] text-xs font-semibold">
-                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: any) => sum + (item.fat * item.quantity), 0)) * 10) / 10}g
+                                {Math.round((meals[selectedMeal as keyof typeof meals].items.reduce((sum: number, item: { fat: number; quantity: number }) => sum + (item.fat * item.quantity), 0)) * 10) / 10}g
                               </span>
                             </div>
                           </div>
@@ -372,71 +383,23 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     </div>
-                    {meals[selectedMeal as keyof typeof meals].items.map((item: any) => {
-                      // quantity is a multiplier of servingSize, so actual amount is quantity * servingSize
-                      const actualQuantity = item.quantity * (item.servingSize || 100);
-                      const servingUnit = item.servingUnit || 'g';
-                      const itemProtein = Math.round((item.protein * item.quantity) * 10) / 10;
-                      const itemCarbs = Math.round((item.carbs * item.quantity) * 10) / 10;
-                      const itemFat = Math.round((item.fat * item.quantity) * 10) / 10;
-                      const itemCalories = Math.round(item.calories * item.quantity);
-                      
-                      // Helper para formatear la unidad
-                      const formatUnit = (unit: string) => {
-                        if (unit === 'g') return 'g';
-                        if (unit === 'ml') return 'ml';
-                        if (unit === 'unit') return ' unidad' + (actualQuantity !== 1 ? 'es' : '');
-                        // Si la unidad no es reconocida, tratarla como 'unit'
-                        return ' unidad' + (actualQuantity !== 1 ? 'es' : '');
-                      };
-                      
-                      return (
-                        <div key={item.id} className="bg-[#131917] rounded-[15px] p-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            {/* Columna izquierda */}
-                            <div className="flex flex-col justify-between">
-                              <p className="text-white font-semibold text-base mb-2">{item.name}</p>
-                              <p className="text-white/70 text-xs">Cantidad: {actualQuantity}{formatUnit(servingUnit)}</p>
-                            </div>
-                            {/* Columna derecha */}
-                            <div className="flex flex-col justify-between items-end">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-white font-bold text-lg">{itemCalories}</span>
-                                <span className="text-white/70 text-xs">kcal</span>
-                                <button
-                                  onClick={async (e) => {
-                                    e.stopPropagation();
-                                    if (confirm('¿Eliminar este alimento?')) {
-                                      await fetch(`/api/logs/delete?id=${item.id}`, { method: 'DELETE' });
-                                      fetchDashboardData();
-                                      setSelectedMeal(null);
-                                    }
-                                  }}
-                                  className="ml-2 text-white/70 hover:text-[#DC3714] transition-colors"
-                                >
-                                  <Trash size={16} weight="bold" />
-                                </button>
-                              </div>
-                              {/* Macros */}
-                              <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-1">
-                                  <Fish size={14} weight="bold" className="text-[#3CCC1F]" />
-                                  <span className="text-white/70 text-xs">{itemProtein}g</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Grains size={14} weight="bold" className="text-[#E5C438]" />
-                                  <span className="text-white/70 text-xs">{itemCarbs}g</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Avocado size={14} weight="bold" className="text-[#DC3714]" />
-                                  <span className="text-white/70 text-xs">{itemFat}g</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {meals[selectedMeal as keyof typeof meals].items.map((item: { id: number; foodId: number; quantity: number; servingSize: number; mealType: string; date: string; name: string; brand: string | null; calories: number; protein: number; carbs: number; fat: number; servingUnit?: string }) => (
+                      <SwipeableFoodCard
+                        key={item.id}
+                        item={item}
+                        isOpen={openSwipeableCard === item.id}
+                        onOpenChange={(itemId) => setOpenSwipeableCard(itemId)}
+                        onEdit={(item) => {
+                          setEditingFoodItem(item);
+                          setShowFoodEditModal(true);
+                        }}
+                        onDelete={async (item) => {
+                          await fetch(`/api/logs/delete?id=${item.id}`, { method: 'DELETE' });
+                          fetchDashboardData();
+                          setSelectedMeal(null);
+                        }}
+                      />
+                    ))}
                     {/* Botón para agregar comida al final de la lista */}
                     <div className="pt-2">
                       <Link href="/add" className="flex justify-center">
@@ -459,6 +422,7 @@ export default function DashboardPage() {
             title="Agregar Hidratación"
           >
             <HydrationForm
+              selectedDate={selectedDate}
               onSuccess={() => {
                 setShowHydrationModal(false);
                 fetchDashboardData();
@@ -490,6 +454,10 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-2">
+                  <p className="text-xs text-[#5A5B5A]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
+                    <Lightbulb size={14} weight="bold" className="text-[#5A5B5A] inline-block align-middle mr-1" />
+                    <strong>Nota:</strong> Desliza cada registro hacia la izquierda para eliminar.
+                  </p>
                   <div className="bg-[#6484E2]/70 border-2 border-[#6484E2] rounded-[15px] p-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-white font-semibold">Total:</span>
@@ -498,63 +466,33 @@ export default function DashboardPage() {
                       </span>
                     </div>
                   </div>
-                  {waterEntries.map((entry: any) => (
-                    <div key={entry.id} className="bg-[#131917] rounded-[15px] p-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        {/* Columna izquierda */}
-                        <div className="flex flex-col justify-between min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <PintGlass size={18} weight="bold" className="text-[#6484E2] flex-shrink-0" />
-                            <p className="text-white font-semibold text-base whitespace-nowrap">Vaso de agua</p>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock size={14} weight="bold" className="text-white/70" />
-                            <p className="text-white/70 text-xs">Hora: {entry.time}</p>
-                          </div>
-                        </div>
-                        {/* Columna derecha */}
-                        <div className="flex flex-col justify-between items-end">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Drop size={18} weight="bold" className="text-[#6484E2]" />
-                            <span className="text-white font-bold text-lg">{entry.amount}</span>
-                            <span className="text-white/70 text-xs">ml</span>
-                          </div>
-                          <button
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              if (confirm('¿Eliminar este registro de agua?')) {
-                                // Guardar el ID y cantidad para revertir si falla
-                                const entryId = entry.id;
-                                const amountToRemove = entry.amount || 0;
-                                
-                                // Actualización optimista: eliminar del estado inmediatamente
-                                setWaterEntries((prev: any[]) => prev.filter((e: any) => e.id !== entryId));
-                                setTotalWater((prev: number) => prev - amountToRemove);
-                                
-                                try {
-                                  const response = await fetch(`/api/hydration/delete?id=${entryId}`, { method: 'DELETE' });
-                                  if (!response.ok) {
-                                    // Si falla, revertir la actualización optimista y recargar
-                                    const data = await response.json();
-                                    alert(data.error || 'Error al eliminar registro de agua');
-                                    await fetchDashboardData();
-                                  }
-                                  // Si es exitoso, no recargamos para evitar que vuelva a aparecer
-                                } catch (error) {
-                                  console.error('Error deleting water entry:', error);
-                                  alert('Error al eliminar registro de agua');
-                                  // Revertir actualización optimista en caso de error
-                                  await fetchDashboardData();
-                                }
-                              }
-                            }}
-                            className="text-white/70 hover:text-[#DC3714] transition-colors"
-                          >
-                            <Trash size={16} weight="bold" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                  {waterEntries.map((entry: { id: number; amount: number; time: string }) => (
+                    <SwipeableHydrationCard
+                      key={entry.id}
+                      entry={entry}
+                      isOpen={openSwipeableHydration === entry.id}
+                      onOpenChange={(entryId) => setOpenSwipeableHydration(entryId)}
+                      onDelete={async (entry) => {
+                        const entryId = entry.id;
+                        const amountToRemove = entry.amount || 0;
+                        
+                        setWaterEntries((prev) => prev.filter((e) => e.id !== entryId));
+                        setTotalWater((prev: number) => prev - amountToRemove);
+                        
+                        try {
+                          const response = await fetch(`/api/hydration/delete?id=${entryId}`, { method: 'DELETE' });
+                          if (!response.ok) {
+                            const data = await response.json();
+                            alert(data.error || 'Error al eliminar registro de agua');
+                            await fetchDashboardData();
+                          }
+                        } catch (error) {
+                          console.error('Error deleting water entry:', error);
+                          alert('Error al eliminar registro de agua');
+                          await fetchDashboardData();
+                        }
+                      }}
+                    />
                   ))}
                 </div>
               )}
@@ -564,17 +502,26 @@ export default function DashboardPage() {
           {/* Exercise Modal */}
           <Modal
             isOpen={showExerciseModal}
-            onClose={() => setShowExerciseModal(false)}
-            title="Registrar Ejercicio"
+            onClose={() => {
+              setShowExerciseModal(false);
+              setEditingExercise(null);
+            }}
+            title={editingExercise ? "Editar Ejercicio" : "Registrar Ejercicio"}
           >
             <ExerciseForm
+              exercise={editingExercise || undefined}
+              selectedDate={selectedDate}
               onSuccess={async () => {
                 setShowExerciseModal(false);
+                setEditingExercise(null);
                 // Esperar un momento para que la base de datos se actualice
                 await new Promise(resolve => setTimeout(resolve, 100));
                 await fetchDashboardData();
               }}
-              onCancel={() => setShowExerciseModal(false)}
+              onCancel={() => {
+                setShowExerciseModal(false);
+                setEditingExercise(null);
+              }}
             />
           </Modal>
 
@@ -585,7 +532,41 @@ export default function DashboardPage() {
             title="Ejercicios del día"
           >
             <div className="space-y-3">
-              {exercises.length === 0 ? (
+              {isDeletingExercise ? (
+                <div className="space-y-2">
+                  <div className="bg-[#E5C438]/70 border-2 border-[#E5C438] rounded-[15px] p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 w-16 bg-[#131917]/20 rounded animate-pulse"></div>
+                      <div className="h-4 w-20 bg-[#131917]/20 rounded animate-pulse"></div>
+                    </div>
+                  </div>
+                  {[...Array(Math.max(1, exercises.length))].map((_, i) => (
+                    <div key={i} className="bg-[#131917] rounded-[15px] p-4">
+                      <div className="flex flex-col gap-3">
+                        {/* Fila 1: Nombre del ejercicio y kcal */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-[18px] h-[18px] bg-white/20 rounded animate-pulse"></div>
+                            <div className="h-5 w-32 bg-white/20 rounded animate-pulse"></div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="h-5 w-16 bg-white/20 rounded animate-pulse"></div>
+                            <div className="h-4 w-8 bg-white/10 rounded animate-pulse"></div>
+                          </div>
+                        </div>
+                        {/* Fila 2: Duración y botones */}
+                        <div className="flex items-center justify-between">
+                          <div className="h-3 w-24 bg-white/10 rounded animate-pulse"></div>
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 bg-white/10 rounded animate-pulse"></div>
+                            <div className="h-4 w-4 bg-white/10 rounded animate-pulse"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : exercises.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500 mb-4">No hay ejercicios registrados hoy</p>
                   <button
@@ -601,6 +582,10 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-2">
+                  <p className="text-xs text-[#5A5B5A]" style={{ fontFamily: 'Quicksand, sans-serif' }}>
+                    <Lightbulb size={14} weight="bold" className="text-[#5A5B5A] inline-block align-middle mr-1" />
+                    <strong>Nota:</strong> Desliza cada ejercicio hacia la izquierda para editar o eliminar.
+                  </p>
                   <div className="bg-[#E5C438]/70 border-2 border-[#E5C438] rounded-[15px] p-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-[#131917] font-semibold">Total:</span>
@@ -609,67 +594,48 @@ export default function DashboardPage() {
                       </span>
                     </div>
                   </div>
-                  {exercises.map((exercise: any) => {
-                    const ExerciseIcon = getExerciseIcon(exercise.icon);
-                    return (
-                      <div key={exercise.id} className="bg-[#131917] rounded-[15px] p-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          {/* Columna izquierda */}
-                          <div className="flex flex-col justify-between min-w-0">
-                            <div className="flex items-center gap-2 mb-2 min-w-0">
-                              <ExerciseIcon size={18} weight="bold" className="text-[#E5C438] flex-shrink-0" />
-                              <p className="text-white font-semibold text-base truncate">{exercise.name}</p>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock size={14} weight="bold" className="text-white/70" />
-                              <p className="text-white/70 text-xs">Duración: {exercise.durationMinutes} min</p>
-                            </div>
-                          </div>
-                          {/* Columna derecha */}
-                          <div className="flex flex-col justify-between items-end">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Fire size={18} weight="bold" className="text-[#DC3714]" />
-                              <span className="text-white font-bold text-lg">{exercise.caloriesBurned}</span>
-                              <span className="text-white/70 text-xs">kcal</span>
-                              <button
-                                onClick={async (e) => {
-                                  e.stopPropagation();
-                                  if (confirm('¿Eliminar este ejercicio?')) {
-                                    // Guardar el ID y calorías para revertir si falla
-                                    const exerciseId = exercise.id;
-                                    const caloriesToRemove = exercise.caloriesBurned || 0;
-                                    
-                                    // Actualización optimista: eliminar del estado inmediatamente
-                                    setExercises((prev: any[]) => prev.filter((ex: any) => ex.id !== exerciseId));
-                                    setTotalCaloriesBurned((prev: number) => prev - caloriesToRemove);
-                                    
-                                    try {
-                                      const response = await fetch(`/api/exercises/delete?id=${exerciseId}`, { method: 'DELETE' });
-                                      if (!response.ok) {
-                                        // Si falla, revertir la actualización optimista y recargar
-                                        const data = await response.json();
-                                        alert(data.error || 'Error al eliminar ejercicio');
-                                        await fetchDashboardData();
-                                      }
-                                      // Si es exitoso, no recargamos para evitar que vuelva a aparecer
-                                    } catch (error) {
-                                      console.error('Error deleting exercise:', error);
-                                      alert('Error al eliminar ejercicio');
-                                      // Revertir actualización optimista en caso de error
-                                      await fetchDashboardData();
-                                    }
-                                  }
-                                }}
-                                className="ml-2 text-white/70 hover:text-[#DC3714] transition-colors"
-                              >
-                                <Trash size={16} weight="bold" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {exercises.map((exercise: { id: number; name: string; durationMinutes: number; caloriesBurned: number; icon: string; date: string }) => (
+                    <SwipeableExerciseCard
+                      key={exercise.id}
+                      exercise={exercise}
+                      isOpen={openSwipeableExercise === exercise.id}
+                      onOpenChange={(exerciseId) => setOpenSwipeableExercise(exerciseId)}
+                      onEdit={(exercise) => {
+                        setEditingExercise(exercise);
+                        setShowExercisesListModal(false);
+                        setShowExerciseModal(true);
+                      }}
+                      onDelete={async (exercise) => {
+                        const exerciseId = exercise.id;
+                        const caloriesToRemove = exercise.caloriesBurned || 0;
+                        
+                        setExercises((prev) => prev.filter((ex) => ex.id !== exerciseId));
+                        setTotalCaloriesBurned((prev: number) => prev - caloriesToRemove);
+                        setIsDeletingExercise(true);
+                        
+                        try {
+                          const response = await fetch(`/api/exercises/delete?id=${exerciseId}`, { method: 'DELETE' });
+                          if (!response.ok) {
+                            const data = await response.json();
+                            alert(data.error || 'Error al eliminar ejercicio');
+                            isFetchingRef.current = false;
+                            await fetchDashboardData();
+                          } else {
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                            isFetchingRef.current = false;
+                            await fetchDashboardData();
+                          }
+                        } catch (error) {
+                          console.error('Error deleting exercise:', error);
+                          alert('Error al eliminar ejercicio');
+                          isFetchingRef.current = false;
+                          await fetchDashboardData();
+                        } finally {
+                          setIsDeletingExercise(false);
+                        }
+                      }}
+                    />
+                  ))}
                 </div>
               )}
               
@@ -689,6 +655,51 @@ export default function DashboardPage() {
         isOpen={showExerciseCalculationInfo}
         onClose={() => setShowExerciseCalculationInfo(false)}
       />
+
+      {/* Food Edit Modal */}
+      {editingFoodItem && (
+        <Modal
+          isOpen={showFoodEditModal}
+          onClose={() => {
+            setShowFoodEditModal(false);
+            setEditingFoodItem(null);
+          }}
+          title="Editar Alimento"
+        >
+          <FoodLogForm
+            food={{
+              id: editingFoodItem.foodId,
+              name: editingFoodItem.name,
+              brand: editingFoodItem.brand,
+              calories: editingFoodItem.calories,
+              protein: editingFoodItem.protein,
+              carbs: editingFoodItem.carbs,
+              fat: editingFoodItem.fat,
+              servingSize: editingFoodItem.servingSize,
+              servingUnit: editingFoodItem.servingUnit,
+            }}
+            foodLog={{
+              id: editingFoodItem.id,
+              quantity: editingFoodItem.quantity,
+              servingSize: editingFoodItem.servingSize,
+              mealType: editingFoodItem.mealType,
+              date: editingFoodItem.date,
+            }}
+            onSuccess={async () => {
+              setShowFoodEditModal(false);
+              setEditingFoodItem(null);
+              setSelectedMeal(null);
+              // Esperar un momento para que la base de datos se actualice
+              await new Promise(resolve => setTimeout(resolve, 100));
+              await fetchDashboardData();
+            }}
+            onCancel={() => {
+              setShowFoodEditModal(false);
+              setEditingFoodItem(null);
+            }}
+          />
+        </Modal>
+      )}
 
       {/* Bottom Navigation */}
       <BottomNav />

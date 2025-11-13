@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { CaretDown, Barbell, Clock, Fire, PersonSimpleWalk, PersonSimpleBike, PersonSimpleRun, PersonSimpleSwim, PersonSimpleTaiChi, Heartbeat, Basketball, Pulse, PersonSimpleHike, BaseballHelmet, BeachBall, BowlingBall, BoxingGlove, Football, Horse, PersonSimpleSki, PersonSimpleSnowboard, PersonSimpleThrow, PingPong, SneakerMove, SoccerBall, TennisBall, Timer, Volleyball } from '@phosphor-icons/react';
-import { getTodayDateLocal } from '@/lib/utils/date';
+import { getTodayDateLocal, formatDateLocal } from '@/lib/utils/date';
 
 // Lista de iconos disponibles para ejercicios (solo iconos que existen en Phosphor Icons)
 const EXERCISE_ICONS = [
@@ -40,12 +40,31 @@ interface ExerciseType {
   icon: string | null;
 }
 
-export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; onCancel?: () => void }) {
-  const [exerciseName, setExerciseName] = useState('');
-  const [duration, setDuration] = useState('');
+interface ExerciseFormProps {
+  onSuccess?: () => void;
+  onCancel?: () => void;
+  exercise?: {
+    id: number;
+    name: string;
+    durationMinutes: number;
+    caloriesBurned: number;
+    icon: string;
+    date: string;
+  };
+  selectedDate?: Date; // Fecha seleccionada en el dashboard
+}
+
+export function ExerciseForm({ onSuccess, onCancel, exercise, selectedDate }: ExerciseFormProps) {
+  const isEditing = !!exercise;
+  const initialDate = exercise?.date || (selectedDate ? formatDateLocal(selectedDate) : getTodayDateLocal());
+  
+  const [exerciseName, setExerciseName] = useState(exercise?.name || '');
+  const [duration, setDuration] = useState(exercise?.durationMinutes.toString() || '');
   const [weight, setWeight] = useState('');
-  const [selectedIcon, setSelectedIcon] = useState<string>('Barbell');
+  const [selectedIcon, setSelectedIcon] = useState<string>(exercise?.icon || 'Barbell');
   const [customExercise, setCustomExercise] = useState(false);
+  const [manualCalories, setManualCalories] = useState<string>(exercise?.caloriesBurned.toString() || '');
+  const [date, setDate] = useState(initialDate);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [exerciseTypes, setExerciseTypes] = useState<ExerciseType[]>([]);
@@ -59,6 +78,12 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
         if (response.ok) {
           const data = await response.json();
           setExerciseTypes(data);
+          
+          // Si estamos editando, verificar si el ejercicio es custom
+          if (exercise && exercise.name) {
+            const isCustom = !data.find((e: ExerciseType) => e.name === exercise.name);
+            setCustomExercise(isCustom);
+          }
         } else {
           console.error('Error fetching exercises');
           // Fallback a lista vacía si falla
@@ -72,7 +97,7 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
       }
     };
     fetchExercises();
-  }, []);
+  }, [exercise]);
 
   // Cargar peso del usuario desde el perfil
   useEffect(() => {
@@ -110,6 +135,22 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
     return Math.round(met * weightKg * durationHours);
   };
 
+  // Obtener las calorías finales (manuales si existen, sino calculadas)
+  const getFinalCalories = () => {
+    if (manualCalories && manualCalories.trim() !== '') {
+      const parsed = parseFloat(manualCalories);
+      return isNaN(parsed) ? 0 : Math.round(parsed);
+    }
+    return calculateCalories();
+  };
+
+  // Resetear calorías manuales cuando cambian los parámetros de cálculo
+  useEffect(() => {
+    if (customExercise) {
+      setManualCalories('');
+    }
+  }, [duration, weight, customExercise]);
+
   // Actualizar el icono cuando se selecciona un ejercicio
   useEffect(() => {
     if (exerciseName && !customExercise) {
@@ -139,18 +180,29 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
 
     try {
       const durationValue = parseFloat(duration);
-      const caloriesValue = calculateCalories();
+      const caloriesValue = getFinalCalories();
+      
+      if (caloriesValue <= 0) {
+        setError('Por favor ingresa un valor válido de calorías');
+        setIsSubmitting(false);
+        return;
+      }
       
       const payload = {
         name: exerciseName,
         durationMinutes: durationValue,
         caloriesBurned: caloriesValue,
         icon: selectedIcon,
-        date: getTodayDateLocal(),
+        date: date,
       };
 
-      const response = await fetch('/api/exercises/create', {
-        method: 'POST',
+      const url = isEditing 
+        ? `/api/exercises/${exercise.id}`
+        : '/api/exercises/create';
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
@@ -158,21 +210,24 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || data.details || 'Error al registrar ejercicio');
+        throw new Error(data.error || data.details || (isEditing ? 'Error al actualizar ejercicio' : 'Error al registrar ejercicio'));
       }
 
-      // Resetear el formulario después de guardar exitosamente
-      setExerciseName('');
-      setDuration('');
-      setCustomExercise(false);
+      // Resetear el formulario después de guardar exitosamente (solo si no está editando)
+      if (!isEditing) {
+        setExerciseName('');
+        setDuration('');
+        setCustomExercise(false);
+        setManualCalories('');
+      }
       setError('');
 
       if (onSuccess) {
         onSuccess();
       }
     } catch (error: any) {
-      console.error('Error al registrar ejercicio:', error);
-      setError(error.message || 'Error al registrar ejercicio');
+      console.error(isEditing ? 'Error al actualizar ejercicio:' : 'Error al registrar ejercicio:', error);
+      setError(error.message || (isEditing ? 'Error al actualizar ejercicio' : 'Error al registrar ejercicio'));
     } finally {
       setIsSubmitting(false);
     }
@@ -196,7 +251,11 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
             value={exerciseName}
             onChange={(e) => {
               setExerciseName(e.target.value);
-              setCustomExercise(e.target.value === 'custom');
+              const isCustom = e.target.value === 'custom';
+              setCustomExercise(isCustom);
+              if (!isCustom) {
+                setManualCalories('');
+              }
             }}
             className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] pr-10 text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none appearance-none transition-all"
             required
@@ -216,19 +275,21 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
       </div>
 
       {customExercise && (
-        <div>
-          <label className="block text-[#131917] text-[14px] font-medium mb-2">
-            Nombre del ejercicio personalizado
-          </label>
-          <input
-            type="text"
-            placeholder="Ej: CrossFit, HIIT, etc."
-            value={exerciseName}
-            onChange={(e) => setExerciseName(e.target.value)}
-            className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
-            required
-          />
-        </div>
+        <>
+          <div>
+            <label className="block text-[#131917] text-[14px] font-medium mb-2">
+              Nombre del ejercicio personalizado
+            </label>
+            <input
+              type="text"
+              placeholder="Ej: CrossFit, HIIT, etc."
+              value={exerciseName}
+              onChange={(e) => setExerciseName(e.target.value)}
+              className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] placeholder-[#D9D9D9] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
+              required
+            />
+          </div>
+        </>
       )}
 
       {/* Selección de Icono */}
@@ -305,14 +366,56 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
         </div>
       </div>
 
-      {/* Calculated Calories Preview */}
+      {/* Calorías - Campo editable para ejercicios custom o cuando se está editando, preview para ejercicios normales */}
       {duration && parseFloat(duration) > 0 && (
-        <div className="bg-[#E5C438]/20 border-2 border-[#E5C438] rounded-[15px] p-4">
-          <p className="text-[#131917] text-sm font-medium mb-1 flex items-center gap-2">
-            <Fire size={18} weight="bold" className="text-[#DC3714]" />
-            Calorías quemadas (estimadas):
-          </p>
-          <p className="text-[#131917] text-2xl font-bold">{calculateCalories()} kcal</p>
+        <>
+          {(customExercise || isEditing) ? (
+            <div>
+              <label className="block text-[#131917] text-[14px] font-medium mb-2">
+                Calorías quemadas
+              </label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#5A5B5A]">
+                  <Fire size={20} weight="bold" />
+                </div>
+                <input
+                  type="number"
+                  value={manualCalories || calculateCalories()}
+                  onChange={(e) => setManualCalories(e.target.value)}
+                  min="0"
+                  className="w-full bg-white rounded-[15px] border-2 border-transparent pl-[50px] pr-4 py-[10px] text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
+                />
+              </div>
+              <p className="text-[#5A5B5A] text-xs mt-1">
+                Calculado automáticamente: {calculateCalories()} kcal (puedes modificarlo)
+              </p>
+            </div>
+          ) : (
+            <div className="bg-[#E5C438]/20 border-2 border-[#E5C438] rounded-[15px] p-4">
+              <p className="text-[#131917] text-sm font-medium mb-1 flex items-center gap-2">
+                <Fire size={18} weight="bold" className="text-[#DC3714]" />
+                Calorías quemadas (estimadas):
+              </p>
+              <p className="text-[#131917] text-2xl font-bold">{calculateCalories()} kcal</p>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Campo de Fecha - Solo visible al editar */}
+      {isEditing && (
+        <div>
+          <label className="block text-[#131917] text-[14px] font-medium mb-2">
+            Fecha
+          </label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+            max={getTodayDateLocal()}
+            className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
+          />
         </div>
       )}
 
@@ -330,17 +433,17 @@ export function ExerciseForm({ onSuccess, onCancel }: { onSuccess?: () => void; 
         )}
         <button
           type="submit"
-          disabled={isSubmitting || !exerciseName || !duration}
+          disabled={isSubmitting || !exerciseName || !duration || (customExercise && getFinalCalories() <= 0)}
           className="flex-1 bg-[#E5C438] rounded-[15px] px-4 py-[10px] text-[#131917] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>
-              <span>Guardando...</span>
+              <span>{isEditing ? 'Actualizando...' : 'Guardando...'}</span>
             </>
           ) : (
             <>
               <Fire size={20} weight="bold" />
-              <span>Guardar</span>
+              <span>{isEditing ? 'Actualizar' : 'Guardar'}</span>
             </>
           )}
         </button>

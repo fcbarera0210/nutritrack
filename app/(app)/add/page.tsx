@@ -288,7 +288,7 @@ export default function AddPage() {
     <div className="min-h-screen bg-[#D9D9D9] pb-24">
       {/* Header oscuro con botón volver, título y descripción */}
       <div className="bg-[#131917] rounded-b-[60px]">
-        <div className="px-25 pt-[25px] pb-6">
+        <div className="px-25 pt-[24px] pb-6">
           <div className="flex items-center gap-3">
             <Link href="/dashboard">
               <button className="w-12 h-12 rounded-full bg-[#404040] flex items-center justify-center text-white hover:opacity-90 transition-colors flex-shrink-0">

@@ -16,6 +16,13 @@ interface FoodLogFormProps {
     servingSize?: number;
     servingUnit?: string;
   };
+  foodLog?: {
+    id: number;
+    quantity: number;
+    servingSize: number;
+    mealType: string;
+    date: string;
+  };
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -27,11 +34,21 @@ const MEAL_TYPES = [
   { value: 'snack', label: 'Snack' },
 ];
 
-export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
+export function FoodLogForm({ food, foodLog, onSuccess, onCancel }: FoodLogFormProps) {
+  const isEditing = !!foodLog;
   const servingSize = food.servingSize || 100;
   const servingUnit = food.servingUnit || 'g';
-  const [quantity, setQuantity] = useState(servingSize.toString());
-  const [mealType, setMealType] = useState('breakfast');
+  
+  // Si está editando, usar los valores del foodLog, sino usar valores por defecto
+  const initialQuantity = foodLog 
+    ? (foodLog.quantity * (foodLog.servingSize || servingSize)).toString()
+    : servingSize.toString();
+  const initialMealType = foodLog?.mealType || 'breakfast';
+  const initialDate = foodLog?.date || getTodayDateLocal();
+  
+  const [quantity, setQuantity] = useState(initialQuantity);
+  const [mealType, setMealType] = useState(initialMealType);
+  const [date, setDate] = useState(initialDate);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -41,29 +58,39 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/logs/create', {
-        method: 'POST',
+      const quantityValue = parseFloat(quantity) / servingSize; // Cantidad como múltiplo del tamaño de porción
+      
+      const payload = {
+        quantity: quantityValue,
+        servingSize: servingSize,
+        mealType,
+        date: date,
+      };
+
+      const url = isEditing ? '/api/logs/update' : '/api/logs/create';
+      const method = isEditing ? 'PUT' : 'POST';
+      
+      const body = isEditing 
+        ? { id: foodLog.id, ...payload }
+        : { foodId: food.id, ...payload };
+
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          foodId: food.id,
-          quantity: parseFloat(quantity) / servingSize, // Cantidad como múltiplo del tamaño de porción
-          servingSize: servingSize,
-          mealType,
-          date: getTodayDateLocal(),
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al registrar alimento');
+        throw new Error(data.error || (isEditing ? 'Error al actualizar alimento' : 'Error al registrar alimento'));
       }
 
       if (onSuccess) {
         onSuccess();
       }
     } catch (error: any) {
-      setError(error.message || 'Error al registrar alimento');
+      setError(error.message || (isEditing ? 'Error al actualizar alimento' : 'Error al registrar alimento'));
     } finally {
       setIsSubmitting(false);
     }
@@ -127,6 +154,21 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
           </div>
         </div>
 
+        {/* Campo de Fecha */}
+        <div>
+          <label className="block text-[#131917] text-[14px] font-medium mb-2">
+            Fecha
+          </label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+            max={getTodayDateLocal()}
+            className="w-full bg-white rounded-[15px] border-2 border-transparent px-4 py-[10px] text-[#131917] text-[16px] font-semibold focus:outline-none focus:border-[#3CCC1F] focus:shadow-none transition-all"
+          />
+        </div>
+
         {/* Valores Calculados - Fondo oscuro y horizontal */}
         <div className="bg-[#131917] rounded-[15px] p-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -165,7 +207,7 @@ export function FoodLogForm({ food, onSuccess, onCancel }: FoodLogFormProps) {
             disabled={isSubmitting}
             className="flex-1 bg-[#3CCC1F] text-[#131917] rounded-[15px] px-4 py-[10px] font-semibold text-[16px] hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {isSubmitting ? 'Agregando...' : 'Agregar'}
+            {isSubmitting ? (isEditing ? 'Actualizando...' : 'Agregando...') : (isEditing ? 'Actualizar' : 'Agregar')}
           </button>
         </div>
       </form>

@@ -3,8 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { foodLogs, foods, exercises, userStreaks, userProfiles, waterLogs, users } from '@/lib/db/schema';
 import { eq, and, sql, gte } from 'drizzle-orm';
-import { getTodayDateLocal, formatDateLocal } from '@/lib/utils/date';
-import { format } from 'date-fns';
+import { getTodayDateLocal, formatDateLocal, formatTimeLocal } from '@/lib/utils/date';
 
 export async function GET(req: Request) {
   try {
@@ -47,9 +46,11 @@ export async function GET(req: Request) {
     const todayLogs = await db
       .select({
         id: foodLogs.id,
+        foodId: foodLogs.foodId,
         quantity: foodLogs.quantity,
         servingSize: foodLogs.servingSize,
         mealType: foodLogs.mealType,
+        date: foodLogs.date,
         name: foods.name,
         calories: foods.calories,
         protein: foods.protein,
@@ -232,7 +233,7 @@ export async function GET(req: Request) {
     const waterEntries = todayWaterLogs.map(log => ({
       id: log.id,
       amount: log.amount,
-      time: format(new Date(log.createdAt), 'HH:mm'),
+      time: formatTimeLocal(log.createdAt),
     }));
 
     // Get user name

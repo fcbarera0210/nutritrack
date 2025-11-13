@@ -45,7 +45,7 @@ export function Header({ userName }: HeaderProps) {
   };
 
   return (
-    <header className="flex items-center justify-between bg-[#131917] text-white rounded-b-[30px] pt-[25px]">
+    <header className="flex items-center justify-between bg-[#131917] text-white rounded-b-[30px] pt-[24px]">
       {/* User Avatar with Initials */}
       <Link href="/profile">
         <button className="w-12 h-12 rounded-full bg-[#404040] flex items-center justify-center text-white hover:opacity-90 transition-colors">
