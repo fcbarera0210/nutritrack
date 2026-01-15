@@ -11,6 +11,7 @@ import { BottomNav } from '@/components/dashboard/BottomNav';
 import { calculateTDEE, calculateMacros } from '@/lib/utils/calories';
 import { APP_VERSION } from '@/lib/constants';
 import { useModal } from '@/contexts/ModalContext';
+import { CharlideasCredit } from '@/components/ui/CharlideasCredit';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -821,16 +822,19 @@ export default function ProfilePage() {
                 </button>
                 
                 {/* Versión con logo */}
-                <div className="flex items-center justify-center gap-2 pt-2">
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex flex-col gap-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#3CCC1F]" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#E5C438]" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#DC3714]" />
+                <div className="flex flex-col items-center gap-2 pt-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#3CCC1F]" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#E5C438]" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#DC3714]" />
+                      </div>
+                      <h2 className="text-[#5A5B5A] font-bold text-[14px] leading-tight">NutriTrack</h2>
                     </div>
-                    <h2 className="text-[#5A5B5A] font-bold text-[14px] leading-tight">NutriTrack</h2>
+                    <p className="text-[#5A5B5A] text-[12px]">v{APP_VERSION}</p>
                   </div>
-                  <p className="text-[#5A5B5A] text-[12px]">v{APP_VERSION}</p>
+                  <CharlideasCredit />
                 </div>
               </div>
             </>

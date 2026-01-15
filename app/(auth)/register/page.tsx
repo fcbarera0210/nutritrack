@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { At, Key, Eye, EyeClosed, User } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { APP_VERSION } from '@/lib/constants';
+import { CharlideasCredit } from '@/components/ui/CharlideasCredit';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -69,9 +70,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#D9D9D9] flex flex-col">
+    <div className="min-h-screen bg-[#D9D9D9] flex flex-col overflow-hidden">
       {/* Header oscuro con logo */}
-      <div className="bg-[#131917] rounded-b-[60px] py-[35px] px-[50px] flex flex-col items-center">
+      <div className="bg-[#131917] rounded-b-[60px] py-[35px] px-[50px] flex flex-col items-center flex-shrink-0">
         {/* Logo: 3 puntos verticales con título */}
         <div className="flex items-center gap-3 mb-3">
           <div className="flex flex-col gap-1">
@@ -89,7 +90,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Contenido principal */}
-      <div className="flex-1 px-[25px] pt-[40px] pb-[20px] flex flex-col">
+      <div className="flex-1 px-[25px] pt-[40px] pb-[20px] flex flex-col min-h-0 overflow-y-auto">
         {/* Título */}
         <h2 className="text-[#131917] font-semibold text-[36px] text-center mb-5">
           Crear Cuenta
@@ -220,9 +221,10 @@ export default function RegisterPage() {
           </div>
         </form>
 
-        {/* Footer versión */}
-        <div className="text-center mt-auto pt-6">
+        {/* Footer versión y crédito */}
+        <div className="text-center mt-auto pt-4 space-y-1 flex-shrink-0">
           <p className="text-[#5A5B5A] text-[12px]">v{APP_VERSION}</p>
+          <CharlideasCredit />
         </div>
       </div>
     </div>

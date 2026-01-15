@@ -13,12 +13,35 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://nutritrack.app'),
   title: "NutriTrack - Registro de Alimentos",
   description: "Aplica para el registro diario de consumo de alimentos y seguimiento nutricional",
   manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
+    ],
+    shortcut: "/icon.svg",
     apple: "/icons/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "NutriTrack - Registro de Alimentos",
+    description: "Aplica para el registro diario de consumo de alimentos y seguimiento nutricional",
+    type: "website",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "NutriTrack - Registro de Alimentos",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NutriTrack - Registro de Alimentos",
+    description: "Aplica para el registro diario de consumo de alimentos y seguimiento nutricional",
+    images: ["/twitter-image.png"],
   },
 };
 
@@ -38,6 +61,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
